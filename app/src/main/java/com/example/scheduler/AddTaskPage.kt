@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.sharp.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,25 +39,26 @@ import com.example.scheduler.values.PaddingCustomValues.internalSpacing
 @Composable
 @Preview(showBackground = true)
 fun AddTaskScreen() {
-    val scrollState = remember { ScrollState(0) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(20.dp)
-            .verticalScroll(scrollState),
+            .padding(bottom = 20.dp, start = 20.dp, end = 20.dp)
+            .verticalScroll(remember { ScrollState(0) }),
         verticalArrangement = Arrangement.spacedBy(internalSpacing, Alignment.CenterVertically),
     ) {
         Text(
             text = "Add Task",
-            fontSize = 30.sp,
+            fontSize = 36.sp,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(externalSpacing)
         )
-        TitleAndDescription()
+        TitleAndDescription(modifier = Modifier.height(1000.dp))
         StartTimePicker()
         StartDatePicker()
         RepeatSchedule()
+        DelayTaskTime()
+        DelayTaskDay()
         Button(
             onClick = { /*TODO*/ }, modifier = Modifier.align(Alignment.End)
         ) { Text(text = "Add Task") }
@@ -78,14 +78,14 @@ fun TitleAndDescription(modifier: Modifier = Modifier) {
             OutlinedTextField(
                 value = title.value,
                 onValueChange = { title.value = it },
-                label = { Text(text = "Title...") },
+                label = { Text(text = "Title") },
                 modifier = Modifier.fillMaxWidth()
             )
             val description = rememberSaveable { mutableStateOf("") }
             OutlinedTextField(
                 value = description.value,
                 onValueChange = { description.value = it },
-                label = { Text(text = "Description...") },
+                label = { Text(text = "Description") },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -95,33 +95,16 @@ fun TitleAndDescription(modifier: Modifier = Modifier) {
 @Composable
 @Preview
 fun RepeatSchedule(modifier: Modifier = Modifier) {
-    val repeatNumber = remember {
-        mutableStateOf(1)
-    }
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Days to repeat after",
+                text = "Repeat in",
                 fontSize = FontSizeCustomValues.medium,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = externalSpacing)
+                    .padding(externalSpacing)
             )
-            IconButton(onClick = {
-                if (repeatNumber.value > 0) {
-                    repeatNumber.value--
-                }
-            }) {
-                Icon(imageVector = Icons.Sharp.Warning, contentDescription = null)
-            }
-            Text(
-                text = repeatNumber.value.toString(),
-                fontSize = FontSizeCustomValues.medium,
-                textAlign = TextAlign.Center
-            )
-            IconButton(onClick = { repeatNumber.value++ }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = null)
-            }
+            SelectNumberRange("day")
         }
     }
 }
@@ -130,26 +113,26 @@ fun RepeatSchedule(modifier: Modifier = Modifier) {
 @Preview
 fun StartTimePicker(modifier: Modifier = Modifier) {
     val calendar = Calendar.getInstance()
-    val hour = calendar[Calendar.HOUR_OF_DAY]
-    val minute = calendar[Calendar.MINUTE]
-    val time = remember { mutableStateOf(getTimeAsText(hour, minute)) }
+    val hour = remember { mutableStateOf(calendar[Calendar.HOUR_OF_DAY]) }
+    val minute = remember { mutableStateOf(calendar[Calendar.MINUTE]) }
     val timerDialog = TimePickerDialog(
-        LocalContext.current, { _, mHour: Int, mMinute: Int ->
-            time.value = getTimeAsText(mHour, mMinute)
-        }, hour, minute, false
+        LocalContext.current, { _, h: Int, m: Int ->
+            hour.value = h
+            minute.value = m
+        }, hour.value, minute.value, false
     )
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "Select time for reminder",
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = externalSpacing)
+                    .padding(externalSpacing)
                     .weight(1f),
                 fontSize = FontSizeCustomValues.medium
             )
             Text(
-                text = time.value, fontSize = FontSizeCustomValues.medium
+                text = getTimeAsText(hour.value, minute.value),
+                fontSize = FontSizeCustomValues.medium
             )
             IconButton(onClick = { timerDialog.show() }) {
                 Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
@@ -161,26 +144,35 @@ fun StartTimePicker(modifier: Modifier = Modifier) {
 @Composable
 @Preview
 fun StartDatePicker(modifier: Modifier = Modifier) {
-    val date = remember {
-        mutableStateOf("--1/1/1--")
-    }
+    val instance = Calendar.getInstance()
+
+    val day = remember { mutableStateOf(instance[Calendar.DAY_OF_MONTH]) }
+    val month = remember { mutableStateOf(instance[Calendar.MONTH]) }
+    val year = remember { mutableStateOf(instance[Calendar.YEAR]) }
+
     val datePickerDialog = DatePickerDialog(
         LocalContext.current, { _: DatePicker, y: Int, m: Int, d: Int ->
-            date.value = getDateAsText(y, m, d)
-        }, 2022, 1, 1
+            year.value = y
+            month.value = m
+            day.value = d
+        },
+        year.value,
+        month.value,
+        day.value
     )
+
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Initial Date",
+                text = "Select date for Task",
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = externalSpacing)
+                    .padding(externalSpacing)
                     .weight(1f),
                 fontSize = FontSizeCustomValues.medium
             )
             Text(
-                text = date.value, fontSize = FontSizeCustomValues.medium
+                text = getDateAsText(year.value, month.value, day.value),
+                fontSize = FontSizeCustomValues.medium
             )
             IconButton(onClick = { datePickerDialog.show() }) {
                 Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
@@ -189,11 +181,69 @@ fun StartDatePicker(modifier: Modifier = Modifier) {
     }
 }
 
-fun getTimeAsText(hour: Int, minute: Int): String {
-    return "${if (hour < 10) "0$hour" else hour.toString()}:${if (minute < 10) "0$minute" else minute.toString()}"
+@Composable
+@Preview
+fun DelayTaskTime(modifier: Modifier = Modifier) {
+    Card(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Time allowed to delay",
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(externalSpacing),
+                fontSize = FontSizeCustomValues.medium
+            )
+            SelectNumberRange("min")
+        }
+    }
 }
 
-fun getDateAsText(y: Int, m: Int, d: Int): String {
+@Composable
+@Preview
+fun DelayTaskDay(modifier: Modifier = Modifier) {
+    Card(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Time allowed to Postpone",
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(externalSpacing),
+                fontSize = FontSizeCustomValues.medium
+            )
+            SelectNumberRange("day")
+        }
+    }
+}
+
+@Composable
+fun SelectNumberRange(unit: String) {
+    val value = remember { mutableStateOf(1) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = { if (value.value > 0) value.value-- }) {
+            Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+        }
+        Text(
+            text = "${value.value} $unit${if (value.value > 1) "s" else ""}",
+            fontSize = FontSizeCustomValues.medium
+        )
+        IconButton(onClick = { value.value++ }) {
+            Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RangePreview() {
+    SelectNumberRange(unit = "min")
+}
+
+private fun getTimeAsText(hour: Int, minute: Int): String {
+    val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
+    return "${if (hour > 12) (hour - 12).toString() else hour.toString()}:${t(minute)} ${if (hour > 12) "PM" else "AM"}"
+}
+
+private fun getDateAsText(y: Int, m: Int, d: Int): String {
     val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
     return "${t(d)}/${t(m)}/${t(y)}"
 }
