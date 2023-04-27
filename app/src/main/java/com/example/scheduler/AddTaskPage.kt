@@ -53,7 +53,7 @@ fun AddTaskScreen() {
                 .align(Alignment.CenterHorizontally)
                 .padding(externalSpacing)
         )
-        TitleAndDescription(modifier = Modifier.height(1000.dp))
+        TitleAndDescription()
         StartTimePicker()
         StartDatePicker()
         RepeatSchedule()
