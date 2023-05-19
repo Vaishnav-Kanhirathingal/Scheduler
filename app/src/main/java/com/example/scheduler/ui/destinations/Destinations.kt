@@ -15,7 +15,7 @@ object AddTaskScreen : Destinations {
     override val displayName = "Add New Task"
 }
 
-object DetailsScreen:Destinations{
+object DetailsScreen : Destinations {
     override val route = "DetailsScreen"
     override val displayName = "Task Details"
 }

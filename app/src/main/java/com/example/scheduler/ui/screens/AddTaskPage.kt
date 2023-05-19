@@ -63,9 +63,11 @@ fun AddTaskScreen() {
         Button(
             onClick = { /*TODO*/ }, modifier = Modifier.align(Alignment.End)
         ) { Text(text = "Add Task") }
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(20.dp))
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp)
+        )
     }
 }
 
