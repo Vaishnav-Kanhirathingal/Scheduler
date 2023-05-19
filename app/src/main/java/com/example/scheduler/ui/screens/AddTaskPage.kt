@@ -8,7 +8,9 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -41,7 +43,7 @@ fun AddTaskScreen() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 20.dp, start = 20.dp, end = 20.dp)
+            .padding(horizontal = 20.dp)
             .verticalScroll(remember { ScrollState(0) }),
         verticalArrangement = Arrangement.spacedBy(internalSpacing, Alignment.CenterVertically),
     ) {
@@ -61,6 +63,9 @@ fun AddTaskScreen() {
         Button(
             onClick = { /*TODO*/ }, modifier = Modifier.align(Alignment.End)
         ) { Text(text = "Add Task") }
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .height(20.dp))
     }
 }
 
