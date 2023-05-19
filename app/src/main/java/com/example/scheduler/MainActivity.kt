@@ -24,28 +24,16 @@ import com.example.scheduler.ui.destinations.MainScreen
 import com.example.scheduler.ui.screens.AddTaskScreen
 import com.example.scheduler.ui.screens.MainScreen
 import com.example.scheduler.ui.theme.SchedulerTheme
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
-    lateinit var oneTapClient: SignInClient
-    //= Identity.getSignInClient(this)
-
     private val TAG = this::class.java.simpleName
-    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = Firebase.auth
         setContent {
             SchedulerTheme {
                 Surface(
@@ -61,33 +49,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        oneTapClient = Identity.getSignInClient(this)
-//        signInGoogle()
     }
 
-    private fun signInGoogle() {
-        // TODO: fix this
-        val signInRequest =
-            BeginSignInRequest.builder()
-                .setGoogleIdTokenRequestOptions(
-                    BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                        .setSupported(true)
-                        .setServerClientId(getString(R.string.client_id))
-                        .setFilterByAuthorizedAccounts(true)
-                        .build()
-                )
-                .build()
-        oneTapClient.beginSignIn(signInRequest).addOnSuccessListener {
-            Log.d(TAG, "signed in successfully")
-        }.addOnFailureListener {
-            // TODO: show login error
-            it.printStackTrace()
-        }
-    }
-    
     @Composable
     fun DisplaySignUpScreen() {
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .requestIdToken(getString(R.string.client_id))
@@ -95,22 +60,28 @@ class MainActivity : ComponentActivity() {
             .requestProfile()
             .build()
         val client = GoogleSignIn.getClient(this, gso)
-
         val startForResult =
-            rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val intent = result.data
-                    if (result.data != null) {
-                        val task: Task<GoogleSignInAccount> =
-                            GoogleSignIn.getSignedInAccountFromIntent(intent)
-                        task.addOnSuccessListener {
-                            Log.d("TAG", "success")
-                        }.addOnFailureListener {
-                            it.printStackTrace()
+            rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult(),
+                onResult = { result: ActivityResult ->
+                    if (result.resultCode == Activity.RESULT_OK) {
+                        val intent = result.data
+                        if (result.data != null) {
+                            val task: Task<GoogleSignInAccount> =
+                                GoogleSignIn.getSignedInAccountFromIntent(intent)
+                            task.addOnSuccessListener {
+                                Log.d("TAG", "success")
+                            }.addOnFailureListener {
+                                it.printStackTrace()
+                            }
+                        }else{
+                            Log.d(TAG,"else section 2")
                         }
+                    }else{
+                        Log.d(TAG,"else section 1 result.resultCode = ${result.resultCode}")
                     }
                 }
-            }
+            )
         Button(
             onClick = { startForResult.launch(client.signInIntent) },
             content = { Text(text = "sign in") }
@@ -128,11 +99,7 @@ fun SchedulerNavHost(navController: NavHostController, modifier: Modifier) {
         modifier = modifier,
         builder = {
             composable(route = MainScreen.route) {
-                MainScreen(
-                    toAddTaskScreen = {
-                        navController.navigate(AddTaskScreen.route)
-                    }
-                )
+                MainScreen(toAddTaskScreen = { navController.navigate(AddTaskScreen.route) })
             }
             composable(route = AddTaskScreen.route) {
                 // TODO: navigate up after adding the new task
