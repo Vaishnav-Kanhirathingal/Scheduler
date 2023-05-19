@@ -26,14 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.scheduler.values.PaddingCustomValues
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(heightDp = 800)
-fun MainScreen() {
+fun MainScreen(toAddTaskScreen: () -> Unit) {
     val lazyListState = rememberLazyListState()
     val showFullText = remember { mutableStateOf(true) }
     LaunchedEffect(lazyListState) {
@@ -41,7 +39,7 @@ fun MainScreen() {
             .collect { showFullText.value = (it == 0) }
     }
     Scaffold(
-        floatingActionButton = { AddTaskFAB(showFullText = showFullText.value) },
+        floatingActionButton = { AddTaskFAB(showFullText = showFullText.value, toAddTaskScreen) },
         content = {
             ListOfTasks(
                 padding = it,
@@ -52,10 +50,11 @@ fun MainScreen() {
 }
 
 @Composable
-fun AddTaskFAB(showFullText: Boolean) {
+fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
     FloatingActionButton(
         onClick = {
             // TODO: move to add tasks page
+            toAddTaskScreen()
         },
         shape = CircleShape,
         content = {
