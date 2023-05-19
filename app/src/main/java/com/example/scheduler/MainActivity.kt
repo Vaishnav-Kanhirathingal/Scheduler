@@ -48,50 +48,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    DisplaySignUpScreen()
+//                    DisplaySignUpScreen()
+                    composableLogin()
                 }
-            }
-        }
-    }
-
-    @Composable
-    fun DisplaySignUpScreen() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .build()
-        val client = GoogleSignIn.getClient(this, gso)
-        Button(
-            onClick = {
-//                googleSignInActivity.launch(client.signInIntent)
-                signUp()
-            },
-            content = { Text(text = "sign in") }
-        )
-
-    }
-
-
-    //----------------------------------------------------------------------------------------------
-    fun signUp() {
-
-        val googleSignInOptions = GoogleSignInOptions
-            .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        val googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
-        val intent = googleSignInClient.signInIntent
-        startActivityForResult(intent, code)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == code) {
-            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
-            task.addOnSuccessListener {
-                firebaseAuthenticate(it.idToken)
-            }.addOnFailureListener {
-                it.printStackTrace()
             }
         }
     }
@@ -107,8 +66,6 @@ class MainActivity : ComponentActivity() {
     }
 
     //----------------------compose sign up
-
-
     @Composable
     fun composableLogin() {
         val googleSignInOptions = GoogleSignInOptions
@@ -122,27 +79,18 @@ class MainActivity : ComponentActivity() {
             rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult(),
                 onResult = { result: ActivityResult ->
-                    if (result.resultCode == RESULT_OK) {
-                        val intent = result.data
-                        if (result.data != null) {
-                            val task: Task<GoogleSignInAccount> =
-                                GoogleSignIn.getSignedInAccountFromIntent(intent)
-                            task.addOnSuccessListener {
-                                Log.d("TAG", "success")
-                            }.addOnFailureListener {
-                                it.printStackTrace()
-                            }
-                        } else {
-                            Log.d(TAG, "else section 2")
-                        }
-                    } else {
-                        Log.d(TAG, "else section 1 result.resultCode = ${result.resultCode}")
+                    val task: Task<GoogleSignInAccount> =
+                        GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                    task.addOnSuccessListener {
+                        firebaseAuthenticate(it.idToken)
+                    }.addOnFailureListener {
+                        it.printStackTrace()
                     }
                 }
             )
         Button(
             onClick = { startForResult.launch(googleSignInClient.signInIntent) },
-            content = { Text(text = "sign in") }
+            content = { Text(text = "sign in compose") }
         )
 
     }
