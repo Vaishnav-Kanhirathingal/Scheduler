@@ -5,6 +5,8 @@ import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.widget.DatePicker
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -39,7 +42,12 @@ import com.example.scheduler.values.PaddingCustomValues.internalSpacing
 
 @Composable
 @Preview(showBackground = true)
-fun AddTaskScreen() {
+fun AddTaskScreenPreview() {
+    AddTaskScreen {}
+}
+
+@Composable
+fun AddTaskScreen(onCompletion: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -98,19 +106,68 @@ fun TitleAndDescription(modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun RepeatSchedule(modifier: Modifier = Modifier) {
+    val selected = remember { mutableStateOf(Repetition.SAME_DATE) }
     Card(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "Repeat in",
-                fontSize = FontSizeCustomValues.medium,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(externalSpacing)
-            )
-            SelectNumberRange("day")
+        Column {
+            Row(
+                modifier = modifier
+                    .padding(horizontal = externalSpacing)
+                    .scrollable(ScrollState(0), orientation = Orientation.Horizontal),
+                horizontalArrangement = Arrangement.spacedBy(externalSpacing)
+            ) {
+                // TODO: select units day, week, year
+                FilterChip(
+                    onClick = { selected.value = Repetition.DAY },
+                    label = { Text(text = "Day") },
+                    selected = Repetition.DAY == selected.value
+                )
+                FilterChip(
+                    onClick = { selected.value = Repetition.WEEK },
+                    label = { Text(text = "Week") },
+                    selected = Repetition.WEEK == selected.value
+                )
+                FilterChip(
+                    onClick = { selected.value = Repetition.MONTH },
+                    label = { Text(text = "Month") },
+                    selected = Repetition.MONTH == selected.value
+                )
+                FilterChip(
+                    onClick = { selected.value = Repetition.SAME_DATE },
+                    label = { Text(text = "Date-Wise") },
+                    selected = Repetition.SAME_DATE == selected.value
+                )
+            }
+            if (selected.value == Repetition.SAME_DATE) {
+                // TODO: display the date of month
+                Text(
+                    text = "The given task would be repeated on ---- of every month",
+                    fontSize = FontSizeCustomValues.medium,
+                    modifier = Modifier
+                        .padding(externalSpacing)
+                )
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Repeat in",
+                        fontSize = FontSizeCustomValues.medium,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(externalSpacing)
+                    )
+                    SelectNumberRange(
+                        when (selected.value) {
+                            Repetition.DAY -> "Day"
+                            Repetition.WEEK -> "Week"
+                            Repetition.MONTH -> "Month"
+                            Repetition.SAME_DATE -> "error"
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -222,17 +279,18 @@ fun DelayTaskDay(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SelectNumberRange(unit: String) {
+fun SelectNumberRange(unit: String, rangeMin: Int = 0, rangeMax: Int = 20) {
     val value = remember { mutableStateOf(1) }
+
     Row(verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { if (value.value > 0) value.value-- }) {
+        IconButton(onClick = { if (value.value > rangeMin) value.value-- }) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = null)
         }
         Text(
             text = "${value.value} $unit${if (value.value > 1) "s" else ""}",
             fontSize = FontSizeCustomValues.medium
         )
-        IconButton(onClick = { value.value++ }) {
+        IconButton(onClick = { if (value.value < rangeMax) value.value++ }) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = null)
         }
     }
@@ -252,4 +310,8 @@ private fun getTimeAsText(hour: Int, minute: Int): String {
 private fun getDateAsText(y: Int, m: Int, d: Int): String {
     val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
     return "${t(d)}/${t(m)}/${t(y)}"
+}
+
+enum class Repetition {
+    DAY, WEEK, MONTH, SAME_DATE
 }
