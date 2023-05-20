@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.widget.DatePicker
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -36,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.scheduler.data.Repetition
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues.externalSpacing
 import com.example.scheduler.values.PaddingCustomValues.internalSpacing
@@ -141,7 +143,8 @@ fun RepeatSchedule(modifier: Modifier = Modifier) {
                     selected = Repetition.SAME_DATE == selected.value
                 )
             }
-            if (selected.value == Repetition.SAME_DATE) {
+
+            AnimatedVisibility(visible = selected.value == Repetition.SAME_DATE) {
                 // TODO: display the date of month
                 Text(
                     text = "The given task would be repeated on ---- of every month",
@@ -149,7 +152,9 @@ fun RepeatSchedule(modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .padding(externalSpacing)
                 )
-            } else {
+
+            }
+            AnimatedVisibility(visible = selected.value != Repetition.SAME_DATE) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Repeat in",
@@ -167,6 +172,7 @@ fun RepeatSchedule(modifier: Modifier = Modifier) {
                         }
                     )
                 }
+
             }
         }
     }
@@ -245,7 +251,6 @@ fun StartDatePicker(modifier: Modifier = Modifier) {
 }
 
 @Composable
-@Preview
 fun DelayTaskTime(modifier: Modifier = Modifier) {
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -262,7 +267,6 @@ fun DelayTaskTime(modifier: Modifier = Modifier) {
 }
 
 @Composable
-@Preview
 fun DelayTaskDay(modifier: Modifier = Modifier) {
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -281,7 +285,6 @@ fun DelayTaskDay(modifier: Modifier = Modifier) {
 @Composable
 fun SelectNumberRange(unit: String, rangeMin: Int = 0, rangeMax: Int = 20) {
     val value = remember { mutableStateOf(1) }
-
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = { if (value.value > rangeMin) value.value-- }) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = null)
@@ -296,7 +299,6 @@ fun SelectNumberRange(unit: String, rangeMin: Int = 0, rangeMax: Int = 20) {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 fun RangePreview() {
     SelectNumberRange(unit = "min")
@@ -310,8 +312,4 @@ private fun getTimeAsText(hour: Int, minute: Int): String {
 private fun getDateAsText(y: Int, m: Int, d: Int): String {
     val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
     return "${t(d)}/${t(m)}/${t(y)}"
-}
-
-enum class Repetition {
-    DAY, WEEK, MONTH, SAME_DATE
 }

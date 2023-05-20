@@ -16,3 +16,6 @@ data class Task(
     val delayTime: Int,
     val delayDuration: Int
 )
+enum class Repetition {
+    DAY, WEEK, MONTH, SAME_DATE
+}
