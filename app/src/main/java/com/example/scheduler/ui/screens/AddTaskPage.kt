@@ -12,14 +12,14 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,6 +67,7 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .fillMaxHeight()
             .padding(horizontal = 20.dp)
             .verticalScroll(remember { ScrollState(0) }),
         verticalArrangement = Arrangement.spacedBy(internalSpacing, Alignment.CenterVertically),
@@ -89,8 +90,8 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
                 val task = Task(
                     title = title.value,
                     description = description.value,
-                    timeForReminder = 0,
-                    dateForReminder = 0,
+                    timeForReminder = 0,// TODO: set custom values
+                    dateForReminder = 0,// TODO: set custom values
                     dateWise = dateWise.value,
                     repeatGapDuration = daysDelayed.value,
                     snoozeDuration = snoozeDuration.value,
@@ -98,13 +99,10 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
                 )
                 Log.d(TAG, "gson str = ${Gson().toJson(task)}")
             },
-            modifier = Modifier.align(Alignment.End),
-            content = { Text(text = "Add Task") }
-        )
-        Spacer(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(20.dp)
+                .align(Alignment.End)
+                .padding(bottom = 20.dp),
+            content = { Text(text = "Add Task") }
         )
     }
 }
@@ -124,13 +122,29 @@ fun TitleAndDescription(
                 value = title.value,
                 onValueChange = { title.value = it },
                 label = { Text(text = "Title") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = { title.value = "" },
+                        content = {
+                            Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
+                        }
+                    )
+                }
             )
             OutlinedTextField(
                 value = description.value,
                 onValueChange = { description.value = it },
                 label = { Text(text = "Description") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = { description.value = "" },
+                        content = {
+                            Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
+                        }
+                    )
+                }
             )
         }
     }
@@ -353,7 +367,8 @@ fun DelayTaskDay(modifier: Modifier = Modifier, postponeDuration: MutableState<I
             )
             SelectNumberRange(
                 unit = "day",
-                value = postponeDuration
+                value = postponeDuration,
+                rangeMin = 1
             )
         }
     }
@@ -393,5 +408,5 @@ private fun getTimeAsText(hour: Int, minute: Int): String {
 
 private fun getDateAsText(y: Int, m: Int, d: Int): String {
     val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
-    return "${t(d)}/${t(m)}/${t(y)}"
+    return "${t(d)}/${t(m + 1)}/${t(y)}"
 }
