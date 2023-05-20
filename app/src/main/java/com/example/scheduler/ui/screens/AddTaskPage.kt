@@ -3,6 +3,7 @@ package com.example.scheduler.ui.screens
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
+import android.util.Log
 import android.widget.DatePicker
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ScrollState
@@ -28,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,9 +40,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scheduler.data.Repetition
+import com.example.scheduler.data.Repetitions
+import com.example.scheduler.data.Reps
+import com.example.scheduler.data.Task
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues.externalSpacing
 import com.example.scheduler.values.PaddingCustomValues.internalSpacing
+import com.google.gson.Gson
+
+private const val TAG = "AddTaskPage"
 
 @Composable
 @Preview(showBackground = true)
@@ -50,6 +58,12 @@ fun AddTaskScreenPreview() {
 
 @Composable
 fun AddTaskScreen(onCompletion: () -> Unit) {
+    val title = rememberSaveable { mutableStateOf("") }
+    val description = rememberSaveable { mutableStateOf("") }
+    val dateWise = rememberSaveable { mutableStateOf(false) }
+    val snoozeDuration = rememberSaveable { mutableStateOf(0) }
+    val postponeDuration = rememberSaveable { mutableStateOf(1) }
+    val daysDelayed = rememberSaveable { mutableStateOf(0) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -64,15 +78,29 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
                 .align(Alignment.CenterHorizontally)
                 .padding(externalSpacing)
         )
-        TitleAndDescription()
+        TitleAndDescription(title, description)
         StartTimePicker()
         StartDatePicker()
-        RepeatSchedule()
-        DelayTaskTime()
-        DelayTaskDay()
+        RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed)
+        DelayTaskTime(snoozeDuration = snoozeDuration)
+        DelayTaskDay(postponeDuration = postponeDuration)
         Button(
-            onClick = { /*TODO*/ }, modifier = Modifier.align(Alignment.End)
-        ) { Text(text = "Add Task") }
+            onClick = {
+                val task = Task(
+                    title = title.value,
+                    description = description.value,
+                    timeForReminder = 0,
+                    dateForReminder = 0,
+                    dateWise = dateWise.value,
+                    repeatGapDuration = daysDelayed.value,
+                    snoozeDuration = snoozeDuration.value,
+                    postponeDuration = postponeDuration.value
+                )
+                Log.d(TAG, "gson str = ${Gson().toJson(task)}")
+            },
+            modifier = Modifier.align(Alignment.End),
+            content = { Text(text = "Add Task") }
+        )
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,21 +111,21 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
-fun TitleAndDescription(modifier: Modifier = Modifier) {
+fun TitleAndDescription(
+    title: MutableState<String>,
+    description: MutableState<String>, modifier: Modifier = Modifier
+) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(
             verticalArrangement = Arrangement.spacedBy(externalSpacing),
             modifier = Modifier.padding(externalSpacing)
         ) {
-            val title = rememberSaveable { mutableStateOf("") }
             OutlinedTextField(
                 value = title.value,
                 onValueChange = { title.value = it },
                 label = { Text(text = "Title") },
                 modifier = Modifier.fillMaxWidth()
             )
-            val description = rememberSaveable { mutableStateOf("") }
             OutlinedTextField(
                 value = description.value,
                 onValueChange = { description.value = it },
@@ -108,11 +136,24 @@ fun TitleAndDescription(modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun RepeatSchedule(modifier: Modifier = Modifier) {
-    val selected = remember { mutableStateOf(Repetition.SAME_DATE) }
+fun RepeatSchedulePreview() {
+    RepeatSchedule(
+        dateWise = remember { mutableStateOf(true) },
+        daysDelayed = remember { mutableStateOf(0) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RepeatSchedule(
+    modifier: Modifier = Modifier,
+    dateWise: MutableState<Boolean>,
+    daysDelayed: MutableState<Int>
+) {
+//    val daysDelayed = remember { mutableStateOf(0) }
+    val selected = remember { mutableStateOf(Repetitions.SAME_DATE) }
     Card(modifier = modifier) {
         Column {
             Row(
@@ -121,30 +162,38 @@ fun RepeatSchedule(modifier: Modifier = Modifier) {
                     .scrollable(ScrollState(0), orientation = Orientation.Horizontal),
                 horizontalArrangement = Arrangement.spacedBy(externalSpacing)
             ) {
-                // TODO: select units day, week, year
+                val selector: (Reps) -> Unit = { reps: Reps ->
+                    selected.value = reps
+                    daysDelayed.value = if (reps.step != 0) {
+                        (daysDelayed.value / reps.step) * reps.step
+                    } else {
+                        0
+                    }
+                }
                 FilterChip(
-                    onClick = { selected.value = Repetition.DAY },
+                    onClick = { selector(Repetitions.DAY) },
                     label = { Text(text = "Day") },
-                    selected = Repetition.DAY == selected.value
+                    selected = Repetition.DAY == selected.value.enumValue
                 )
                 FilterChip(
-                    onClick = { selected.value = Repetition.WEEK },
+                    onClick = { selector(Repetitions.WEEK) },
                     label = { Text(text = "Week") },
-                    selected = Repetition.WEEK == selected.value
+                    selected = Repetition.WEEK == selected.value.enumValue
                 )
                 FilterChip(
-                    onClick = { selected.value = Repetition.MONTH },
+                    onClick = { selector(Repetitions.MONTH) },
                     label = { Text(text = "Month") },
-                    selected = Repetition.MONTH == selected.value
+                    selected = Repetition.MONTH == selected.value.enumValue
                 )
                 FilterChip(
-                    onClick = { selected.value = Repetition.SAME_DATE },
+                    onClick = { selector(Repetitions.SAME_DATE) },
                     label = { Text(text = "Date-Wise") },
-                    selected = Repetition.SAME_DATE == selected.value
+                    selected = Repetition.SAME_DATE == selected.value.enumValue
                 )
+                dateWise.value = (selected.value.enumValue == Repetition.SAME_DATE)
             }
 
-            AnimatedVisibility(visible = selected.value == Repetition.SAME_DATE) {
+            AnimatedVisibility(visible = selected.value.enumValue == Repetition.SAME_DATE) {
                 // TODO: display the date of month
                 Text(
                     text = "The given task would be repeated on ---- of every month",
@@ -154,7 +203,7 @@ fun RepeatSchedule(modifier: Modifier = Modifier) {
                 )
 
             }
-            AnimatedVisibility(visible = selected.value != Repetition.SAME_DATE) {
+            AnimatedVisibility(visible = selected.value.enumValue != Repetition.SAME_DATE) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Repeat in",
@@ -163,12 +212,34 @@ fun RepeatSchedule(modifier: Modifier = Modifier) {
                             .weight(1f)
                             .padding(externalSpacing)
                     )
-                    SelectNumberRange(
-                        when (selected.value) {
-                            Repetition.DAY -> "Day"
-                            Repetition.WEEK -> "Week"
-                            Repetition.MONTH -> "Month"
-                            Repetition.SAME_DATE -> "error"
+                    IconButton(
+                        onClick = {
+                            if (daysDelayed.value >= selected.value.step) {
+                                daysDelayed.value -= selected.value.step
+                            }
+                        },
+                        content = {
+                            Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+                        }
+                    )
+                    Text(
+                        text = "${
+                            if (selected.value.step != 0) {
+                                daysDelayed.value / selected.value.step
+                            } else {
+                                "0"
+                            }
+                        } ${selected.value.timeUnit}${if (daysDelayed.value > 1) "s" else ""}",
+                        fontSize = FontSizeCustomValues.medium
+                    )
+                    IconButton(
+                        onClick = {
+                            if (daysDelayed.value < 1000) {
+                                daysDelayed.value += selected.value.step
+                            }
+                        },
+                        content = {
+                            Icon(imageVector = Icons.Filled.Add, contentDescription = null)
                         }
                     )
                 }
@@ -251,40 +322,50 @@ fun StartDatePicker(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun DelayTaskTime(modifier: Modifier = Modifier) {
+fun DelayTaskTime(modifier: Modifier = Modifier, snoozeDuration: MutableState<Int>) {
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Time allowed to delay",
+                text = "Snooze Duration",
                 modifier = Modifier
                     .weight(1f)
                     .padding(externalSpacing),
                 fontSize = FontSizeCustomValues.medium
             )
-            SelectNumberRange("min")
+            SelectNumberRange(
+                unit = "min",
+                value = snoozeDuration
+            )
         }
     }
 }
 
 @Composable
-fun DelayTaskDay(modifier: Modifier = Modifier) {
+fun DelayTaskDay(modifier: Modifier = Modifier, postponeDuration: MutableState<Int>) {
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Time allowed to Postpone",
+                text = "Days Allowed To Postpone",
                 modifier = Modifier
                     .weight(1f)
                     .padding(externalSpacing),
                 fontSize = FontSizeCustomValues.medium
             )
-            SelectNumberRange("day")
+            SelectNumberRange(
+                unit = "day",
+                value = postponeDuration
+            )
         }
     }
 }
 
 @Composable
-fun SelectNumberRange(unit: String, rangeMin: Int = 0, rangeMax: Int = 20) {
-    val value = remember { mutableStateOf(1) }
+fun SelectNumberRange(
+    unit: String,
+    rangeMin: Int = 0,
+    rangeMax: Int = 20,
+    value: MutableState<Int>
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = { if (value.value > rangeMin) value.value-- }) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = null)
@@ -300,8 +381,9 @@ fun SelectNumberRange(unit: String, rangeMin: Int = 0, rangeMax: Int = 20) {
 }
 
 @Composable
+@Preview(showBackground = true)
 fun RangePreview() {
-    SelectNumberRange(unit = "min")
+    SelectNumberRange(unit = "min", value = remember { mutableStateOf(1) })
 }
 
 private fun getTimeAsText(hour: Int, minute: Int): String {
