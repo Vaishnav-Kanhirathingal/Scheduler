@@ -1,6 +1,6 @@
 package com.example.scheduler.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,12 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,16 +21,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.scheduler.values.PaddingCustomValues
 
+@Composable
+@Preview
+fun MainScreenPreview() {
+    MainScreen(toAddTaskScreen = { /*TODO*/ }) {}
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(toAddTaskScreen: () -> Unit) {
+fun MainScreen(toAddTaskScreen: () -> Unit, googleSignInButton: @Composable () -> Unit) {
     val lazyListState = rememberLazyListState()
     val showFullText = remember { mutableStateOf(true) }
     LaunchedEffect(lazyListState) {
@@ -39,7 +44,17 @@ fun MainScreen(toAddTaskScreen: () -> Unit) {
             .collect { showFullText.value = (it == 0) }
     }
     Scaffold(
-        floatingActionButton = { AddTaskFAB(showFullText = showFullText.value, toAddTaskScreen) },
+        topBar = {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                googleSignInButton()
+            }
+        },
+        floatingActionButton = {
+            AddTaskFAB(
+                showFullText = showFullText.value,
+                toAddTaskScreen
+            )
+        },
         content = {
             ListOfTasks(
                 padding = it,
@@ -51,31 +66,22 @@ fun MainScreen(toAddTaskScreen: () -> Unit) {
 
 @Composable
 fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
-    FloatingActionButton(
+    ExtendedFloatingActionButton(
         onClick = {
-            // TODO: move to add tasks page
+            // TODO: move to "add tasks" page
             toAddTaskScreen()
         },
-        shape = CircleShape,
-        content = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(PaddingCustomValues.externalSpacing)
-            ) {
-                AnimatedVisibility(
-                    visible = showFullText,
-                    modifier = Modifier.padding(start = PaddingCustomValues.externalSpacing),
-                ) {
-                    Text(text = "Add Task")
-                }
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null,
-                    tint = Color.Blue
-                )
-            }
-        }
+        icon = {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = null,
+                tint = Color.Blue
+            )
+        },
+        text = { Text(text = "Add Task") },
+        expanded = showFullText,
     )
+
 }
 
 @Composable
