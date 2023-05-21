@@ -7,8 +7,7 @@ import android.util.Log
 import android.widget.DatePicker
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,14 +38,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.scheduler.data.Date
 import com.example.scheduler.data.Repetition
 import com.example.scheduler.data.Repetitions
 import com.example.scheduler.data.Reps
 import com.example.scheduler.data.Task
+import com.example.scheduler.data.Time
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues.externalSpacing
 import com.example.scheduler.values.PaddingCustomValues.internalSpacing
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 
 private const val TAG = "AddTaskPage"
 
@@ -64,6 +65,17 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
     val snoozeDuration = rememberSaveable { mutableStateOf(0) }
     val postponeDuration = rememberSaveable { mutableStateOf(1) }
     val daysDelayed = rememberSaveable { mutableStateOf(0) }
+
+    val calenderInstance = Calendar.getInstance()
+
+    val hour = rememberSaveable { mutableStateOf(calenderInstance[Calendar.HOUR_OF_DAY]) }
+    val minute = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MINUTE]) }
+
+    val day = rememberSaveable { mutableStateOf(calenderInstance[Calendar.DAY_OF_MONTH]) }
+    val month = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MONTH]) }
+    val year = rememberSaveable { mutableStateOf(calenderInstance[Calendar.YEAR]) }
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -80,9 +92,9 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
                 .padding(externalSpacing)
         )
         TitleAndDescription(title, description)
-        StartTimePicker()
-        StartDatePicker()
-        RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed)
+        StartTimePicker(hour = hour, minute = minute)
+        StartDatePicker(day = day, month = month, year = year)
+        RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed, date = day)
         DelayTaskTime(snoozeDuration = snoozeDuration)
         DelayTaskDay(postponeDuration = postponeDuration)
         Button(
@@ -90,14 +102,21 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
                 val task = Task(
                     title = title.value,
                     description = description.value,
-                    timeForReminder = 0,// TODO: set custom values
-                    dateForReminder = 0,// TODO: set custom values
+                    timeForReminder = Time(
+                        hour = hour.value,
+                        minute = minute.value
+                    ),
+                    dateForReminder = Date(
+                        dayOfMonth = day.value,
+                        month = month.value,
+                        year = year.value
+                    ),
                     dateWise = dateWise.value,
                     repeatGapDuration = daysDelayed.value,
                     snoozeDuration = snoozeDuration.value,
                     postponeDuration = postponeDuration.value
                 )
-                Log.d(TAG, "gson str = ${Gson().toJson(task)}")
+                Log.d(TAG, "gson str = ${GsonBuilder().setPrettyPrinting().create().toJson(task)}")
             },
             modifier = Modifier
                 .align(Alignment.End)
@@ -155,7 +174,8 @@ fun TitleAndDescription(
 fun RepeatSchedulePreview() {
     RepeatSchedule(
         dateWise = remember { mutableStateOf(true) },
-        daysDelayed = remember { mutableStateOf(0) }
+        daysDelayed = remember { mutableStateOf(0) },
+        date = remember { mutableStateOf(0) }
     )
 }
 
@@ -164,16 +184,16 @@ fun RepeatSchedulePreview() {
 fun RepeatSchedule(
     modifier: Modifier = Modifier,
     dateWise: MutableState<Boolean>,
-    daysDelayed: MutableState<Int>
+    daysDelayed: MutableState<Int>,
+    date: MutableState<Int>
 ) {
-//    val daysDelayed = remember { mutableStateOf(0) }
-    val selected = remember { mutableStateOf(Repetitions.SAME_DATE) }
     Card(modifier = modifier) {
         Column {
+            val selected = remember { mutableStateOf(Repetitions.SAME_DATE) }
             Row(
                 modifier = modifier
                     .padding(horizontal = externalSpacing)
-                    .scrollable(ScrollState(0), orientation = Orientation.Horizontal),
+                    .horizontalScroll(ScrollState(0)),
                 horizontalArrangement = Arrangement.spacedBy(externalSpacing)
             ) {
                 val selector: (Reps) -> Unit = { reps: Reps ->
@@ -209,12 +229,22 @@ fun RepeatSchedule(
 
             AnimatedVisibility(visible = selected.value.enumValue == Repetition.SAME_DATE) {
                 // TODO: display the date of month
-                Text(
-                    text = "The given task would be repeated on ---- of every month",
-                    fontSize = FontSizeCustomValues.medium,
-                    modifier = Modifier
-                        .padding(externalSpacing)
-                )
+                val numFormatter = { num: Int ->
+                    num.toString() + when (num % 10) {
+                        1 -> "st"
+                        2 -> "nd"
+                        3 -> "rd"
+                        else -> "th"
+                    }
+                }
+                Row {
+                    Text(
+                        text = "The given task would be repeated on ${numFormatter(date.value)} of every month",
+                        fontSize = FontSizeCustomValues.medium,
+                        modifier = Modifier
+                            .padding(externalSpacing)
+                    )
+                }
 
             }
             AnimatedVisibility(visible = selected.value.enumValue != Repetition.SAME_DATE) {
@@ -264,16 +294,21 @@ fun RepeatSchedule(
 }
 
 @Composable
-@Preview
-fun StartTimePicker(modifier: Modifier = Modifier) {
+fun StartTimePicker(
+    modifier: Modifier = Modifier,
+    hour: MutableState<Int>,
+    minute: MutableState<Int>
+) {
     val calendar = Calendar.getInstance()
-    val hour = remember { mutableStateOf(calendar[Calendar.HOUR_OF_DAY]) }
-    val minute = remember { mutableStateOf(calendar[Calendar.MINUTE]) }
     val timerDialog = TimePickerDialog(
-        LocalContext.current, { _, h: Int, m: Int ->
+        LocalContext.current,
+        { _, h: Int, m: Int ->
             hour.value = h
             minute.value = m
-        }, hour.value, minute.value, false
+        },
+        calendar[Calendar.HOUR_OF_DAY],
+        calendar[Calendar.MINUTE],
+        false
     )
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -296,14 +331,12 @@ fun StartTimePicker(modifier: Modifier = Modifier) {
 }
 
 @Composable
-@Preview
-fun StartDatePicker(modifier: Modifier = Modifier) {
-    val instance = Calendar.getInstance()
-
-    val day = remember { mutableStateOf(instance[Calendar.DAY_OF_MONTH]) }
-    val month = remember { mutableStateOf(instance[Calendar.MONTH]) }
-    val year = remember { mutableStateOf(instance[Calendar.YEAR]) }
-
+fun StartDatePicker(
+    modifier: Modifier = Modifier,
+    day: MutableState<Int>,
+    month: MutableState<Int>,
+    year: MutableState<Int>,
+) {
     val datePickerDialog = DatePickerDialog(
         LocalContext.current, { _: DatePicker, y: Int, m: Int, d: Int ->
             year.value = y
@@ -311,7 +344,7 @@ fun StartDatePicker(modifier: Modifier = Modifier) {
             day.value = d
         },
         year.value,
-        month.value,
+        month.value,// TODO: check for -1
         day.value
     )
 
@@ -325,7 +358,7 @@ fun StartDatePicker(modifier: Modifier = Modifier) {
                 fontSize = FontSizeCustomValues.medium
             )
             Text(
-                text = getDateAsText(year.value, month.value, day.value),
+                text = getDateAsText(year.value, month.value + 1, day.value),
                 fontSize = FontSizeCustomValues.medium
             )
             IconButton(onClick = { datePickerDialog.show() }) {
@@ -359,7 +392,7 @@ fun DelayTaskDay(modifier: Modifier = Modifier, postponeDuration: MutableState<I
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Days Allowed To Postpone",
+                text = "Event Postpone Duration",
                 modifier = Modifier
                     .weight(1f)
                     .padding(externalSpacing),
@@ -368,7 +401,8 @@ fun DelayTaskDay(modifier: Modifier = Modifier, postponeDuration: MutableState<I
             SelectNumberRange(
                 unit = "day",
                 value = postponeDuration,
-                rangeMin = 1
+                rangeMin = 1,
+                rangeMax = 15
             )
         }
     }
@@ -408,5 +442,5 @@ private fun getTimeAsText(hour: Int, minute: Int): String {
 
 private fun getDateAsText(y: Int, m: Int, d: Int): String {
     val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
-    return "${t(d)}/${t(m + 1)}/${t(y)}"
+    return "${t(d)}/${t(m)}/${t(y)}"
 }

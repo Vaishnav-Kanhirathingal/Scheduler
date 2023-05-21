@@ -13,8 +13,8 @@ package com.example.scheduler.data
 data class Task(
     val title: String,
     val description: String,
-    val timeForReminder: Int,
-    val dateForReminder: Int,
+    val timeForReminder: Time,
+    val dateForReminder: Date,
     val dateWise: Boolean,
     val repeatGapDuration: Int,
     val snoozeDuration: Int,
@@ -38,3 +38,14 @@ object Repetitions {
     val MONTH = Reps(enumValue = Repetition.MONTH, timeUnit = "month", step = 30)
     val SAME_DATE = Reps(enumValue = Repetition.SAME_DATE, timeUnit = "error", step = 0)
 }
+
+class Date(
+    val dayOfMonth: Int,
+    val month: Int,
+    val year: Int
+)
+
+class Time(
+    val hour: Int,
+    val minute: Int
+)
