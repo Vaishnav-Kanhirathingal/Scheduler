@@ -75,7 +75,6 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
     val month = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MONTH]) }
     val year = rememberSaveable { mutableStateOf(calenderInstance[Calendar.YEAR]) }
 
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,6 +116,8 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
                     postponeDuration = postponeDuration.value
                 )
                 Log.d(TAG, "gson str = ${GsonBuilder().setPrettyPrinting().create().toJson(task)}")
+                // TODO: save the task variable to datastore
+                // TODO: add a undismissable prompt to show saving in progress
             },
             modifier = Modifier
                 .align(Alignment.End)
@@ -337,7 +338,7 @@ fun StartDatePicker(
             day.value = d
         },
         year.value,
-        month.value,// TODO: check for -1
+        month.value,
         day.value
     )
 

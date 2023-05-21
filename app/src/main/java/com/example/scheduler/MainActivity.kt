@@ -6,10 +6,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -44,7 +46,7 @@ class MainActivity : ComponentActivity() {
                     SchedulerNavHost(
                         navController = navHostController,
                         modifier = Modifier,
-                        googleSignInButton = { GoogleSignInButton() }
+                        googleSignInButton = { GoogleSignInButton(it) }
                     )
                 }
             }
@@ -52,7 +54,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GoogleSignInButton() {
+    fun GoogleSignInButton(modifier: Modifier) {
         val googleSignInOptions = GoogleSignInOptions
             .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
@@ -66,9 +68,10 @@ class MainActivity : ComponentActivity() {
                 onResult = AccountFunctions.signInLambda
             )
         // TODO: create a login button with the onclick
-        Button(
+        IconButton(
+            modifier = modifier,
             onClick = { startForResult.launch(googleSignInClient.signInIntent) },
-            content = { Text(text = "sign in compose") }
+            content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) }
         )
     }
 }
@@ -77,7 +80,7 @@ class MainActivity : ComponentActivity() {
 fun SchedulerNavHost(
     navController: NavHostController,
     modifier: Modifier,
-    googleSignInButton: @Composable () -> Unit
+    googleSignInButton: @Composable (modifier: Modifier) -> Unit
 ) {
     NavHost(
         navController = navController,
