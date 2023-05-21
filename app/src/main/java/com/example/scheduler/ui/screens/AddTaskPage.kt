@@ -226,14 +226,6 @@ fun RepeatSchedule(
 
             AnimatedVisibility(visible = selected.value.enumValue == Repetition.SAME_DATE) {
                 // TODO: display the date of month
-                val numFormatter = { num: Int ->
-                    num.toString() + when (num % 10) {
-                        1 -> "st"
-                        2 -> "nd"
-                        3 -> "rd"
-                        else -> "th"
-                    }
-                }
                 Row {
                     Text(
                         text = "The given task would be repeated on ${numFormatter(date.value)} of every month",
@@ -429,12 +421,20 @@ fun RangePreview() {
     SelectNumberRange(unit = "min", value = remember { mutableStateOf(1) })
 }
 
-private fun getTimeAsText(hour: Int, minute: Int): String {
+fun getTimeAsText(hour: Int, minute: Int): String {
     val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
     return "${if (hour > 12) (hour - 12).toString() else hour.toString()}:${t(minute)} ${if (hour > 12) "PM" else "AM"}"
 }
 
-private fun getDateAsText(y: Int, m: Int, d: Int): String {
+fun getDateAsText(y: Int, m: Int, d: Int): String {
     val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
     return "${t(d)}/${t(m)}/${t(y)}"
 }
+
+fun numFormatter(num: Int): String =
+    num.toString() + when (num % 10) {
+        1 -> "st"
+        2 -> "nd"
+        3 -> "rd"
+        else -> "th"
+    }
