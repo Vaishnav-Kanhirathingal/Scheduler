@@ -189,7 +189,7 @@ fun RepeatSchedule(
 ) {
     Card(modifier = modifier) {
         Column {
-            val selected = remember { mutableStateOf(Repetitions.SAME_DATE) }
+            val selected = remember { mutableStateOf(Repetitions.DAY) }
             Row(
                 modifier = modifier
                     .padding(horizontal = externalSpacing)
@@ -198,11 +198,7 @@ fun RepeatSchedule(
             ) {
                 val selector: (Reps) -> Unit = { reps: Reps ->
                     selected.value = reps
-                    daysDelayed.value = if (reps.step != 0) {
-                        (daysDelayed.value / reps.step) * reps.step
-                    } else {
-                        0
-                    }
+                    daysDelayed.value = (daysDelayed.value / reps.step) * reps.step
                 }
                 FilterChip(
                     onClick = { selector(Repetitions.DAY) },
@@ -266,14 +262,11 @@ fun RepeatSchedule(
                             Icon(imageVector = Icons.Filled.Add, contentDescription = null)
                         }
                     )
+                    val display = daysDelayed.value / selected.value.step
                     Text(
-                        text = "${
-                            if (selected.value.step != 0) {
-                                daysDelayed.value / selected.value.step
-                            } else {
-                                "0"
-                            }
-                        } ${selected.value.timeUnit}${if (daysDelayed.value > 1) "s" else ""}",
+                        text = "$display ${selected.value.timeUnit}${if (display > 1) "s" else ""} ${
+                            if (selected.value.enumValue != Repetition.DAY) "[${daysDelayed.value}d]" else ""
+                        }",
                         fontSize = FontSizeCustomValues.medium
                     )
                     IconButton(

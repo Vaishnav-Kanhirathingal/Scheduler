@@ -26,6 +26,7 @@ enum class Repetition {
 
 }
 
+/** @param step can't be zero */
 class Reps(
     val enumValue: Repetition,
     val timeUnit: String,
@@ -36,7 +37,7 @@ object Repetitions {
     val DAY = Reps(enumValue = Repetition.DAY, timeUnit = "day", step = 1)
     val WEEK = Reps(enumValue = Repetition.WEEK, timeUnit = "week", step = 7)
     val MONTH = Reps(enumValue = Repetition.MONTH, timeUnit = "month", step = 30)
-    val SAME_DATE = Reps(enumValue = Repetition.SAME_DATE, timeUnit = "error", step = 0)
+    val SAME_DATE = Reps(enumValue = Repetition.SAME_DATE, timeUnit = "error", step = 1)
 }
 
 class Date(
