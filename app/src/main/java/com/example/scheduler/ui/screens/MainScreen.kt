@@ -1,6 +1,6 @@
 package com.example.scheduler.ui.screens
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,7 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.example.scheduler.data.Task
+import com.example.scheduler.data.testTaskList
+import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 
 @Composable
@@ -89,8 +91,10 @@ fun MainScreen(
             )
         },
         content = {
-            ListOfTasks(
-                padding = it,
+            SavedTaskList(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(it),
                 lazyListState = lazyListState
             )
         }
@@ -118,36 +122,74 @@ fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
 }
 
 @Composable
-fun ListOfTasks(padding: PaddingValues, lazyListState: LazyListState) {
-    // TODO: use lazy list to display tasks after sorting and remove this sample column
+fun SavedTaskList(
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState
+) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding),
+        modifier = modifier,
         state = lazyListState,
-        contentPadding = PaddingValues(vertical = PaddingCustomValues.internalSpacing)
-    ) {
-        // TODO: show all tasks
-        items(
-            count = 20,
-            itemContent = {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(PaddingCustomValues.internalSpacing)
-                ) {
-                    Text(
+        content = {
+            items(
+                count = testTaskList.size,
+                itemContent = {
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(
-                                horizontal = PaddingCustomValues.externalSpacing,
-                                vertical = 15.dp
-                            ),
-                        text = "sample text $it",
-                        textAlign = TextAlign.Center,
-                    )
+                            .padding(PaddingCustomValues.internalSpacing)
+                    ) {
+                        TaskCard(task = testTaskList[it])
+                    }
                 }
+            )
+        }
+    )
+}
+
+@Composable
+@Preview
+fun TaskCardPreview() {
+    TaskCard(task = testTaskList[3], modifier = Modifier.fillMaxWidth())
+}
+
+@Composable
+fun TaskCard(task: Task, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier,
+        content = {
+            Column(modifier = Modifier.padding(PaddingCustomValues.internalSpacing)) {
+                Text(text = task.title, fontSize = FontSizeCustomValues.large)
+                Text(text = task.description)
+                Text(
+                    text = "Reminder set for " +
+                            getDateAsText(
+                                y = task.dateForReminder.year,
+                                m = task.dateForReminder.month,
+                                d = task.dateForReminder.dayOfMonth
+                            ) + " on " +
+                            getTimeAsText(
+                                hour = task.timeForReminder.hour,
+                                minute = task.timeForReminder.minute
+                            ) +
+                            " and, " +
+                            if (task.dateWise) {
+                                "task is repeated on the ${numFormatter(task.dateForReminder.dayOfMonth)} of every month, "
+                            } else {
+                                if (task.repeatGapDuration == 0) {
+                                    "task isn't repeated, "
+                                } else {
+                                    "task is repeated every ${task.repeatGapDuration} day${if (task.repeatGapDuration > 1) "s" else ""}, "
+                                }
+                            } + "snooze is available for ${task.snoozeDuration} minute" +
+                            if (task.snoozeDuration > 1) {
+                                "s "
+                            } else {
+                                " "
+                            } +
+                            "and, can be postponed by ${task.postponeDuration} day" + if (task.postponeDuration > 1) "s" else "",
+                    // TODO: reduce line spacing
+                )
             }
-        )
-    }
+        }
+    )
 }

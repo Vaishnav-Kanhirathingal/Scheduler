@@ -9,5 +9,6 @@ object PaddingCustomValues {
 }
 
 object FontSizeCustomValues {
+    val large = 20.sp
     val medium = 16.sp
 }
