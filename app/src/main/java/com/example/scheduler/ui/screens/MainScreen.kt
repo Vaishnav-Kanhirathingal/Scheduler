@@ -1,6 +1,7 @@
 package com.example.scheduler.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,9 +10,17 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -23,14 +32,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.scheduler.data.Task
 import com.example.scheduler.data.testTaskList
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
+import com.google.gson.GsonBuilder
 
 @Composable
 @Preview
@@ -138,7 +150,8 @@ fun SavedTaskList(
                             .fillMaxWidth()
                             .padding(PaddingCustomValues.internalSpacing)
                     ) {
-                        TaskCard(task = testTaskList[it])
+//                        TaskCard(task = testTaskList[it])
+                        DetailedTaskCard(task = testTaskList[it])
                     }
                 }
             )
@@ -157,9 +170,13 @@ fun TaskCard(task: Task, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
         content = {
-            Column(modifier = Modifier.padding(PaddingCustomValues.internalSpacing)) {
-                Text(text = task.title, fontSize = FontSizeCustomValues.large)
-                Text(text = task.description)
+            Column(modifier = Modifier.padding(PaddingCustomValues.externalSpacing)) {
+                Text(
+                    text = task.title,
+                    fontSize = FontSizeCustomValues.large,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(text = task.description, fontSize = FontSizeCustomValues.medium)
                 Text(
                     text = "Reminder set for " +
                             getDateAsText(
@@ -178,18 +195,185 @@ fun TaskCard(task: Task, modifier: Modifier = Modifier) {
                                 if (task.repeatGapDuration == 0) {
                                     "task isn't repeated, "
                                 } else {
-                                    "task is repeated every ${task.repeatGapDuration} day${if (task.repeatGapDuration > 1) "s" else ""}, "
+                                    "task is repeated every " +
+                                            getTextWithS(
+                                                unit = "day",
+                                                num = task.repeatGapDuration
+                                            ) + ", "
                                 }
-                            } + "snooze is available for ${task.snoozeDuration} minute" +
-                            if (task.snoozeDuration > 1) {
-                                "s "
-                            } else {
-                                " "
-                            } +
-                            "and, can be postponed by ${task.postponeDuration} day" + if (task.postponeDuration > 1) "s" else "",
+                            } + "snooze is available for " +
+                            getTextWithS(unit = "minute", num = task.snoozeDuration) +
+                            "and, can be postponed by " +
+                            getTextWithS(unit = "day", num = task.postponeDuration),
                     // TODO: reduce line spacing
+                    fontSize = FontSizeCustomValues.extraSmall,
+                    lineHeight = FontSizeCustomValues.extraSmall
                 )
             }
         }
     )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun DetailedTaskCardComparePreview() {
+    Column(
+        modifier = Modifier.padding(PaddingCustomValues.internalSpacing),
+        content = {
+            DetailedTaskCard(
+                task = testTaskList[3], modifier = Modifier
+                    .fillMaxWidth()
+            )
+            Text(text = "versus", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                content = {
+                    Text(
+                        text = GsonBuilder().setPrettyPrinting().create().toJson(testTaskList[1]),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(PaddingCustomValues.externalSpacing)
+                    )
+                }
+            )
+        }
+    )
+}
+
+@Composable
+fun DetailedTaskCard(task: Task, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier,
+        content = {
+            Column(
+                modifier = Modifier.padding(PaddingCustomValues.externalSpacing),
+                content = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = {
+                            Icon(
+                                imageVector = Icons.Outlined.Create,// TODO: this icon should denote whether the task is scheduled for today or not
+                                contentDescription = null
+                            )
+                            Text(
+                                text = task.title,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(horizontal = PaddingCustomValues.externalSpacing),
+                                fontSize = FontSizeCustomValues.large
+                            )
+                            IconButton(
+                                onClick = { TODO("move to edit page for the selected task") },
+                                content = {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                            IconButton(
+                                onClick = { TODO("delete selected task") },
+                                content = {
+                                    Icon(
+                                        imageVector = Icons.Filled.Delete,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                        }
+                    )
+                    Divider(
+                        modifier = Modifier.fillMaxWidth(),
+                        thickness = 1.dp,
+                        color = Color(0, 0, 0)
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(top = PaddingCustomValues.internalSpacing)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = {
+                            Icon(imageVector = Icons.Outlined.Info, contentDescription = null)
+                            Text(
+                                text = task.description,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = PaddingCustomValues.internalSpacing)
+                            )
+                        }
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(top = PaddingCustomValues.internalSpacing)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = {
+                            Icon(imageVector = Icons.Outlined.DateRange, contentDescription = null)
+                            Text(
+                                text = getTimeAsText(
+                                    hour = task.timeForReminder.hour,
+                                    minute = task.timeForReminder.minute
+                                ) + " on " +
+                                        getDateAsText(
+                                            y = task.dateForReminder.year,
+                                            m = task.dateForReminder.month,
+                                            d = task.dateForReminder.dayOfMonth
+                                        ),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = PaddingCustomValues.internalSpacing)
+                            )
+                        }
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(top = PaddingCustomValues.internalSpacing)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = {
+                            Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
+                            Text(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = PaddingCustomValues.internalSpacing),
+                                text = if (task.dateWise) {
+                                    "Repeated on the ${numFormatter(task.dateForReminder.dayOfMonth)} of every month"
+                                } else if (task.repeatGapDuration == 0) {
+                                    "Not repeated"
+                                } else {
+                                    "Repeated every ${getTextWithS("day", task.repeatGapDuration)}"
+                                }
+                            )
+                        }
+                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(top = PaddingCustomValues.internalSpacing)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = {
+                            // TODO: set icon to show how much we can snooze
+                            Icon(
+                                imageVector = Icons.Outlined.ArrowForward,
+                                contentDescription = null
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = PaddingCustomValues.internalSpacing),
+                                text = getTextWithS(unit = "minute", num = task.snoozeDuration)
+                                        + " or " +
+                                        getTextWithS(unit = "day", num = task.postponeDuration)
+                            )
+                        }
+                    )
+                }
+            )
+        }
+    )
+}
+
+fun getTextWithS(unit: String, num: Int): String {
+    return "$num $unit" + if (num > 1) "s" else ""
 }
