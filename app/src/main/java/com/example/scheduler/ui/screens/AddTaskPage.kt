@@ -47,6 +47,7 @@ import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
 import com.example.scheduler.data.Time
+import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues.externalSpacing
 import com.example.scheduler.values.PaddingCustomValues.internalSpacing
@@ -119,8 +120,16 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
                     postponeDuration = postponeDuration.value
                 )
                 Log.d(TAG, "gson str = ${GsonBuilder().setPrettyPrinting().create().toJson(task)}")
+                DatabaseFunctions.uploadTaskToFirebase(
+                    task = task,
+                    onSuccessListener = onCompletion,
+                    onFailureListener = {
+                        // TODO: set something
+                    }
+                )
                 // TODO: save the task variable to datastore
                 // TODO: add a undismissable prompt to show saving in progress
+                // TODO: save to firebase
             },
             modifier = Modifier
                 .align(Alignment.End)

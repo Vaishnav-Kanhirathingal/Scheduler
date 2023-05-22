@@ -14,12 +14,19 @@ object AccountFunctions {
         GoogleSignIn.getSignedInAccountFromIntent(result.data)
             .addOnSuccessListener {
                 val credential = GoogleAuthProvider.getCredential(it.idToken, null)
-                auth.signInWithCredential(credential).addOnSuccessListener {
-                    val user = auth.currentUser
-                    Log.d(TAG, "user = ${user?.email}")
-                }.addOnFailureListener { e ->
-                    e.printStackTrace()
-                }
+                auth
+                    .signInWithCredential(credential)
+                    .addOnSuccessListener {
+                        val user = auth.currentUser
+                        Log.d(TAG, "user = ${user?.email}")
+                        DatabaseFunctions.createUserDirectories(
+                            // TODO: correctly set the lambdas
+                            onSuccess = {},
+                            onFailure = {}
+                        )
+                    }.addOnFailureListener { e ->
+                        e.printStackTrace()
+                    }
             }.addOnFailureListener {
                 it.printStackTrace()
             }
