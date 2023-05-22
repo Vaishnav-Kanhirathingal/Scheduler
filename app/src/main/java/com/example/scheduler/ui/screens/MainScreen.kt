@@ -140,14 +140,15 @@ fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
 @Composable
 fun SavedTaskList(
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState
+    lazyListState: LazyListState,
+    listOfTaskReceived: List<Task> = testTaskList
 ) {
     LazyColumn(
         modifier = modifier,
         state = lazyListState,
         content = {
             items(
-                count = testTaskList.size,
+                count = listOfTaskReceived.size,
                 itemContent = {
                     Card(
                         modifier = Modifier
@@ -155,7 +156,7 @@ fun SavedTaskList(
                             .padding(PaddingCustomValues.internalSpacing)
                     ) {
 //                        TaskCard(task = testTaskList[it])
-                        DetailedTaskCard(task = testTaskList[it])
+                        DetailedTaskCard(task = listOfTaskReceived[it])
                     }
                 }
             )
