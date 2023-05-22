@@ -51,6 +51,34 @@ class Time(
     val minute: Int
 )
 
+object StringFunctions {
+    /** gets value like 6,1 and formats it as 06:01 AM */
+    fun getTimeAsText(hour: Int, minute: Int): String {
+        val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
+        return "${if (hour > 12) (hour - 12).toString() else hour.toString()}:${t(minute)} ${if (hour > 12) "PM" else "AM"}"
+    }
+
+    /** gets value like 2021,1,1 and formats it as 01/01/2021 */
+    fun getDateAsText(y: Int, m: Int, d: Int): String {
+        val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
+        return "${t(d)}/${t(m)}/${t(y)}"
+    }
+
+    /** gets value like 2 or 12 and returns 2nd ar 12th */
+    fun numFormatter(num: Int): String {
+        return num.toString() + when (num % 10) {
+            1 -> "st"
+            2 -> "nd"
+            3 -> "rd"
+            else -> "th"
+        }
+    }
+
+    fun getTextWithS(unit: String, num: Int): String {
+        return "$num $unit" + if (num > 1) "s" else ""
+    }
+}
+
 /** delete this object, do not use in finished project */
 val testTaskList = mutableListOf(
     Task(

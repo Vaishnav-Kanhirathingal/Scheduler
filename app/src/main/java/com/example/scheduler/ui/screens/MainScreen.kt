@@ -14,7 +14,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
@@ -38,6 +38,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.scheduler.data.StringFunctions.getDateAsText
+import com.example.scheduler.data.StringFunctions.getTextWithS
+import com.example.scheduler.data.StringFunctions.getTimeAsText
+import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
 import com.example.scheduler.data.testTaskList
 import com.example.scheduler.values.FontSizeCustomValues
@@ -200,7 +204,7 @@ fun DetailedTaskCard(task: Task, modifier: Modifier = Modifier) {
                         verticalAlignment = Alignment.CenterVertically,
                         content = {
                             Icon(
-                                imageVector = Icons.Outlined.Create,// TODO: this icon should denote whether the task is scheduled for today or not
+                                imageVector = Icons.Outlined.Build,// TODO: this icon should denote whether the task is scheduled for today or not
                                 contentDescription = null
                             )
                             Text(
@@ -319,8 +323,4 @@ fun DetailedTaskCard(task: Task, modifier: Modifier = Modifier) {
             )
         }
     )
-}
-
-fun getTextWithS(unit: String, num: Int): String {
-    return "$num $unit" + if (num > 1) "s" else ""
 }

@@ -42,6 +42,9 @@ import com.example.scheduler.data.Date
 import com.example.scheduler.data.Repetition
 import com.example.scheduler.data.Repetitions
 import com.example.scheduler.data.Reps
+import com.example.scheduler.data.StringFunctions.getDateAsText
+import com.example.scheduler.data.StringFunctions.getTimeAsText
+import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
 import com.example.scheduler.data.Time
 import com.example.scheduler.values.FontSizeCustomValues
@@ -420,21 +423,3 @@ fun SelectNumberRange(
 fun RangePreview() {
     SelectNumberRange(unit = "min", value = remember { mutableStateOf(1) })
 }
-
-fun getTimeAsText(hour: Int, minute: Int): String {
-    val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
-    return "${if (hour > 12) (hour - 12).toString() else hour.toString()}:${t(minute)} ${if (hour > 12) "PM" else "AM"}"
-}
-
-fun getDateAsText(y: Int, m: Int, d: Int): String {
-    val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
-    return "${t(d)}/${t(m)}/${t(y)}"
-}
-
-fun numFormatter(num: Int): String =
-    num.toString() + when (num % 10) {
-        1 -> "st"
-        2 -> "nd"
-        3 -> "rd"
-        else -> "th"
-    }
