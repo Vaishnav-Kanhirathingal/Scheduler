@@ -160,73 +160,20 @@ fun SavedTaskList(
 }
 
 @Composable
-@Preview
-fun TaskCardPreview() {
-    TaskCard(task = testTaskList[3], modifier = Modifier.fillMaxWidth())
-}
-
-@Composable
-fun TaskCard(task: Task, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier,
-        content = {
-            Column(modifier = Modifier.padding(PaddingCustomValues.externalSpacing)) {
-                Text(
-                    text = task.title,
-                    fontSize = FontSizeCustomValues.large,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(text = task.description, fontSize = FontSizeCustomValues.medium)
-                Text(
-                    text = "Reminder set for " +
-                            getDateAsText(
-                                y = task.dateForReminder.year,
-                                m = task.dateForReminder.month,
-                                d = task.dateForReminder.dayOfMonth
-                            ) + " on " +
-                            getTimeAsText(
-                                hour = task.timeForReminder.hour,
-                                minute = task.timeForReminder.minute
-                            ) +
-                            " and, " +
-                            if (task.dateWise) {
-                                "task is repeated on the ${numFormatter(task.dateForReminder.dayOfMonth)} of every month, "
-                            } else {
-                                if (task.repeatGapDuration == 0) {
-                                    "task isn't repeated, "
-                                } else {
-                                    "task is repeated every " +
-                                            getTextWithS(
-                                                unit = "day",
-                                                num = task.repeatGapDuration
-                                            ) + ", "
-                                }
-                            } + "snooze is available for " +
-                            getTextWithS(unit = "minute", num = task.snoozeDuration) +
-                            "and, can be postponed by " +
-                            getTextWithS(unit = "day", num = task.postponeDuration),
-                    // TODO: reduce line spacing
-                    fontSize = FontSizeCustomValues.extraSmall,
-                    lineHeight = FontSizeCustomValues.extraSmall
-                )
-            }
-        }
-    )
-}
-
-@Composable
 @Preview(showBackground = true)
 fun DetailedTaskCardComparePreview() {
     Column(
         modifier = Modifier.padding(PaddingCustomValues.internalSpacing),
         content = {
             DetailedTaskCard(
-                task = testTaskList[3], modifier = Modifier
+                task = testTaskList[1], modifier = Modifier
                     .fillMaxWidth()
+                    .padding(PaddingCustomValues.internalSpacing)
             )
-            Text(text = "versus", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(PaddingCustomValues.internalSpacing),
                 content = {
                     Text(
                         text = GsonBuilder().setPrettyPrinting().create().toJson(testTaskList[1]),
