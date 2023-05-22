@@ -66,12 +66,17 @@ object StringFunctions {
 
     /** gets value like 2 or 12 and returns 2nd ar 12th */
     fun numFormatter(num: Int): String {
-        return num.toString() + when (num % 10) {
-            1 -> "st"
-            2 -> "nd"
-            3 -> "rd"
-            else -> "th"
-        }
+        return num.toString() +
+                if (num < 10 || num > 20) {
+                    when (num % 10) {
+                        1 -> "st"
+                        2 -> "nd"
+                        3 -> "rd"
+                        else -> "th"
+                    }
+                } else {
+                    "th"
+                }
     }
 
     fun getTextWithS(unit: String, num: Int): String {
