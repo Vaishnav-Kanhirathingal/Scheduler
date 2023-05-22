@@ -10,7 +10,11 @@ object AccountFunctions {
     private val TAG: String = this::class.java.simpleName
     private val auth = FirebaseAuth.getInstance()
 
-    val signInLambda: (result: ActivityResult) -> Unit = { result: ActivityResult ->
+    fun signInGoogle(
+        result: ActivityResult,
+        onSuccess: () -> Unit,
+        onFailure: (issue: String) -> Unit,
+    ) {
         GoogleSignIn.getSignedInAccountFromIntent(result.data)
             .addOnSuccessListener {
                 val credential = GoogleAuthProvider.getCredential(it.idToken, null)
@@ -21,13 +25,15 @@ object AccountFunctions {
                         Log.d(TAG, "user = ${user?.email}")
                         DatabaseFunctions.createUserDirectories(
                             // TODO: correctly set the lambdas
-                            onSuccess = {},
-                            onFailure = {}
+                            onSuccess = onSuccess,
+                            onFailure = onFailure
                         )
                     }.addOnFailureListener { e ->
                         e.printStackTrace()
+                        onFailure(e.message ?: "Failed to get sign in with given credentials")
                     }
             }.addOnFailureListener {
+                onFailure(it.message ?: "Failed to get signed in account from intent")
                 it.printStackTrace()
             }
     }

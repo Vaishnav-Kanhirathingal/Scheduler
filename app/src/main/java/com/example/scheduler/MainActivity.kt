@@ -1,6 +1,7 @@
 package com.example.scheduler
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.scheduler.firebase.AccountFunctions
+import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.ui.destinations.AddTaskScreen
 import com.example.scheduler.ui.destinations.DetailsScreen
 import com.example.scheduler.ui.destinations.MainScreen
@@ -28,6 +30,7 @@ import com.example.scheduler.ui.theme.SchedulerTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.GsonBuilder
 
 class MainActivity : ComponentActivity() {
     private val TAG = this::class.java.simpleName
@@ -55,6 +58,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun GoogleSignInButton(modifier: Modifier) {
+
         val googleSignInOptions = GoogleSignInOptions
             .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
@@ -65,14 +69,26 @@ class MainActivity : ComponentActivity() {
         val startForResult =
             rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult(),
-                onResult = AccountFunctions.signInLambda
+                onResult = {
+                    AccountFunctions.signInGoogle(
+                        // TODO: correctly set lambda parameters
+                        result = it,
+                        onSuccess = {},
+                        onFailure = {}
+                    )
+                }
             )
-        // TODO: create a login button with the onclick
         IconButton(
             modifier = modifier,
             onClick = { startForResult.launch(googleSignInClient.signInIntent) },
             content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) }
         )
+        DatabaseFunctions.getListOfTasksFromDatastore {
+            Log.d(
+                DatabaseFunctions.TAG, "list received = " +
+                        GsonBuilder().setPrettyPrinting().create().toJson(it)
+            )
+        }
     }
 }
 
