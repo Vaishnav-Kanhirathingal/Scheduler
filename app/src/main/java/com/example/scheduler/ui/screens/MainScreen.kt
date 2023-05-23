@@ -1,5 +1,8 @@
 package com.example.scheduler.ui.screens
 
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,12 +26,14 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -54,8 +59,7 @@ fun MainScreenPreview() {
     MainScreen(toAddTaskScreen = { /*TODO*/ }) {
         IconButton(
             onClick = { },
-            content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) },
-//            modifier = Modifier.padding(horizontal = PaddingCustomValues.externalSpacing)
+            content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) }
         )
     }
 }
@@ -103,18 +107,80 @@ fun MainScreen(
         floatingActionButton = {
             AddTaskFAB(
                 showFullText = showFullText.value,
-                toAddTaskScreen
+                toAddTaskScreen = toAddTaskScreen
             )
         },
         content = {
-            SavedTaskList(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(it),
-                lazyListState = lazyListState
+            Column {
+                FilterRow(
+                    modifier = Modifier
+                        .padding(it)
+                        .fillMaxWidth()
+                )
+                SavedTaskList(
+                    modifier = Modifier.fillMaxWidth(),
+                    lazyListState = lazyListState
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview(showBackground = true)
+fun FilterRow(modifier: Modifier = Modifier) {
+    val filterSelected = remember { mutableStateOf(TimeFilter.DAY) }
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(PaddingCustomValues.internalSpacing),
+        modifier = modifier
+            .padding(horizontal = PaddingCustomValues.internalSpacing)
+            .fillMaxWidth()
+            .horizontalScroll(ScrollState(0)),
+        content = {
+            TimeFilterChip(
+                modifier = Modifier.weight(1f),
+                currentChoice = filterSelected,
+                text = "Day",
+                chipFilterType = TimeFilter.DAY
+            )
+            TimeFilterChip(
+                modifier = Modifier.weight(1f),
+                currentChoice = filterSelected,
+                text = "Week",
+                chipFilterType = TimeFilter.WEEK
+            )
+            TimeFilterChip(
+                modifier = Modifier.weight(1f),
+                currentChoice = filterSelected,
+                text = "Month",
+                chipFilterType = TimeFilter.MONTH
             )
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimeFilterChip(
+    modifier: Modifier = Modifier,
+    currentChoice: MutableState<TimeFilter>,
+    text: String,
+    chipFilterType: TimeFilter
+) {
+    FilterChip(
+        modifier = modifier,
+        selected = currentChoice.value == chipFilterType,
+        onClick = { currentChoice.value = chipFilterType },
+        label = {
+            Text(
+                text = text,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    )
+
 }
 
 @Composable
@@ -194,6 +260,7 @@ fun DetailedTaskCardComparePreview() {
 
 @Composable
 fun DetailedTaskCard(task: Task, modifier: Modifier = Modifier) {
+    // TODO: add a UI element that tells how much time remaining till the next alarm
     Card(
         modifier = modifier,
         content = {
@@ -324,4 +391,8 @@ fun DetailedTaskCard(task: Task, modifier: Modifier = Modifier) {
             )
         }
     )
+}
+
+enum class TimeFilter {
+    DAY, WEEK, MONTH
 }
