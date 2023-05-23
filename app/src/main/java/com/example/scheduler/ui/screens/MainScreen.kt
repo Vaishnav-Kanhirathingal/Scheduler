@@ -6,13 +6,13 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
@@ -31,6 +32,9 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +47,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,19 +61,22 @@ import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private const val TAG = "MainScreen"
 
-@Composable
-@Preview
-fun MainScreenPreview() {
-    MainScreen(toAddTaskScreen = { /*TODO*/ }) {
-        IconButton(
-            onClick = { },
-            content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) }
-        )
-    }
-}
+//@Composable
+//@Preview
+//fun MainScreenPreview() {
+//    MainScreen(toAddTaskScreen = { /*TODO*/ }) {
+//        IconButton(
+//            onClick = { },
+//            content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) }
+//        )
+//    }
+//}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +84,7 @@ fun MainScreen(
     toAddTaskScreen: () -> Unit,
     googleSignInButton: @Composable (modifier: Modifier) -> Unit
 ) {
+    val snackBarHostState = SnackbarHostState()
     val lazyListState = rememberLazyListState()
     val showFullText = remember { mutableStateOf(true) }
     LaunchedEffect(lazyListState) {
@@ -83,6 +92,7 @@ fun MainScreen(
             .collect { showFullText.value = (it == 0) }
     }
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 modifier = Modifier.fillMaxWidth(),
@@ -117,11 +127,9 @@ fun MainScreen(
             )
         },
         content = {
-            // TODO: save received value as a savable state list
             val receivedList = remember { mutableStateListOf<Task>() }
             Column {
                 DatabaseFunctions.getListOfTasksFromDatastore(
-                    // TODO: correctly set [onSuccess] and [onFailure] parameters
                     listReceiver = {
                         receivedList.clear()
                         for (i in it) {
@@ -132,14 +140,35 @@ fun MainScreen(
                             )
                         }
                     },
-                    onSuccess = {},
-                    onFailure = {}
+                    onFailure = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            snackBarHostState.showSnackbar(
+                                message = it,
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Short,
+                            )
+                        }
+                    }
                 )
-
                 FilterRow(
                     modifier = Modifier
                         .padding(it)
                         .fillMaxWidth()
+                )
+                Button(
+                    // TODO: remove
+                    onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            snackBarHostState.showSnackbar(
+                                message = "mess",
+                                actionLabel = "act",
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Short,
+                            )
+                        }
+                    }, content = {
+                        Text(text = "testButton")
+                    }
                 )
                 SavedTaskList(
                     modifier = Modifier.fillMaxWidth(),
@@ -228,6 +257,20 @@ fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
 }
 
 @Composable
+@Preview(showBackground = true)
+fun SavedTaskListPreview() {
+    val receivedList = remember { mutableStateListOf<Task>() }
+    receivedList.addAll(testTaskList)
+    SavedTaskList(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        lazyListState = LazyListState(0, 0),
+        listOfTaskReceived = receivedList
+    )
+}
+
+@Composable
 fun SavedTaskList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
@@ -243,11 +286,9 @@ fun SavedTaskList(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(PaddingCustomValues.internalSpacing)
-                    ) {
-//                        TaskCard(task = testTaskList[it])
-                        DetailedTaskCard(task = listOfTaskReceived[it])
-                    }
+                            .padding(PaddingCustomValues.internalSpacing),
+                        content = { DetailedTaskCard(task = listOfTaskReceived[it]) }
+                    )
                 }
             )
         }
@@ -331,90 +372,60 @@ fun DetailedTaskCard(task: Task, modifier: Modifier = Modifier) {
                         thickness = 1.dp,
                         color = Color(0, 0, 0)
                     )
-                    Row(
-                        modifier = Modifier
-                            .padding(top = PaddingCustomValues.internalSpacing)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = {
-                            Icon(imageVector = Icons.Outlined.Info, contentDescription = null)
-                            Text(
-                                text = task.description,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = PaddingCustomValues.internalSpacing)
-                            )
-                        }
+                    DetailsRow(text = task.description, icon = Icons.Outlined.Info)
+                    DetailsRow(
+                        text = getTimeAsText(
+                            hour = task.timeForReminder.hour,
+                            minute = task.timeForReminder.minute
+                        ) + " on " +
+                                getDateAsText(
+                                    y = task.dateForReminder.year,
+                                    m = task.dateForReminder.month,
+                                    d = task.dateForReminder.dayOfMonth
+                                ),
+                        icon = Icons.Outlined.DateRange
                     )
-                    Row(
-                        modifier = Modifier
-                            .padding(top = PaddingCustomValues.internalSpacing)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = {
-                            Icon(imageVector = Icons.Outlined.DateRange, contentDescription = null)
-                            Text(
-                                text = getTimeAsText(
-                                    hour = task.timeForReminder.hour,
-                                    minute = task.timeForReminder.minute
-                                ) + " on " +
-                                        getDateAsText(
-                                            y = task.dateForReminder.year,
-                                            m = task.dateForReminder.month,
-                                            d = task.dateForReminder.dayOfMonth
-                                        ),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = PaddingCustomValues.internalSpacing)
-                            )
-                        }
+
+                    DetailsRow(
+                        text = if (task.dateWise) {
+                            "Repeated on the ${numFormatter(task.dateForReminder.dayOfMonth)} of every month"
+                        } else if (task.repeatGapDuration == 0) {
+                            "Not repeated"
+                        } else {
+                            "Repeated every ${getTextWithS("day", task.repeatGapDuration)}"
+                        },
+                        icon = Icons.Outlined.Refresh
                     )
-                    Row(
-                        modifier = Modifier
-                            .padding(top = PaddingCustomValues.internalSpacing)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = {
-                            Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
-                            Text(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = PaddingCustomValues.internalSpacing),
-                                text = if (task.dateWise) {
-                                    "Repeated on the ${numFormatter(task.dateForReminder.dayOfMonth)} of every month"
-                                } else if (task.repeatGapDuration == 0) {
-                                    "Not repeated"
-                                } else {
-                                    "Repeated every ${getTextWithS("day", task.repeatGapDuration)}"
-                                }
-                            )
-                        }
-                    )
-                    Row(
-                        modifier = Modifier
-                            .padding(top = PaddingCustomValues.internalSpacing)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = {
-                            // TODO: set icon to show how much we can snooze
-                            Icon(
-                                imageVector = Icons.Outlined.ArrowForward,
-                                contentDescription = null
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = PaddingCustomValues.internalSpacing),
-                                text = getTextWithS(unit = "minute", num = task.snoozeDuration)
-                                        + " or " +
-                                        getTextWithS(unit = "day", num = task.postponeDuration)
-                            )
-                        }
+                    DetailsRow(
+                        text = getTextWithS(unit = "minute", num = task.snoozeDuration)
+                                + " or " +
+                                getTextWithS(unit = "day", num = task.postponeDuration),
+                        icon = Icons.Outlined.ArrowForward
                     )
                 }
             )
         }
     )
+}
+
+@Composable
+fun DetailsRow(text: String, icon: ImageVector) {
+    Row(
+        modifier = Modifier
+            .padding(top = PaddingCustomValues.internalSpacing)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        content = {
+            Icon(imageVector = icon, contentDescription = null)
+            Text(
+                text = text,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = PaddingCustomValues.internalSpacing)
+            )
+        }
+    )
+
 }
 
 enum class TimeFilter {

@@ -65,7 +65,6 @@ object DatabaseFunctions {
 
     fun getListOfTasksFromDatastore(
         listReceiver: (List<Task>) -> Unit,
-        onSuccess: () -> Unit,
         onFailure: (issue: String) -> Unit
     ) {
         val email = FirebaseAuth.getInstance().currentUser!!.email!!
@@ -107,7 +106,6 @@ object DatabaseFunctions {
                     )
                 }
                 listReceiver(listOfTasks)
-                onSuccess()
             }
             .addOnFailureListener {
                 it.printStackTrace()
