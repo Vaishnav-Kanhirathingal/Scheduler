@@ -100,8 +100,10 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
         RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed, date = day)
         DelayTaskTime(snoozeDuration = snoozeDuration)
         DelayTaskDay(postponeDuration = postponeDuration)
+        val addTaskButtonEnabled = remember { mutableStateOf(true) }
         Button(
             onClick = {
+                addTaskButtonEnabled.value = false
                 val task = Task(
                     title = title.value,
                     description = description.value,
@@ -124,17 +126,17 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
                     task = task,
                     onSuccessListener = onCompletion,
                     onFailureListener = {
+                        addTaskButtonEnabled.value = true
                         // TODO: set something
                     }
                 )
-                // TODO: save the task variable to datastore
                 // TODO: add a undismissable prompt to show saving in progress
-                // TODO: save to firebase
             },
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(bottom = 20.dp),
-            content = { Text(text = "Add Task") }
+            content = { Text(text = "Add Task") },
+            enabled = addTaskButtonEnabled.value
         )
     }
 }
