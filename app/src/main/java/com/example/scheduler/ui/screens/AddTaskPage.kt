@@ -17,15 +17,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -35,9 +38,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.scheduler.data.Date
 import com.example.scheduler.data.RepetitionEnum
 import com.example.scheduler.data.Repetitions
@@ -49,8 +53,7 @@ import com.example.scheduler.data.Task
 import com.example.scheduler.data.Time
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.FontSizeCustomValues
-import com.example.scheduler.values.PaddingCustomValues.externalSpacing
-import com.example.scheduler.values.PaddingCustomValues.internalSpacing
+import com.example.scheduler.values.PaddingCustomValues
 import com.google.gson.GsonBuilder
 
 private const val TAG = "AddTaskPage"
@@ -58,14 +61,17 @@ private const val TAG = "AddTaskPage"
 @Composable
 @Preview(showBackground = true)
 fun AddTaskScreenPreview() {
-    AddTaskScreen {}
+    AddTaskScaffold {
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTaskScreen(onCompletion: () -> Unit) {
+fun AddTaskScaffold(navigateUp: () -> Unit) {
     val title = rememberSaveable { mutableStateOf("") }
     val description = rememberSaveable { mutableStateOf("") }
     val dateWise = rememberSaveable { mutableStateOf(false) }
+
     val snoozeDuration = rememberSaveable { mutableStateOf(1) }
     val postponeDuration = rememberSaveable { mutableStateOf(1) }
     val daysDelayed = rememberSaveable { mutableStateOf(0) }
@@ -74,72 +80,107 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
 
     val hour = rememberSaveable { mutableStateOf(calenderInstance[Calendar.HOUR_OF_DAY]) }
     val minute = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MINUTE]) }
-
     val day = rememberSaveable { mutableStateOf(calenderInstance[Calendar.DAY_OF_MONTH]) }
     val month = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MONTH]) }
     val year = rememberSaveable { mutableStateOf(calenderInstance[Calendar.YEAR]) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(horizontal = 20.dp)
-            .verticalScroll(remember { ScrollState(0) }),
-        verticalArrangement = Arrangement.spacedBy(internalSpacing, Alignment.CenterVertically),
-    ) {
-        Text(
-            text = "Add Task",
-            fontSize = 36.sp,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(externalSpacing)
-        )
-        TitleAndDescription(title, description)
-        StartTimePicker(hour = hour, minute = minute)
-        StartDatePicker(day = day, month = month, year = year)
-        RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed, date = day)
-        DelayTaskTime(snoozeDuration = snoozeDuration)
-        DelayTaskDay(postponeDuration = postponeDuration)
-        val addTaskButtonEnabled = remember { mutableStateOf(true) }
-        Button(
-            onClick = {
-                addTaskButtonEnabled.value = false
-                val task = Task(
-                    title = title.value,
-                    description = description.value,
-                    timeForReminder = Time(
-                        hour = hour.value,
-                        minute = minute.value
-                    ),
-                    dateForReminder = Date(
-                        dayOfMonth = day.value,
-                        month = month.value,
-                        year = year.value
-                    ),
-                    dateWise = dateWise.value,
-                    repeatGapDuration = daysDelayed.value,
-                    snoozeDuration = snoozeDuration.value,
-                    postponeDuration = postponeDuration.value
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Add Task",
+                        textAlign = TextAlign.Center,
+                        fontSize = FontSizeCustomValues.large
+                        // TODO: set nav up button
+                    )
+                }, navigationIcon = {
+                    IconButton(
+                        onClick = navigateUp,
+                        content = {
+                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                        }
+                    )
+                }
+            )
+        },
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(it)
+                    .padding(horizontal = 20.dp)
+                    .verticalScroll(remember { ScrollState(0) }),
+                verticalArrangement = Arrangement.spacedBy(
+                    PaddingCustomValues.smallSpacing,
+                    Alignment.CenterVertically
+                ),
+            ) {
+                Text(
+                    text = "New Task",
+                    fontSize = FontSizeCustomValues.extraLarge,
+                    modifier = Modifier
+                        .padding(
+                            start = PaddingCustomValues.mediumSpacing,
+                            end = PaddingCustomValues.mediumSpacing,
+                            top = PaddingCustomValues.screenGap,
+                            bottom = PaddingCustomValues.smallSpacing
+                        ),
+                    fontWeight = FontWeight.Bold
                 )
-                Log.d(TAG, "gson str = ${GsonBuilder().setPrettyPrinting().create().toJson(task)}")
-                DatabaseFunctions.uploadTaskToFirebase(
-                    task = task,
-                    onSuccessListener = onCompletion,
-                    onFailureListener = {
-                        addTaskButtonEnabled.value = true
-                        // TODO: set something
-                    }
+                TitleAndDescription(title, description)
+                StartTimePicker(hour = hour, minute = minute)
+                StartDatePicker(day = day, month = month, year = year)
+                RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed, date = day)
+                DelayTaskTime(snoozeDuration = snoozeDuration)
+                DelayTaskDay(postponeDuration = postponeDuration)
+                val addTaskButtonEnabled = remember { mutableStateOf(true) }
+                Button(
+                    onClick = {
+                        addTaskButtonEnabled.value = false
+                        val task = Task(
+                            title = title.value,
+                            description = description.value,
+                            timeForReminder = Time(
+                                hour = hour.value,
+                                minute = minute.value
+                            ),
+                            dateForReminder = Date(
+                                dayOfMonth = day.value,
+                                month = month.value,
+                                year = year.value
+                            ),
+                            dateWise = dateWise.value,
+                            repeatGapDuration = daysDelayed.value,
+                            snoozeDuration = snoozeDuration.value,
+                            postponeDuration = postponeDuration.value
+                        )
+                        Log.d(
+                            TAG,
+                            "gson str = ${GsonBuilder().setPrettyPrinting().create().toJson(task)}"
+                        )
+                        DatabaseFunctions.uploadTaskToFirebase(
+                            task = task,
+                            onSuccessListener = navigateUp,
+                            onFailureListener = {
+                                addTaskButtonEnabled.value = true
+                                // TODO: set something
+                            }
+                        )
+                        // TODO: add a undismissable prompt to show saving in progress
+                    },
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(bottom = PaddingCustomValues.screenGap),
+                    content = { Text(text = "Add Task") },
+                    enabled = addTaskButtonEnabled.value
                 )
-                // TODO: add a undismissable prompt to show saving in progress
-            },
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(bottom = 20.dp),
-            content = { Text(text = "Add Task") },
-            enabled = addTaskButtonEnabled.value
-        )
-    }
+            }
+        }
+    )
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -149,8 +190,8 @@ fun TitleAndDescription(
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(externalSpacing),
-            modifier = Modifier.padding(externalSpacing)
+            verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.mediumSpacing),
+            modifier = Modifier.padding(PaddingCustomValues.mediumSpacing)
         ) {
             OutlinedTextField(
                 value = title.value,
@@ -207,9 +248,9 @@ fun RepeatSchedule(
             val selected = remember { mutableStateOf(Repetitions.DAY) }
             Row(
                 modifier = modifier
-                    .padding(horizontal = externalSpacing)
+                    .padding(horizontal = PaddingCustomValues.mediumSpacing)
                     .horizontalScroll(ScrollState(0)),
-                horizontalArrangement = Arrangement.spacedBy(externalSpacing)
+                horizontalArrangement = Arrangement.spacedBy(PaddingCustomValues.mediumSpacing)
             ) {
                 val selector: (Reps) -> Unit = { reps: Reps ->
                     selected.value = reps
@@ -245,7 +286,7 @@ fun RepeatSchedule(
                         text = "The given task would be repeated on ${numFormatter(date.value)} of every month",
                         fontSize = FontSizeCustomValues.medium,
                         modifier = Modifier
-                            .padding(externalSpacing)
+                            .padding(PaddingCustomValues.mediumSpacing)
                     )
                 }
 
@@ -257,7 +298,7 @@ fun RepeatSchedule(
                         fontSize = FontSizeCustomValues.medium,
                         modifier = Modifier
                             .weight(1f)
-                            .padding(externalSpacing)
+                            .padding(PaddingCustomValues.mediumSpacing)
                     )
                     IconButton(
                         onClick = {
@@ -315,7 +356,7 @@ fun StartTimePicker(
             Text(
                 text = "Select time for reminder",
                 modifier = Modifier
-                    .padding(externalSpacing)
+                    .padding(PaddingCustomValues.mediumSpacing)
                     .weight(1f),
                 fontSize = FontSizeCustomValues.medium
             )
@@ -353,7 +394,7 @@ fun StartDatePicker(
             Text(
                 text = "Select date for Task",
                 modifier = Modifier
-                    .padding(externalSpacing)
+                    .padding(PaddingCustomValues.mediumSpacing)
                     .weight(1f),
                 fontSize = FontSizeCustomValues.medium
             )
@@ -376,7 +417,7 @@ fun DelayTaskTime(modifier: Modifier = Modifier, snoozeDuration: MutableState<In
                 text = "Snooze Duration",
                 modifier = Modifier
                     .weight(1f)
-                    .padding(externalSpacing),
+                    .padding(PaddingCustomValues.mediumSpacing),
                 fontSize = FontSizeCustomValues.medium
             )
             SelectNumberRange(
@@ -396,7 +437,7 @@ fun DelayTaskDay(modifier: Modifier = Modifier, postponeDuration: MutableState<I
                 text = "Event Postpone Duration",
                 modifier = Modifier
                     .weight(1f)
-                    .padding(externalSpacing),
+                    .padding(PaddingCustomValues.mediumSpacing),
                 fontSize = FontSizeCustomValues.medium
             )
             SelectNumberRange(

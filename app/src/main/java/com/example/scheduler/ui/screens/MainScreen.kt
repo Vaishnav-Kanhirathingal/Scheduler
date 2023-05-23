@@ -205,9 +205,9 @@ fun FilterRowPreview() {
 @Composable
 fun FilterRow(modifier: Modifier = Modifier, filterSelected: MutableState<Reps>) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(PaddingCustomValues.internalSpacing),
+        horizontalArrangement = Arrangement.spacedBy(PaddingCustomValues.smallSpacing),
         modifier = modifier
-            .padding(horizontal = PaddingCustomValues.internalSpacing)
+            .padding(horizontal = PaddingCustomValues.smallSpacing)
             .fillMaxWidth()
             .horizontalScroll(ScrollState(0)),
         content = {
@@ -312,7 +312,7 @@ fun SavedTaskList(
                         DetailedTaskCard(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(PaddingCustomValues.internalSpacing),
+                                .padding(PaddingCustomValues.smallSpacing),
                             task = task,
                             selected = selected
                         )
@@ -334,7 +334,7 @@ fun DetailedTaskCard(
         modifier = modifier,
         content = {
             Column(
-                modifier = Modifier.padding(PaddingCustomValues.externalSpacing),
+                modifier = Modifier.padding(PaddingCustomValues.mediumSpacing),
                 content = {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -361,7 +361,7 @@ fun DetailedTaskCard(
                                 text = task.title,
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(horizontal = PaddingCustomValues.externalSpacing),
+                                    .padding(horizontal = PaddingCustomValues.mediumSpacing),
                                 fontSize = FontSizeCustomValues.large
                             )
                             IconButton(
@@ -429,7 +429,7 @@ fun DetailedTaskCard(
 fun DetailsRow(text: String, icon: ImageVector) {
     Row(
         modifier = Modifier
-            .padding(top = PaddingCustomValues.internalSpacing)
+            .padding(top = PaddingCustomValues.smallSpacing)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         content = {
@@ -438,7 +438,7 @@ fun DetailsRow(text: String, icon: ImageVector) {
                 text = text,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = PaddingCustomValues.internalSpacing)
+                    .padding(start = PaddingCustomValues.smallSpacing)
             )
         }
     )
