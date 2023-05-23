@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scheduler.data.Date
-import com.example.scheduler.data.Repetition
+import com.example.scheduler.data.RepetitionEnum
 import com.example.scheduler.data.Repetitions
 import com.example.scheduler.data.Reps
 import com.example.scheduler.data.StringFunctions.getDateAsText
@@ -66,7 +66,7 @@ fun AddTaskScreen(onCompletion: () -> Unit) {
     val title = rememberSaveable { mutableStateOf("") }
     val description = rememberSaveable { mutableStateOf("") }
     val dateWise = rememberSaveable { mutableStateOf(false) }
-    val snoozeDuration = rememberSaveable { mutableStateOf(0) }
+    val snoozeDuration = rememberSaveable { mutableStateOf(1) }
     val postponeDuration = rememberSaveable { mutableStateOf(1) }
     val daysDelayed = rememberSaveable { mutableStateOf(0) }
 
@@ -216,27 +216,27 @@ fun RepeatSchedule(
                 FilterChip(
                     onClick = { selector(Repetitions.DAY) },
                     label = { Text(text = "Day") },
-                    selected = Repetition.DAY == selected.value.enumValue
+                    selected = RepetitionEnum.DAY == selected.value.enumValue
                 )
                 FilterChip(
                     onClick = { selector(Repetitions.WEEK) },
                     label = { Text(text = "Week") },
-                    selected = Repetition.WEEK == selected.value.enumValue
+                    selected = RepetitionEnum.WEEK == selected.value.enumValue
                 )
                 FilterChip(
                     onClick = { selector(Repetitions.MONTH) },
                     label = { Text(text = "Month") },
-                    selected = Repetition.MONTH == selected.value.enumValue
+                    selected = RepetitionEnum.MONTH == selected.value.enumValue
                 )
                 FilterChip(
                     onClick = { selector(Repetitions.SAME_DATE) },
                     label = { Text(text = "Date-Wise") },
-                    selected = Repetition.SAME_DATE == selected.value.enumValue
+                    selected = RepetitionEnum.SAME_DATE == selected.value.enumValue
                 )
-                dateWise.value = (selected.value.enumValue == Repetition.SAME_DATE)
+                dateWise.value = (selected.value.enumValue == RepetitionEnum.SAME_DATE)
             }
 
-            AnimatedVisibility(visible = selected.value.enumValue == Repetition.SAME_DATE) {
+            AnimatedVisibility(visible = selected.value.enumValue == RepetitionEnum.SAME_DATE) {
                 // TODO: display the date of month
                 Row {
                     Text(
@@ -248,7 +248,7 @@ fun RepeatSchedule(
                 }
 
             }
-            AnimatedVisibility(visible = selected.value.enumValue != Repetition.SAME_DATE) {
+            AnimatedVisibility(visible = selected.value.enumValue != RepetitionEnum.SAME_DATE) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Repeat in",
@@ -270,7 +270,7 @@ fun RepeatSchedule(
                     val display = daysDelayed.value / selected.value.step
                     Text(
                         text = "$display ${selected.value.timeUnit}${if (display > 1) "s" else ""} ${
-                            if (selected.value.enumValue != Repetition.DAY) "[${daysDelayed.value}d]" else ""
+                            if (selected.value.enumValue != RepetitionEnum.DAY) "[${daysDelayed.value}d]" else ""
                         }",
                         fontSize = FontSizeCustomValues.medium
                     )
@@ -379,7 +379,8 @@ fun DelayTaskTime(modifier: Modifier = Modifier, snoozeDuration: MutableState<In
             )
             SelectNumberRange(
                 unit = "min",
-                value = snoozeDuration
+                value = snoozeDuration,
+                rangeMin = 1
             )
         }
     }

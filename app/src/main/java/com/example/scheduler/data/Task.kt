@@ -1,5 +1,10 @@
 package com.example.scheduler.data
 
+import android.icu.util.Calendar
+import java.time.Duration
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 /**
  * @param title main title
  * @param description
@@ -19,25 +24,91 @@ data class Task(
     val repeatGapDuration: Int,
     val snoozeDuration: Int,
     val postponeDuration: Int,
-)
+) {
+    fun nextReminderIsScheduledFor(): Int {
+        // TODO: check for legitimacy
+        val calenderInstance = Calendar.getInstance()
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val today = Date(
+            dayOfMonth = calenderInstance[Calendar.DAY_OF_MONTH],
+            month = calenderInstance[Calendar.MONTH],
+            year = calenderInstance[Calendar.YEAR]
+        )
+        val todayDate = LocalDate.parse(
+            StringFunctions.getDateAsText(
+                y = today.year,
+                m = today.month,
+                d = today.dayOfMonth
+            ),
+            formatter
+        )
+        if (dateWise) {
+            val nextDate = LocalDate.parse(
+                StringFunctions.getDateAsText(
+                    y = if (today.month == 11 && (today.dayOfMonth > dateForReminder.dayOfMonth)) {
+                        today.year + 1
+                    } else {
+                        today.year
+                    },
+                    m = if (today.month == 11 && (today.dayOfMonth > dateForReminder.dayOfMonth)) {
+                        0
+                    } else {
+                        today.month + 1
+                    },
+                    d = dateForReminder.dayOfMonth
+                ), formatter
+            )
+            return Duration.between(todayDate.atStartOfDay(), nextDate.atStartOfDay()).toDays()
+                .toInt()
+            // TODO: get separate for date wise
+        } else {
+            val alarmSetOnDate = LocalDate.parse(
+                StringFunctions.getDateAsText(
+                    y = dateForReminder.year,
+                    m = dateForReminder.month,
+                    d = dateForReminder.dayOfMonth
+                ),
+                formatter
+            )
+            val gap =
+                Duration.between(todayDate.atStartOfDay(), alarmSetOnDate.atStartOfDay()).toDays()
+            if (repeatGapDuration == 0) {
+                // TODO:
+                return 10000
+            } else {
+                (gap % repeatGapDuration).let {
+                    return repeatGapDuration - if (it == 0L) {
+                        repeatGapDuration
+                    } else {
+                        it.toInt()
+                    }
+                }
+            }
+        }
+    }
 
-enum class Repetition {
+    fun isScheduled(inDays: Int): Boolean {
+        return nextReminderIsScheduledFor() < inDays
+    }
+}
+
+enum class RepetitionEnum {
     DAY, WEEK, MONTH, SAME_DATE
 
 }
 
 /** @param step can't be zero */
 class Reps(
-    val enumValue: Repetition,
+    val enumValue: RepetitionEnum,
     val timeUnit: String,
     val step: Int
 )
 
 object Repetitions {
-    val DAY = Reps(enumValue = Repetition.DAY, timeUnit = "day", step = 1)
-    val WEEK = Reps(enumValue = Repetition.WEEK, timeUnit = "week", step = 7)
-    val MONTH = Reps(enumValue = Repetition.MONTH, timeUnit = "month", step = 30)
-    val SAME_DATE = Reps(enumValue = Repetition.SAME_DATE, timeUnit = "error", step = 1)
+    val DAY = Reps(enumValue = RepetitionEnum.DAY, timeUnit = "Day", step = 1)
+    val WEEK = Reps(enumValue = RepetitionEnum.WEEK, timeUnit = "Week", step = 7)
+    val MONTH = Reps(enumValue = RepetitionEnum.MONTH, timeUnit = "Month", step = 30)
+    val SAME_DATE = Reps(enumValue = RepetitionEnum.SAME_DATE, timeUnit = "error", step = 1)
 }
 
 class Date(
@@ -90,7 +161,7 @@ val testTaskList = mutableListOf(
         title = "Meeting",
         description = "Discuss project updates",
         timeForReminder = Time(hour = 9, minute = 30),
-        dateForReminder = Date(dayOfMonth = 15, month = 5, year = 2023),
+        dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
         dateWise = false,
         repeatGapDuration = 7,
         snoozeDuration = 10,
@@ -100,7 +171,7 @@ val testTaskList = mutableListOf(
         title = "Birthday",
         description = "Buy a gift",
         timeForReminder = Time(hour = 18, minute = 0),
-        dateForReminder = Date(dayOfMonth = 10, month = 9, year = 2023),
+        dateForReminder = Date(dayOfMonth = 24, month = 5, year = 2023),
         dateWise = true,
         repeatGapDuration = 0,
         snoozeDuration = 5,

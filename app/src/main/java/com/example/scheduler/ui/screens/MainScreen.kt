@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
@@ -50,6 +52,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.scheduler.data.Repetitions
+import com.example.scheduler.data.Reps
 import com.example.scheduler.data.StringFunctions.getDateAsText
 import com.example.scheduler.data.StringFunctions.getTextWithS
 import com.example.scheduler.data.StringFunctions.getTimeAsText
@@ -65,17 +69,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainScreen"
-
-//@Composable
-//@Preview
-//fun MainScreenPreview() {
-//    MainScreen(toAddTaskScreen = { /*TODO*/ }) {
-//        IconButton(
-//            onClick = { },
-//            content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) }
-//        )
-//    }
-//}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -146,6 +139,7 @@ fun MainScreen(
         },
         content = {
             val receivedList = remember { mutableStateListOf<Task>() }
+            val filter = remember { mutableStateOf(Repetitions.DAY) }
             Column {
                 DatabaseFunctions.getListOfTasksFromDatastore(
                     listReceiver = {
@@ -171,22 +165,42 @@ fun MainScreen(
                 FilterRow(
                     modifier = Modifier
                         .padding(it)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    filterSelected = filter
+                )
+                Button(
+                    onClick = {
+                        for (i in testTaskList) {
+                            Log.d(TAG, i.nextReminderIsScheduledFor().toString())
+                        }
+                    },
+                    content = {
+                        Text(text = "Test")
+                    }
                 )
                 SavedTaskList(
                     modifier = Modifier.fillMaxWidth(),
                     lazyListState = lazyListState,
-                    listOfTaskReceived = receivedList
+                    listOfTaskReceived = receivedList,
+                    selected = filter
                 )
             }
         }
     )
 }
 
-@Composable
 @Preview(showBackground = true)
-fun FilterRow(modifier: Modifier = Modifier) {
-    val filterSelected = remember { mutableStateOf(TimeFilter.DAY) }
+@Composable
+fun FilterRowPreview() {
+    FilterRow(
+        filterSelected = remember {
+            mutableStateOf(Repetitions.DAY)
+        }
+    )
+}
+
+@Composable
+fun FilterRow(modifier: Modifier = Modifier, filterSelected: MutableState<Reps>) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(PaddingCustomValues.internalSpacing),
         modifier = modifier
@@ -197,20 +211,17 @@ fun FilterRow(modifier: Modifier = Modifier) {
             TimeFilterChip(
                 modifier = Modifier.weight(1f),
                 currentChoice = filterSelected,
-                text = "Day",
-                chipFilterType = TimeFilter.DAY
+                chipFilterType = Repetitions.DAY
             )
             TimeFilterChip(
                 modifier = Modifier.weight(1f),
                 currentChoice = filterSelected,
-                text = "Week",
-                chipFilterType = TimeFilter.WEEK
+                chipFilterType = Repetitions.WEEK
             )
             TimeFilterChip(
                 modifier = Modifier.weight(1f),
                 currentChoice = filterSelected,
-                text = "Month",
-                chipFilterType = TimeFilter.MONTH
+                chipFilterType = Repetitions.MONTH
             )
         }
     )
@@ -220,17 +231,16 @@ fun FilterRow(modifier: Modifier = Modifier) {
 @Composable
 fun TimeFilterChip(
     modifier: Modifier = Modifier,
-    currentChoice: MutableState<TimeFilter>,
-    text: String,
-    chipFilterType: TimeFilter
+    currentChoice: MutableState<Reps>,
+    chipFilterType: Reps
 ) {
     FilterChip(
         modifier = modifier,
-        selected = currentChoice.value == chipFilterType,
+        selected = currentChoice.value.enumValue == chipFilterType.enumValue,
         onClick = { currentChoice.value = chipFilterType },
         label = {
             Text(
-                text = text,
+                text = chipFilterType.timeUnit,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -269,7 +279,8 @@ fun SavedTaskListPreview() {
             .fillMaxWidth()
             .fillMaxHeight(),
         lazyListState = LazyListState(0, 0),
-        listOfTaskReceived = receivedList
+        listOfTaskReceived = receivedList,
+        selected = remember { mutableStateOf(Repetitions.MONTH) }
     )
 }
 
@@ -277,7 +288,8 @@ fun SavedTaskListPreview() {
 fun SavedTaskList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
-    listOfTaskReceived: SnapshotStateList<Task>
+    listOfTaskReceived: SnapshotStateList<Task>,
+    selected: MutableState<Reps>
 ) {
     LazyColumn(
         modifier = modifier,
@@ -290,7 +302,12 @@ fun SavedTaskList(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(PaddingCustomValues.internalSpacing),
-                        content = { DetailedTaskCard(task = listOfTaskReceived[it]) }
+                        content = {
+                            DetailedTaskCard(
+                                task = listOfTaskReceived[it],
+                                selected = selected
+                            )
+                        }
                     )
                 }
             )
@@ -305,9 +322,11 @@ fun DetailedTaskCardComparePreview() {
         modifier = Modifier.padding(PaddingCustomValues.internalSpacing),
         content = {
             DetailedTaskCard(
-                task = testTaskList[1], modifier = Modifier
+                task = testTaskList[1],
+                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(PaddingCustomValues.internalSpacing)
+                    .padding(PaddingCustomValues.internalSpacing),
+                selected = remember { mutableStateOf(Repetitions.DAY) }
             )
             Card(
                 modifier = Modifier
@@ -327,7 +346,11 @@ fun DetailedTaskCardComparePreview() {
 }
 
 @Composable
-fun DetailedTaskCard(task: Task, modifier: Modifier = Modifier) {
+fun DetailedTaskCard(
+    task: Task,
+    modifier: Modifier = Modifier,
+    selected: MutableState<Reps>
+) {
     // TODO: add a UI element that tells how much time remaining till the next alarm
     Card(
         modifier = modifier,
@@ -340,7 +363,12 @@ fun DetailedTaskCard(task: Task, modifier: Modifier = Modifier) {
                         verticalAlignment = Alignment.CenterVertically,
                         content = {
                             Icon(
-                                imageVector = Icons.Outlined.Build,// TODO: this icon should denote whether the task is scheduled for today or not
+                                // TODO: this icon should denote whether the task is scheduled for today or not
+                                imageVector = if (task.isScheduled(selected.value.step)) {
+                                    Icons.Filled.Build
+                                } else {
+                                    Icons.Outlined.Build
+                                },
                                 contentDescription = null
                             )
                             Text(
@@ -429,8 +457,4 @@ fun DetailsRow(text: String, icon: ImageVector) {
         }
     )
 
-}
-
-enum class TimeFilter {
-    DAY, WEEK, MONTH
 }
