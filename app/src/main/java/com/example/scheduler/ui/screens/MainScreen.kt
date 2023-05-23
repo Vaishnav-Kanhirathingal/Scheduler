@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
@@ -82,7 +81,11 @@ private const val TAG = "MainScreen"
 @Composable
 fun MainScreen(
     toAddTaskScreen: () -> Unit,
-    googleSignInButton: @Composable (modifier: Modifier) -> Unit
+    googleSignInButton: @Composable (
+        modifier: Modifier,
+        onSuccess: () -> Unit,
+        onFailure: (issue: String) -> Unit,
+    ) -> Unit
 ) {
     val snackBarHostState = SnackbarHostState()
     val lazyListState = rememberLazyListState()
@@ -104,8 +107,23 @@ fun MainScreen(
                 },
                 actions = {
                     googleSignInButton(
-                        Modifier
-//                            .padding(horizontal = PaddingCustomValues.externalSpacing)
+                        Modifier,
+                        {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                snackBarHostState.showSnackbar(
+                                    message = "Login Successful",
+                                    withDismissAction = true
+                                )
+                            }
+                        },
+                        {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                snackBarHostState.showSnackbar(
+                                    message = "Login Unsuccessful, reason = $it",
+                                    withDismissAction = true
+                                )
+                            }
+                        }
                     )
                 },
                 navigationIcon = {
@@ -154,21 +172,6 @@ fun MainScreen(
                     modifier = Modifier
                         .padding(it)
                         .fillMaxWidth()
-                )
-                Button(
-                    // TODO: remove
-                    onClick = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            snackBarHostState.showSnackbar(
-                                message = "mess",
-                                actionLabel = "act",
-                                withDismissAction = true,
-                                duration = SnackbarDuration.Short,
-                            )
-                        }
-                    }, content = {
-                        Text(text = "testButton")
-                    }
                 )
                 SavedTaskList(
                     modifier = Modifier.fillMaxWidth(),

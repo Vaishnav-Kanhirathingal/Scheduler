@@ -1,7 +1,6 @@
 package com.example.scheduler
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -20,7 +19,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.scheduler.firebase.AccountFunctions
-import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.ui.destinations.AddTaskScreen
 import com.example.scheduler.ui.destinations.DetailsScreen
 import com.example.scheduler.ui.destinations.MainScreen
@@ -30,7 +28,6 @@ import com.example.scheduler.ui.theme.SchedulerTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.GsonBuilder
 
 class MainActivity : ComponentActivity() {
     private val TAG = this::class.java.simpleName
@@ -49,7 +46,13 @@ class MainActivity : ComponentActivity() {
                     SchedulerNavHost(
                         navController = navHostController,
                         modifier = Modifier,
-                        googleSignInButton = { GoogleSignInButton(it) }
+                        googleSignInButton = { modifier: Modifier, onSuccess: () -> Unit, onFailure: (issue: String) -> Unit ->
+                            GoogleSignInButton(
+                                modifier = modifier,
+                                onSuccess = onSuccess,
+                                onFailure = onFailure
+                            )
+                        }
                     )
                 }
             }
@@ -57,7 +60,11 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GoogleSignInButton(modifier: Modifier) {
+    fun GoogleSignInButton(
+        modifier: Modifier,
+        onSuccess: () -> Unit,
+        onFailure: (issue: String) -> Unit
+    ) {
 
         val googleSignInOptions = GoogleSignInOptions
             .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -65,7 +72,6 @@ class MainActivity : ComponentActivity() {
             .requestEmail()
             .build()
         val googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
-
         val startForResult =
             rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult(),
@@ -73,8 +79,8 @@ class MainActivity : ComponentActivity() {
                     AccountFunctions.signInGoogle(
                         // TODO: correctly set lambda parameters
                         result = it,
-                        onSuccess = {},
-                        onFailure = {}
+                        onSuccess = onSuccess,
+                        onFailure = onFailure
                     )
                 }
             )
@@ -90,7 +96,11 @@ class MainActivity : ComponentActivity() {
 fun SchedulerNavHost(
     navController: NavHostController,
     modifier: Modifier,
-    googleSignInButton: @Composable (modifier: Modifier) -> Unit
+    googleSignInButton: @Composable (
+        modifier: Modifier,
+        onSuccess: () -> Unit,
+        onFailure: (issue: String) -> Unit,
+    ) -> Unit
 ) {
     NavHost(
         navController = navController,
