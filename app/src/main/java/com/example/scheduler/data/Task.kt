@@ -87,13 +87,13 @@ data class Task(
         }
     }
 
-    fun isScheduled(inDays: Int): Boolean {
+    fun isScheduledIn(inDays: Int): Boolean {
         return nextReminderIsScheduledFor() < inDays
     }
 }
 
 enum class RepetitionEnum {
-    DAY, WEEK, MONTH, SAME_DATE
+    DAY, WEEK, MONTH, SAME_DATE,ALL
 
 }
 
@@ -109,6 +109,7 @@ object Repetitions {
     val WEEK = Reps(enumValue = RepetitionEnum.WEEK, timeUnit = "Week", step = 7)
     val MONTH = Reps(enumValue = RepetitionEnum.MONTH, timeUnit = "Month", step = 30)
     val SAME_DATE = Reps(enumValue = RepetitionEnum.SAME_DATE, timeUnit = "error", step = 1)
+    val ALL =  Reps(enumValue = RepetitionEnum.ALL, timeUnit = "All", step = 1)
 }
 
 class Date(

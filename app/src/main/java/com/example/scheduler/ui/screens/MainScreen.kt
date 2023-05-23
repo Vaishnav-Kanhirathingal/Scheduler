@@ -23,6 +23,8 @@ import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material.icons.twotone.Build
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -83,6 +85,8 @@ fun MainScreen(
     val snackBarHostState = SnackbarHostState()
     val lazyListState = rememberLazyListState()
     val showFullText = remember { mutableStateOf(true) }
+
+    val filter = remember { mutableStateOf(Repetitions.ALL) }
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemIndex }
             .collect { showFullText.value = (it == 0) }
@@ -139,7 +143,6 @@ fun MainScreen(
         },
         content = {
             val receivedList = remember { mutableStateListOf<Task>() }
-            val filter = remember { mutableStateOf(Repetitions.DAY) }
             Column {
                 DatabaseFunctions.getListOfTasksFromDatastore(
                     listReceiver = {
@@ -208,6 +211,11 @@ fun FilterRow(modifier: Modifier = Modifier, filterSelected: MutableState<Reps>)
             .fillMaxWidth()
             .horizontalScroll(ScrollState(0)),
         content = {
+            TimeFilterChip(
+                modifier = Modifier.weight(1f),
+                currentChoice = filterSelected,
+                chipFilterType = Repetitions.ALL
+            )
             TimeFilterChip(
                 modifier = Modifier.weight(1f),
                 currentChoice = filterSelected,
@@ -298,47 +306,17 @@ fun SavedTaskList(
             items(
                 count = listOfTaskReceived.size,
                 itemContent = {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(PaddingCustomValues.internalSpacing),
-                        content = {
-                            DetailedTaskCard(
-                                task = listOfTaskReceived[it],
-                                selected = selected
-                            )
-                        }
-                    )
-                }
-            )
-        }
-    )
-}
-
-@Composable
-@Preview(showBackground = true)
-fun DetailedTaskCardComparePreview() {
-    Column(
-        modifier = Modifier.padding(PaddingCustomValues.internalSpacing),
-        content = {
-            DetailedTaskCard(
-                task = testTaskList[1],
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(PaddingCustomValues.internalSpacing),
-                selected = remember { mutableStateOf(Repetitions.DAY) }
-            )
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(PaddingCustomValues.internalSpacing),
-                content = {
-                    Text(
-                        text = GsonBuilder().setPrettyPrinting().create().toJson(testTaskList[1]),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(PaddingCustomValues.externalSpacing)
-                    )
+                    val task = listOfTaskReceived[it]
+                    if (task.isScheduledIn(selected.value.step) || selected.value == Repetitions.ALL) {
+                        // TODO: removve card
+                        DetailedTaskCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(PaddingCustomValues.internalSpacing),
+                            task = task,
+                            selected = selected
+                        )
+                    }
                 }
             )
         }
@@ -364,11 +342,19 @@ fun DetailedTaskCard(
                         content = {
                             Icon(
                                 // TODO: this icon should denote whether the task is scheduled for today or not
-                                imageVector = if (task.isScheduled(selected.value.step)) {
-                                    Icons.Filled.Build
-                                } else {
-                                    Icons.Outlined.Build
-                                },
+                                imageVector =
+                                when {
+                                    task.isScheduledIn(Repetitions.DAY.step) -> Icons.Outlined.Build
+                                    task.isScheduledIn(Repetitions.WEEK.step) -> Icons.TwoTone.Build
+                                    task.isScheduledIn(Repetitions.MONTH.step) -> Icons.Filled.Build
+                                    else -> Icons.Outlined.Warning
+                                }
+//                                if (task.isScheduled(selected.value.step)) {
+//                                    Icons.Filled.Build
+//                                } else {
+//                                    Icons.Outlined.Build
+//                                }
+                                ,
                                 contentDescription = null
                             )
                             Text(

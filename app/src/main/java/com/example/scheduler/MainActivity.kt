@@ -116,6 +116,7 @@ fun SchedulerNavHost(
             composable(route = AddTaskScreen.route) {
                 // TODO: navigate up after adding the new task
                 AddTaskScreen {
+                    navController.navigateUp()
                     // TODO: navigate up after completion and save the task
                 }
             }
