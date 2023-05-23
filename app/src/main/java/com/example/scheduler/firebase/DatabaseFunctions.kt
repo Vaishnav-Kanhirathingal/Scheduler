@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 object DatabaseFunctions {
-    val TAG = this::class.java.simpleName
+    private val TAG = this::class.java.simpleName
     fun uploadTaskToFirebase(
         task: Task,
         onSuccessListener: () -> Unit,
@@ -63,7 +63,11 @@ object DatabaseFunctions {
             }
     }
 
-    fun getListOfTasksFromDatastore(listReceiver: (List<Task>) -> Unit) {
+    fun getListOfTasksFromDatastore(
+        listReceiver: (List<Task>) -> Unit,
+        onSuccess: () -> Unit,
+        onFailure: (issue: String) -> Unit
+    ) {
         val email = FirebaseAuth.getInstance().currentUser!!.email!!
         val db = FirebaseFirestore.getInstance()
 
@@ -103,7 +107,11 @@ object DatabaseFunctions {
                     )
                 }
                 listReceiver(listOfTasks)
+                onSuccess()
             }
-            .addOnFailureListener { it.printStackTrace() }
+            .addOnFailureListener {
+                it.printStackTrace()
+                onFailure(it.message ?: "error occurred while querying list of tasks")
+            }
     }
 }

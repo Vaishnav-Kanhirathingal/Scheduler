@@ -1,5 +1,6 @@
 package com.example.scheduler.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -34,9 +35,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,9 +52,12 @@ import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
 import com.example.scheduler.data.testTaskList
+import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 import com.google.gson.GsonBuilder
+
+private const val TAG = "MainScreen"
 
 @Composable
 @Preview
@@ -111,7 +117,25 @@ fun MainScreen(
             )
         },
         content = {
+            // TODO: save received value as a savable state list
+            val receivedList = remember { mutableStateListOf<Task>() }
             Column {
+                DatabaseFunctions.getListOfTasksFromDatastore(
+                    // TODO: correctly set [onSuccess] and [onFailure] parameters
+                    listReceiver = {
+                        receivedList.clear()
+                        for (i in it) {
+                            val ret = receivedList.add(i)
+                            Log.d(
+                                TAG, "added: $ret = " +
+                                        GsonBuilder().setPrettyPrinting().create().toJson(i)
+                            )
+                        }
+                    },
+                    onSuccess = {},
+                    onFailure = {}
+                )
+
                 FilterRow(
                     modifier = Modifier
                         .padding(it)
@@ -119,14 +143,14 @@ fun MainScreen(
                 )
                 SavedTaskList(
                     modifier = Modifier.fillMaxWidth(),
-                    lazyListState = lazyListState
+                    lazyListState = lazyListState,
+                    listOfTaskReceived = receivedList
                 )
             }
         }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview(showBackground = true)
 fun FilterRow(modifier: Modifier = Modifier) {
@@ -207,7 +231,7 @@ fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
 fun SavedTaskList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
-    listOfTaskReceived: List<Task> = testTaskList
+    listOfTaskReceived: SnapshotStateList<Task>
 ) {
     LazyColumn(
         modifier = modifier,

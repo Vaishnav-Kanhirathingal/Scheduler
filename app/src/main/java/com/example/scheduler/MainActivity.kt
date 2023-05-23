@@ -83,12 +83,6 @@ class MainActivity : ComponentActivity() {
             onClick = { startForResult.launch(googleSignInClient.signInIntent) },
             content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) }
         )
-        DatabaseFunctions.getListOfTasksFromDatastore {
-            Log.d(
-                DatabaseFunctions.TAG, "list received = " +
-                        GsonBuilder().setPrettyPrinting().create().toJson(it)
-            )
-        }
     }
 }
 
