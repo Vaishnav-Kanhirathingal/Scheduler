@@ -171,16 +171,16 @@ fun MainScreen(
                         .fillMaxWidth(),
                     filterSelected = filter
                 )
-                Button(
-                    onClick = {
-                        for (i in testTaskList) {
-                            Log.d(TAG, i.nextReminderIsScheduledFor().toString())
-                        }
-                    },
-                    content = {
-                        Text(text = "Test")
-                    }
-                )
+//                Button(
+//                    onClick = {
+//                        for (i in testTaskList) {
+//                            Log.d(TAG, i.nextReminderIsScheduledFor().toString())
+//                        }
+//                    },
+//                    content = {
+//                        Text(text = "Test")
+//                    }
+//                )
                 SavedTaskList(
                     modifier = Modifier.fillMaxWidth(),
                     lazyListState = lazyListState,

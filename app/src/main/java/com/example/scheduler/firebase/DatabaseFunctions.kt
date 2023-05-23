@@ -6,13 +6,14 @@ import com.example.scheduler.data.Task
 import com.example.scheduler.data.Time
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.lang.Error
 
 object DatabaseFunctions {
     private val TAG = this::class.java.simpleName
     fun uploadTaskToFirebase(
         task: Task,
         onSuccessListener: () -> Unit,
-        onFailureListener: () -> Unit
+        onFailureListener: (error:String) -> Unit
     ) {
         val data = hashMapOf(
             FirebaseConstants.task.title to task.title,
@@ -39,7 +40,7 @@ object DatabaseFunctions {
                 onSuccessListener()
                 Log.d(TAG, "added task to database")
             }.addOnFailureListener {
-                onFailureListener()
+                onFailureListener(it.message?:"error while adding task to remote database")
                 it.printStackTrace()
             }
     }

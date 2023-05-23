@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -29,6 +30,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -55,6 +58,9 @@ import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private const val TAG = "AddTaskPage"
 
@@ -84,7 +90,10 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
     val month = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MONTH]) }
     val year = rememberSaveable { mutableStateOf(calenderInstance[Calendar.YEAR]) }
 
+    // TODO: show error
+    val snackBarHostState = SnackbarHostState()
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -94,11 +103,20 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                         fontSize = FontSizeCustomValues.large
                         // TODO: set nav up button
                     )
-                }, navigationIcon = {
+                },
+                navigationIcon = {
                     IconButton(
                         onClick = navigateUp,
                         content = {
                             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                        }
+                    )
+                },
+                actions = {
+                    IconButton(
+                        onClick = { TODO("show help or guide") },
+                        content = {// TODO: replace the vector image for help circled
+                            Icon(imageVector = Icons.Filled.Send, contentDescription = null)
                         }
                     )
                 }
@@ -163,16 +181,25 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                         DatabaseFunctions.uploadTaskToFirebase(
                             task = task,
                             onSuccessListener = navigateUp,
-                            onFailureListener = {
+                            onFailureListener = { issue ->
                                 addTaskButtonEnabled.value = true
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    snackBarHostState.showSnackbar(
+                                        message = "Database Error: $issue",
+                                        withDismissAction = true
+                                    )
+                                }
                                 // TODO: set something
                             }
                         )
-                        // TODO: add a undismissable prompt to show saving in progress
+                        // TODO: add a un dismissable prompt to show saving in progress
                     },
                     modifier = Modifier
                         .align(Alignment.End)
-                        .padding(bottom = PaddingCustomValues.screenGap),
+                        .padding(
+                            bottom = PaddingCustomValues.screenGap,
+                            end = PaddingCustomValues.smallSpacing
+                        ),
                     content = { Text(text = "Add Task") },
                     enabled = addTaskButtonEnabled.value
                 )
@@ -180,7 +207,6 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
         }
     )
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
