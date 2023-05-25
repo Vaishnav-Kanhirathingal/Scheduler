@@ -10,6 +10,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -570,7 +571,8 @@ fun ShowSavingPrompt() {
                     // TODO: loading gif
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .size(200.dp)
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
                             .padding(PaddingCustomValues.screenGap)
                             .align(Alignment.CenterHorizontally),
                     )

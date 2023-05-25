@@ -6,7 +6,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -60,7 +59,6 @@ import com.example.scheduler.data.StringFunctions.getTextWithS
 import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
-import com.example.scheduler.data.testTaskList
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
@@ -324,7 +322,6 @@ fun DetailedTaskCard(
                         verticalAlignment = Alignment.CenterVertically,
                         content = {
                             Icon(
-                                // TODO: this icon should denote whether the task is scheduled for today or not
                                 imageVector =
                                 when {
                                     task.isScheduledIn(Repetitions.DAY.step) -> Icons.Outlined.Build
