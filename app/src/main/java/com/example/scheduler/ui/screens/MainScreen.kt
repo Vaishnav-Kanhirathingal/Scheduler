@@ -267,8 +267,7 @@ fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
         icon = {
             Icon(
                 imageVector = Icons.Filled.Add,
-                contentDescription = null,
-                tint = Color.Blue
+                contentDescription = null
             )
         },
         text = { Text(text = "Add Task") },

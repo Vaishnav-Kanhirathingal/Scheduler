@@ -108,7 +108,7 @@ object Repetitions {
     val DAY = Reps(enumValue = RepetitionEnum.DAY, timeUnit = "Day", step = 1)
     val WEEK = Reps(enumValue = RepetitionEnum.WEEK, timeUnit = "Week", step = 7)
     val MONTH = Reps(enumValue = RepetitionEnum.MONTH, timeUnit = "Month", step = 30)
-    val SAME_DATE = Reps(enumValue = RepetitionEnum.SAME_DATE, timeUnit = "error", step = 1)
+    val SAME_DATE = Reps(enumValue = RepetitionEnum.SAME_DATE, timeUnit = "Date", step = 1)
     val ALL =  Reps(enumValue = RepetitionEnum.ALL, timeUnit = "All", step = 1)
 }
 

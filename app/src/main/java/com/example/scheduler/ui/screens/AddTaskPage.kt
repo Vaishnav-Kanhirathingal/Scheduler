@@ -7,7 +7,6 @@ import android.util.Log
 import android.widget.DatePicker
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -67,8 +66,7 @@ private const val TAG = "AddTaskPage"
 @Composable
 @Preview(showBackground = true)
 fun AddTaskScreenPreview() {
-    AddTaskScaffold {
-    }
+    AddTaskScaffold {}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -219,9 +217,15 @@ fun TitleAndDescription(
             verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.mediumSpacing),
             modifier = Modifier.padding(PaddingCustomValues.mediumSpacing)
         ) {
+            val titleLimit = 25
+            val descriptionLimit = 100
             OutlinedTextField(
                 value = title.value,
-                onValueChange = { title.value = it },
+                onValueChange = {
+                    if (it.length <= titleLimit && (it.last() != '\n')) {
+                        title.value = it
+                    }
+                },
                 label = { Text(text = "Title") },
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
@@ -231,11 +235,23 @@ fun TitleAndDescription(
                             Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
                         }
                     )
+                },
+                singleLine = true,
+                supportingText = {
+                    Text(
+                        text = "${title.value.length}/$titleLimit",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.End
+                    )
                 }
             )
             OutlinedTextField(
                 value = description.value,
-                onValueChange = { description.value = it },
+                onValueChange = {
+                    if (it.length <= descriptionLimit) {
+                        description.value = it
+                    }
+                },
                 label = { Text(text = "Description") },
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
@@ -245,7 +261,15 @@ fun TitleAndDescription(
                             Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
                         }
                     )
-                }
+                },
+                supportingText = {
+                    Text(
+                        text = "${description.value.length}/$descriptionLimit",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.End
+                    )
+                },
+                maxLines = 5
             )
         }
     }
@@ -270,94 +294,119 @@ fun RepeatSchedule(
     date: MutableState<Int>
 ) {
     Card(modifier = modifier) {
-        Column {
-            val selected = remember { mutableStateOf(Repetitions.DAY) }
-            Row(
-                modifier = modifier
-                    .padding(horizontal = PaddingCustomValues.mediumSpacing)
-                    .horizontalScroll(ScrollState(0)),
-                horizontalArrangement = Arrangement.spacedBy(PaddingCustomValues.mediumSpacing)
-            ) {
-                val selector: (Reps) -> Unit = { reps: Reps ->
-                    selected.value = reps
-                    daysDelayed.value = (daysDelayed.value / reps.step) * reps.step
-                }
-                FilterChip(
-                    onClick = { selector(Repetitions.DAY) },
-                    label = { Text(text = "Day") },
-                    selected = RepetitionEnum.DAY == selected.value.enumValue
-                )
-                FilterChip(
-                    onClick = { selector(Repetitions.WEEK) },
-                    label = { Text(text = "Week") },
-                    selected = RepetitionEnum.WEEK == selected.value.enumValue
-                )
-                FilterChip(
-                    onClick = { selector(Repetitions.MONTH) },
-                    label = { Text(text = "Month") },
-                    selected = RepetitionEnum.MONTH == selected.value.enumValue
-                )
-                FilterChip(
-                    onClick = { selector(Repetitions.SAME_DATE) },
-                    label = { Text(text = "Date-Wise") },
-                    selected = RepetitionEnum.SAME_DATE == selected.value.enumValue
-                )
-                dateWise.value = (selected.value.enumValue == RepetitionEnum.SAME_DATE)
-            }
-
-            AnimatedVisibility(visible = selected.value.enumValue == RepetitionEnum.SAME_DATE) {
-                // TODO: display the date of month
-                Row {
-                    Text(
-                        text = "The given task would be repeated on ${numFormatter(date.value)} of every month",
-                        fontSize = FontSizeCustomValues.medium,
-                        modifier = Modifier
-                            .padding(PaddingCustomValues.mediumSpacing)
-                    )
-                }
-
-            }
-            AnimatedVisibility(visible = selected.value.enumValue != RepetitionEnum.SAME_DATE) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Repeat in",
-                        fontSize = FontSizeCustomValues.medium,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(PaddingCustomValues.mediumSpacing)
-                    )
-                    IconButton(
-                        onClick = {
-                            if (daysDelayed.value >= selected.value.step) {
-                                daysDelayed.value -= selected.value.step
-                            }
-                        },
-                        content = {
-                            Icon(imageVector = Icons.Filled.Add, contentDescription = null)
-                        }
-                    )
-                    val display = daysDelayed.value / selected.value.step
-                    Text(
-                        text = "$display ${selected.value.timeUnit}${if (display > 1) "s" else ""} ${
-                            if (selected.value.enumValue != RepetitionEnum.DAY) "[${daysDelayed.value}d]" else ""
-                        }",
-                        fontSize = FontSizeCustomValues.medium
-                    )
-                    IconButton(
-                        onClick = {
-                            if (daysDelayed.value < 1000) {
-                                daysDelayed.value += selected.value.step
-                            }
-                        },
-                        content = {
-                            Icon(imageVector = Icons.Filled.Add, contentDescription = null)
-                        }
-                    )
-                }
-
-            }
+        val selected = remember { mutableStateOf(Repetitions.DAY) }
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = PaddingCustomValues.mediumSpacing),
+            horizontalArrangement = Arrangement.spacedBy(PaddingCustomValues.mediumSpacing)
+        ) {
+            TimeFilterChip(
+                chipType = Repetitions.DAY,
+                modifier = Modifier.weight(1f),
+                selectedReps = selected,
+                daysDelayed = daysDelayed
+            )
+            TimeFilterChip(
+                chipType = Repetitions.WEEK,
+                modifier = Modifier.weight(1f),
+                selectedReps = selected,
+                daysDelayed = daysDelayed
+            )
+            TimeFilterChip(
+                chipType = Repetitions.MONTH,
+                modifier = Modifier.weight(1f),
+                selectedReps = selected,
+                daysDelayed = daysDelayed
+            )
+            TimeFilterChip(
+                chipType = Repetitions.SAME_DATE,
+                modifier = Modifier.weight(1f),
+                selectedReps = selected,
+                daysDelayed = daysDelayed
+            )
+            dateWise.value = (selected.value.enumValue == RepetitionEnum.SAME_DATE)
         }
+
+        AnimatedVisibility(visible = selected.value.enumValue == RepetitionEnum.SAME_DATE) {
+            // TODO: display the date of month
+            Row {
+                Text(
+                    text = "The given task would be repeated on ${numFormatter(date.value)} of every month",
+                    fontSize = FontSizeCustomValues.medium,
+                    modifier = Modifier
+                        .padding(PaddingCustomValues.mediumSpacing)
+                )
+            }
+
+        }
+        AnimatedVisibility(visible = selected.value.enumValue != RepetitionEnum.SAME_DATE) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Repeat in",
+                    fontSize = FontSizeCustomValues.medium,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(PaddingCustomValues.mediumSpacing)
+                )
+                IconButton(
+                    onClick = {
+                        if (daysDelayed.value >= selected.value.step) {
+                            daysDelayed.value -= selected.value.step
+                        }
+                    },
+                    content = {
+                        Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+                    }
+                )
+                val display = daysDelayed.value / selected.value.step
+                Text(
+                    text = "$display ${selected.value.timeUnit}${if (display > 1) "s" else ""} ${
+                        if (selected.value.enumValue != RepetitionEnum.DAY) "[${daysDelayed.value}d]" else ""
+                    }",
+                    fontSize = FontSizeCustomValues.medium
+                )
+                IconButton(
+                    onClick = {
+                        if (daysDelayed.value < 1000) {
+                            daysDelayed.value += selected.value.step
+                        }
+                    },
+                    content = {
+                        Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+                    }
+                )
+            }
+
+        }
+
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimeFilterChip(
+    chipType: Reps,
+    modifier: Modifier,
+    selectedReps: MutableState<Reps>,
+    daysDelayed: MutableState<Int>
+) {
+    val selector: (Reps) -> Unit = { reps: Reps ->
+        selectedReps.value = reps
+        daysDelayed.value = (daysDelayed.value / reps.step) * reps.step
+    }
+    FilterChip(
+        modifier = modifier,
+        onClick = { selector(chipType) },
+        label = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = chipType.timeUnit,
+                textAlign = TextAlign.Center
+            )
+        },
+        selected = chipType.enumValue == selectedReps.value.enumValue
+    )
 }
 
 @Composable
