@@ -25,7 +25,8 @@ data class Task(
     val snoozeDuration: Int,
     val postponeDuration: Int,
 ) {
-    fun nextReminderIsScheduledIn(): Int {
+    /** returns the number of days till the reminder is scheduled for */
+    private fun nextReminderIsScheduledIn(): Int {
         // TODO: check for legitimacy
         val calenderInstance = Calendar.getInstance()
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")

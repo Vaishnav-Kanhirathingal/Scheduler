@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -44,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.scheduler.data.Date
 import com.example.scheduler.data.RepetitionEnum
 import com.example.scheduler.data.Repetitions
@@ -151,10 +155,13 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                 RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed, date = day)
                 DelayTaskTime(snoozeDuration = snoozeDuration)
                 DelayTaskDay(postponeDuration = postponeDuration)
-                val addTaskButtonEnabled = remember { mutableStateOf(true) }
+                val savingInProgress = remember { mutableStateOf(false) }
+                if (savingInProgress.value) {
+                    ShowSavingPrompt()
+                }
                 Button(
                     onClick = {
-                        addTaskButtonEnabled.value = false
+                        savingInProgress.value = true
                         val task = Task(
                             title = title.value,
                             description = description.value,
@@ -180,7 +187,7 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                             task = task,
                             onSuccessListener = navigateUp,
                             onFailureListener = { issue ->
-                                addTaskButtonEnabled.value = true
+                                savingInProgress.value = false
                                 CoroutineScope(Dispatchers.IO).launch {
                                     snackBarHostState.showSnackbar(
                                         message = "Database Error: $issue",
@@ -199,7 +206,7 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                             end = PaddingCustomValues.smallSpacing
                         ),
                     content = { Text(text = "Add Task") },
-                    enabled = addTaskButtonEnabled.value
+                    enabled = !savingInProgress.value
                 )
             }
         }
@@ -222,8 +229,13 @@ fun TitleAndDescription(
             OutlinedTextField(
                 value = title.value,
                 onValueChange = {
-                    if (it.length <= titleLimit && (it.last() != '\n')) {
-                        title.value = it
+                    try {
+                        if (it.length <= titleLimit && (it.last() != '\n')) {
+                            title.value = it
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        title.value = ""
                     }
                 },
                 label = { Text(text = "Title") },
@@ -544,6 +556,40 @@ fun SelectNumberRange(
             Icon(imageVector = Icons.Filled.Add, contentDescription = null)
         }
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ShowSavingPrompt() {
+    Dialog(
+        onDismissRequest = { /*TODO*/ },
+        content = {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                content = {
+                    // TODO: loading gif
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .padding(PaddingCustomValues.screenGap)
+                            .align(Alignment.CenterHorizontally),
+                    )
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = PaddingCustomValues.screenGap),
+                        text = "Saving...",
+                        textAlign = TextAlign.Center,
+                        fontSize = FontSizeCustomValues.extraLarge
+                    )
+                }
+            )
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    )
 }
 
 @Composable

@@ -276,21 +276,6 @@ fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
 }
 
 @Composable
-@Preview(showBackground = true)
-fun SavedTaskListPreview() {
-    val receivedList = remember { mutableStateListOf<Task>() }
-    receivedList.addAll(testTaskList)
-    SavedTaskList(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        lazyListState = LazyListState(0, 0),
-        listOfTaskReceived = receivedList,
-        selected = remember { mutableStateOf(Repetitions.MONTH) }
-    )
-}
-
-@Composable
 fun SavedTaskList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
