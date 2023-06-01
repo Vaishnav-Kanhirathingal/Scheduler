@@ -9,7 +9,9 @@ object PaddingCustomValues {
     val largeSpacing = 16.dp
     val mediumSpacing = 10.dp
     val smallSpacing = 4.dp
+
     val menuTextSpacing = 4.dp
+    val menuItemMargin = 6.dp
 
     val lineThickness = 1.dp
 }
@@ -19,9 +21,11 @@ object FontSizeCustomValues {
     val large = 20.sp
     val medium = 16.sp
     val extraSmall = 11.sp
+
+    val menuTitle = 20.sp
 }
 
-object ColorCustomValues{
+object ColorCustomValues {
     val sideMenuIconColor = Color.Black
     val sideMenuTextColor = Color.Black
 }

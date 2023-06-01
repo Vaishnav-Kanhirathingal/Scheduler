@@ -3,8 +3,10 @@ package com.example.scheduler.ui.screens
 import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -125,7 +127,6 @@ fun MainScreen(
                 modifier = Modifier
                     .padding(end = 100.dp)
                     .fillMaxHeight()
-                    .verticalScroll(ScrollState(0))
                     .fillMaxWidth()
                     .background(Color.White),
             )
@@ -243,33 +244,44 @@ fun DrawerContent(modifier: Modifier = Modifier) {
     val auth = FirebaseAuth.getInstance()
     val loginErrorMessage = "Login First"
 
-    Column(
+    Box(
         modifier = modifier,
         content = {
-            AsyncImage(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f),
-                model = ImageRequest
-                    .Builder(LocalContext.current)
-                    .data(auth.currentUser?.photoUrl)
-                    .build(),
-                contentDescription = null
+                    .fillMaxHeight()
+                    .verticalScroll(ScrollState(0))
+                    .padding(horizontal = PaddingCustomValues.mediumSpacing),
+                content = {
+                    AsyncImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .padding(top = PaddingCustomValues.mediumSpacing)
+                            .border(width = 1.dp, color = Color.Black),
+                        model = ImageRequest
+                            .Builder(LocalContext.current)
+                            .data(auth.currentUser?.photoUrl)
+                            .build(),
+                        contentDescription = null
+                    )
+                    // TODO: user image
+                    DetailsRow(
+                        text = auth.currentUser?.email ?: loginErrorMessage,
+                        icon = Icons.Filled.Email
+                    )
+                    DetailsRow(
+                        text = auth.currentUser?.displayName ?: loginErrorMessage,
+                        icon = Icons.Filled.AccountBox
+                    )
+                    OptionMenu()
+                }
             )
-            // TODO: user image
-            DetailsRow(
-                modifier = Modifier.padding(start = PaddingCustomValues.mediumSpacing),
-                text = auth.currentUser?.email ?: loginErrorMessage,
-                icon = Icons.Filled.Email
-            )
-            DetailsRow(
-                modifier = Modifier.padding(start = PaddingCustomValues.mediumSpacing),
-                text = auth.currentUser?.displayName ?: loginErrorMessage,
-                icon = Icons.Filled.AccountBox
-            )
-            OptionMenu(modifier = Modifier.padding(start = PaddingCustomValues.mediumSpacing))
+
         }
     )
+
 }
 
 @Composable
@@ -281,16 +293,18 @@ fun OptionMenuPrev() {
 @Composable
 fun OptionMenu(modifier: Modifier = Modifier) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.menuItemMargin),
         modifier = modifier,
         content = {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        top = PaddingCustomValues.mediumSpacing,
+                        top = PaddingCustomValues.screenGap,
                         start = PaddingCustomValues.menuTextSpacing
                     ),
-                text = "Account"
+                text = "Account",
+                fontSize = FontSizeCustomValues.menuTitle
             )
             MenuItem(
                 icon = Icons.Default.AccountBox,
@@ -345,6 +359,7 @@ fun TitledSeparator(text: String) {
                 start = PaddingCustomValues.menuTextSpacing,
                 top = PaddingCustomValues.largeSpacing
             ),
+        fontSize = FontSizeCustomValues.menuTitle,
         text = text
     )
 }
@@ -397,7 +412,10 @@ fun MenuTaskItem(
             Text(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(PaddingCustomValues.mediumSpacing),
+                    .padding(
+                        horizontal = PaddingCustomValues.largeSpacing,
+                        vertical = PaddingCustomValues.mediumSpacing
+                    ),
                 text = text
             )
             IconButton(
