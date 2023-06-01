@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
@@ -14,10 +16,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.ui.destinations.AddTaskScreen
 import com.example.scheduler.ui.destinations.DetailsScreen
@@ -87,7 +94,28 @@ class MainActivity : ComponentActivity() {
         IconButton(
             modifier = modifier,
             onClick = { startForResult.launch(googleSignInClient.signInIntent) },
-            content = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = null) }
+            content = {
+                val imageModifier = Modifier
+                    .clip(CircleShape)
+                    .border(width = 1.dp, color = Color.Black, shape = CircleShape)
+                val user = FirebaseAuth.getInstance().currentUser
+                if (user == null) {
+                    Icon(
+                        modifier = imageModifier,
+                        imageVector = Icons.Filled.AccountCircle,
+                        contentDescription = null
+                    )
+                } else {
+                    AsyncImage(
+                        modifier = imageModifier,
+                        model = ImageRequest.Builder(this)
+                            .data(user.photoUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null
+                    )
+                }
+            }
         )
     }
 }

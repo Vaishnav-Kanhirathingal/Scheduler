@@ -145,8 +145,8 @@ fun MainScreen(
                         },
                         actions = {
                             googleSignInButton(
-                                Modifier,
-                                {
+                                modifier = Modifier,
+                                onSuccess = {
                                     CoroutineScope(Dispatchers.IO).launch {
                                         snackBarHostState.showSnackbar(
                                             message = "Login Successful",
@@ -154,7 +154,7 @@ fun MainScreen(
                                         )
                                     }
                                 },
-                                {
+                                onFailure = {
                                     CoroutineScope(Dispatchers.IO).launch {
                                         snackBarHostState.showSnackbar(
                                             message = "Login Unsuccessful, reason = $it",
