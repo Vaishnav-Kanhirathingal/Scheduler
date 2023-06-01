@@ -2,20 +2,29 @@ package com.example.scheduler.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Build
@@ -27,31 +36,39 @@ import androidx.compose.material.icons.twotone.Build
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.scheduler.data.Repetitions
 import com.example.scheduler.data.Reps
 import com.example.scheduler.data.StringFunctions.getDateAsText
@@ -59,15 +76,24 @@ import com.example.scheduler.data.StringFunctions.getTextWithS
 import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
+import com.example.scheduler.data.testTaskList
 import com.example.scheduler.firebase.DatabaseFunctions
+import com.example.scheduler.values.ColorCustomValues
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainScreen"
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview(showBackground = true)
+fun MainScreenDrawer() {
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,93 +107,113 @@ fun MainScreen(
 ) {
     val snackBarHostState = SnackbarHostState()
     val lazyListState = rememberLazyListState()
+    val drawerState = DrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope(getContext = { Dispatchers.IO })
+
     val showFullText = remember { mutableStateOf(true) }
 
     val filter = remember { mutableStateOf(Repetitions.ALL) }
+
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemIndex }
             .collect { showFullText.value = (it == 0) }
     }
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-        topBar = {
-            CenterAlignedTopAppBar(
-                modifier = Modifier.fillMaxWidth(),
-                title = {
-                    Text(
-                        text = "Task List",
-                        textAlign = TextAlign.Center
-                    )
-                },
-                actions = {
-                    googleSignInButton(
-                        Modifier,
-                        {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                snackBarHostState.showSnackbar(
-                                    message = "Login Successful",
-                                    withDismissAction = true
-                                )
-                            }
-                        },
-                        {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                snackBarHostState.showSnackbar(
-                                    message = "Login Unsuccessful, reason = $it",
-                                    withDismissAction = true
-                                )
-                            }
-                        }
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }, content = {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = null,
-//                            modifier = Modifier.padding(horizontal = PaddingCustomValues.externalSpacing)
-                        )
-                    }
-                    )
-                },
-            )
-        },
-        floatingActionButton = {
-            AddTaskFAB(
-                showFullText = showFullText.value,
-                toAddTaskScreen = toAddTaskScreen
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent(
+                modifier = Modifier
+                    .padding(end = 100.dp)
+                    .fillMaxHeight()
+                    .verticalScroll(ScrollState(0))
+                    .fillMaxWidth()
+                    .background(Color.White),
             )
         },
         content = {
-            val receivedList = remember { mutableStateListOf<Task>() }
-            Column {
-                DatabaseFunctions.getListOfTasksFromDatastore(
-                    listReceiver = {
-                        receivedList.clear()
-                        for (i in it) {
-                            val ret = receivedList.add(i)
-                            Log.d(
-                                TAG, "added: $ret = " +
-                                        GsonBuilder().setPrettyPrinting().create().toJson(i)
+            Scaffold(
+                snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+                topBar = {
+                    CenterAlignedTopAppBar(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = {
+                            Text(
+                                text = "Task List",
+                                textAlign = TextAlign.Center
                             )
-                        }
-                    },
-                    onFailure = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            snackBarHostState.showSnackbar(
-                                message = it,
-                                withDismissAction = true,
-                                duration = SnackbarDuration.Short,
+                        },
+                        actions = {
+                            googleSignInButton(
+                                Modifier,
+                                {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        snackBarHostState.showSnackbar(
+                                            message = "Login Successful",
+                                            withDismissAction = true
+                                        )
+                                    }
+                                },
+                                {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        snackBarHostState.showSnackbar(
+                                            message = "Login Unsuccessful, reason = $it",
+                                            withDismissAction = true
+                                        )
+                                    }
+                                }
                             )
-                        }
-                    }
-                )
-                FilterRow(
-                    modifier = Modifier
-                        .padding(it)
-                        .fillMaxWidth(),
-                    filterSelected = filter
-                )
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = {
+                                    scope.launch { drawerState.open() }
+                                },
+                                content = {
+                                    Icon(
+                                        imageVector = Icons.Filled.Menu,
+                                        contentDescription = null,
+                                    )
+                                }
+                            )
+                        },
+                    )
+                },
+                floatingActionButton = {
+                    AddTaskFAB(
+                        showFullText = showFullText.value,
+                        toAddTaskScreen = toAddTaskScreen
+                    )
+                },
+                content = {
+                    val receivedList = remember { mutableStateListOf<Task>() }
+                    Column {
+                        DatabaseFunctions.getListOfTasksFromDatastore(
+                            listReceiver = {
+                                receivedList.clear()
+                                for (i in it) {
+                                    val ret = receivedList.add(i)
+                                    Log.d(
+                                        TAG, "added: $ret = " +
+                                                GsonBuilder().setPrettyPrinting().create().toJson(i)
+                                    )
+                                }
+                            },
+                            onFailure = {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    snackBarHostState.showSnackbar(
+                                        message = it,
+                                        withDismissAction = true,
+                                        duration = SnackbarDuration.Short,
+                                    )
+                                }
+                            }
+                        )
+                        FilterRow(
+                            modifier = Modifier
+                                .padding(it)
+                                .fillMaxWidth(),
+                            filterSelected = filter
+                        )
 //                Button(
 //                    onClick = {
 //                        for (i in testTaskList) {
@@ -178,13 +224,191 @@ fun MainScreen(
 //                        Text(text = "Test")
 //                    }
 //                )
-                SavedTaskList(
+                        SavedTaskList(
+                            modifier = Modifier.fillMaxWidth(),
+                            lazyListState = lazyListState,
+                            listOfTaskReceived = receivedList,
+                            selected = filter
+                        )
+                    }
+                }
+            )
+        }
+    )
+}
+
+
+@Composable
+fun DrawerContent(modifier: Modifier = Modifier) {
+    val auth = FirebaseAuth.getInstance()
+    val loginErrorMessage = "Login First"
+
+    Column(
+        modifier = modifier,
+        content = {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+                model = ImageRequest
+                    .Builder(LocalContext.current)
+                    .data(auth.currentUser?.photoUrl)
+                    .build(),
+                contentDescription = null
+            )
+            // TODO: user image
+            DetailsRow(
+                modifier = Modifier.padding(start = PaddingCustomValues.mediumSpacing),
+                text = auth.currentUser?.email ?: loginErrorMessage,
+                icon = Icons.Filled.Email
+            )
+            DetailsRow(
+                modifier = Modifier.padding(start = PaddingCustomValues.mediumSpacing),
+                text = auth.currentUser?.displayName ?: loginErrorMessage,
+                icon = Icons.Filled.AccountBox
+            )
+            OptionMenu(modifier = Modifier.padding(start = PaddingCustomValues.mediumSpacing))
+        }
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun OptionMenuPrev() {
+    OptionMenu(modifier = Modifier.padding(PaddingCustomValues.mediumSpacing))
+}
+
+@Composable
+fun OptionMenu(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        content = {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = PaddingCustomValues.mediumSpacing,
+                        start = PaddingCustomValues.menuTextSpacing
+                    ),
+                text = "Account"
+            )
+            MenuItem(
+                icon = Icons.Default.AccountBox,
+                text = "Sign-out",
+                onClick = {
+                    // TODO: to settings page
+                }
+            )
+            TitledSeparator(text = "Today's Tasks")
+            // TODO: show a list of today's tasks
+            testTaskList.forEach {
+                MenuTaskItem(
                     modifier = Modifier.fillMaxWidth(),
-                    lazyListState = lazyListState,
-                    listOfTaskReceived = receivedList,
-                    selected = filter
+                    text = it.title,
+                    onCancel = { TODO("cancel and remove task from firebase") }
                 )
+
             }
+            TitledSeparator(text = "About")
+            MenuItem(
+                icon = Icons.Default.Info,
+                text = "Documentation",
+                onClick = {
+                    // TODO: to settings page
+                }
+            )
+            MenuItem(
+                icon = Icons.Default.Info,
+                text = "Git-Hub Releases",
+                onClick = { TODO("open github") }
+            )
+            TitledSeparator(text = "Exit")
+            MenuItem(
+                icon = Icons.Default.ExitToApp,
+                text = "Exit",
+                onClick = { TODO("exit app") }
+            )
+        }
+    )
+}
+
+@Composable
+fun TitledSeparator(text: String) {
+    Divider(
+        modifier = Modifier.fillMaxWidth(),
+        thickness = PaddingCustomValues.lineThickness
+    )
+    Text(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = PaddingCustomValues.menuTextSpacing,
+                top = PaddingCustomValues.largeSpacing
+            ),
+        text = text
+    )
+}
+
+@Composable
+fun MenuItem(
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit
+) {
+    TextButton(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        content = {
+            Icon(
+                modifier = Modifier.padding(end = PaddingCustomValues.mediumSpacing),
+                imageVector = icon,
+                contentDescription = null,
+                tint = ColorCustomValues.sideMenuIconColor
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = text,
+                color = ColorCustomValues.sideMenuTextColor
+            )
+        }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MenuTaskItemPrev() {
+    MenuTaskItem(
+        modifier = Modifier.fillMaxWidth(),
+        text = testTaskList[0].title,
+        onCancel = {}
+    )
+}
+
+@Composable
+fun MenuTaskItem(
+    modifier: Modifier = Modifier,
+    text: String,
+    onCancel: () -> Unit
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        content = {
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(PaddingCustomValues.mediumSpacing),
+                text = text
+            )
+            IconButton(
+                onClick = onCancel,
+                content = {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = null
+                    )
+                }
+            )
         }
     )
 }
@@ -289,13 +513,11 @@ fun SavedTaskList(
                 itemContent = {
                     val task = listOfTaskReceived[it]
                     if (task.isScheduledIn(selected.value.step) || selected.value == Repetitions.ALL) {
-                        // TODO: removve card
                         DetailedTaskCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(PaddingCustomValues.smallSpacing),
                             task = task,
-                            selected = selected
                         )
                     }
                 }
@@ -307,8 +529,7 @@ fun SavedTaskList(
 @Composable
 fun DetailedTaskCard(
     task: Task,
-    modifier: Modifier = Modifier,
-    selected: MutableState<Reps>
+    modifier: Modifier = Modifier
 ) {
     // TODO: add a UI element that tells how much time remaining till the next alarm
     Card(
@@ -328,13 +549,7 @@ fun DetailedTaskCard(
                                     task.isScheduledIn(Repetitions.WEEK.step) -> Icons.TwoTone.Build
                                     task.isScheduledIn(Repetitions.MONTH.step) -> Icons.Filled.Build
                                     else -> Icons.Outlined.Warning
-                                }
-//                                if (task.isScheduled(selected.value.step)) {
-//                                    Icons.Filled.Build
-//                                } else {
-//                                    Icons.Outlined.Build
-//                                }
-                                ,
+                                },
                                 contentDescription = null
                             )
                             Text(
@@ -394,8 +609,7 @@ fun DetailedTaskCard(
                         icon = Icons.Outlined.Refresh
                     )
                     DetailsRow(
-                        text = getTextWithS(unit = "minute", num = task.snoozeDuration)
-                                + " or " +
+                        text = getTextWithS(unit = "minute", num = task.snoozeDuration) + " or " +
                                 getTextWithS(unit = "day", num = task.postponeDuration),
                         icon = Icons.Outlined.ArrowForward
                     )
@@ -406,9 +620,9 @@ fun DetailedTaskCard(
 }
 
 @Composable
-fun DetailsRow(text: String, icon: ImageVector) {
+fun DetailsRow(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(top = PaddingCustomValues.smallSpacing)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -422,5 +636,4 @@ fun DetailsRow(text: String, icon: ImageVector) {
             )
         }
     )
-
 }
