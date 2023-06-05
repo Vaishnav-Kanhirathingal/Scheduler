@@ -93,12 +93,6 @@ private const val TAG = "MainScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(showBackground = true)
-fun MainScreenDrawer() {
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 fun MainScreen(
     toAddTaskScreen: () -> Unit,
     googleSignInButton: @Composable (
@@ -125,9 +119,8 @@ fun MainScreen(
         drawerContent = {
             DrawerContent(
                 modifier = Modifier
-                    .padding(end = 100.dp)
                     .fillMaxHeight()
-                    .fillMaxWidth()
+                    .fillMaxWidth(0.7f)
                     .background(Color.White),
             )
         },
@@ -215,16 +208,6 @@ fun MainScreen(
                                 .fillMaxWidth(),
                             filterSelected = filter
                         )
-//                Button(
-//                    onClick = {
-//                        for (i in testTaskList) {
-//                            Log.d(TAG, i.nextReminderIsScheduledFor().toString())
-//                        }
-//                    },
-//                    content = {
-//                        Text(text = "Test")
-//                    }
-//                )
                         SavedTaskList(
                             modifier = Modifier.fillMaxWidth(),
                             lazyListState = lazyListState,
@@ -321,7 +304,6 @@ fun OptionMenu(modifier: Modifier = Modifier) {
                     text = it.title,
                     onCancel = { TODO("cancel and remove task from firebase") }
                 )
-
             }
             TitledSeparator(text = "About")
             MenuItem(
@@ -499,10 +481,7 @@ fun TimeFilterChip(
 @Composable
 fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
     ExtendedFloatingActionButton(
-        onClick = {
-            // TODO: move to "add tasks" page
-            toAddTaskScreen()
-        },
+        onClick = toAddTaskScreen,
         icon = {
             Icon(
                 imageVector = Icons.Filled.Add,
