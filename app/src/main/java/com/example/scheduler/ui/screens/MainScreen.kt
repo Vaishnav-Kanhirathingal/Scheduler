@@ -575,46 +575,11 @@ fun DetailedTaskCard(
                             )
                             //-------------------------------------------------------deleting prompt
                             val showDeletePrompt = remember { mutableStateOf(false) }
-                            val deleting = remember { mutableStateOf(false) }
-                            if (showDeletePrompt.value) {
-                                QuestionPrompt(
-                                    onConfirm = { /*TODO*/
-                                        deleting.value = true
-                                        showDeletePrompt.value = false
-                                        DatabaseFunctions.deleteTaskDocument(
-                                            taskDoc = taskDoc,
-                                            onSuccessListener = {
-                                                deleting.value = false
-                                                CoroutineScope(Dispatchers.IO).launch {
-                                                    snackBarHostState.showSnackbar(
-                                                        message = "Successfully deleted task",
-                                                        withDismissAction = true
-                                                    )
-                                                }
-                                                // TODO: show snack bar
-                                            },
-                                            onFailureListener = {
-                                                deleting.value = false
-                                                // TODO:
-                                                CoroutineScope(Dispatchers.IO).launch {
-                                                    snackBarHostState.showSnackbar(
-                                                        message = "Failed to deleted task: $it",
-                                                        withDismissAction = true
-                                                    )
-                                                }
-                                            }
-                                        )
-                                    },
-                                    onCancel = { /*TODO*/
-                                        showDeletePrompt.value = false
-                                    },
-                                    question = "delete task with title \"${task.title}\""
-                                )
-                            }
-
-                            if (deleting.value) {
-                                ShowLoadingPrompt(text = "deleting...")
-                            }
+                            DeletePrompt(
+                                taskDoc = taskDoc,
+                                snackBarHostState = snackBarHostState,
+                                showDeletePrompt = showDeletePrompt
+                            )
                             //-----------------------------------------------------------------close
                             IconButton(
                                 onClick = { showDeletePrompt.value = true },
@@ -743,4 +708,48 @@ fun QuestionPrompt(
             )
         }
     )
+}
+
+@Composable
+fun DeletePrompt(
+    taskDoc: DocumentSnapshot,
+    snackBarHostState: SnackbarHostState,
+    showDeletePrompt: MutableState<Boolean>
+) {
+    val task = DatabaseFunctions.getTaskFromDocument(taskDoc)
+    val deleting = remember { mutableStateOf(false) }
+    if (showDeletePrompt.value) {
+        QuestionPrompt(
+            onConfirm = {
+                showDeletePrompt.value = false
+                deleting.value = true
+                DatabaseFunctions.deleteTaskDocument(
+                    taskDoc = taskDoc,
+                    onSuccessListener = {
+                        deleting.value = false
+                        CoroutineScope(Dispatchers.IO).launch {
+                            snackBarHostState.showSnackbar(
+                                message = "Successfully deleted task",
+                                withDismissAction = true
+                            )
+                        }
+                    },
+                    onFailureListener = {
+                        deleting.value = false
+                        CoroutineScope(Dispatchers.IO).launch {
+                            snackBarHostState.showSnackbar(
+                                message = "Failed to deleted task: $it",
+                                withDismissAction = true
+                            )
+                        }
+                    }
+                )
+            },
+            onCancel = { showDeletePrompt.value = false },
+            question = "delete task with title \"${task.title}\""
+        )
+    }
+    if (deleting.value) {
+        ShowLoadingPrompt(text = "deleting...")
+    }
 }
