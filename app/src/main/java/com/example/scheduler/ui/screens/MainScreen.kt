@@ -77,13 +77,13 @@ import com.example.scheduler.data.StringFunctions.getDateAsText
 import com.example.scheduler.data.StringFunctions.getTextWithS
 import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
-import com.example.scheduler.data.Task
 import com.example.scheduler.data.testTaskList
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.ColorCustomValues
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -179,16 +179,18 @@ fun MainScreen(
                     )
                 },
                 content = {
-                    val receivedList = remember { mutableStateListOf<Task>() }
+                    val receivedList = remember { mutableStateListOf<DocumentSnapshot>() }
                     Column {
-                        DatabaseFunctions.getListOfTasksFromDatastore(
-                            listReceiver = {
+                        DatabaseFunctions.getListOfTasksAsDocuments(
+                            listReceiver = { ds ->
                                 receivedList.clear()
-                                for (i in it) {
+                                for (i in ds) {
+                                    val task = DatabaseFunctions.getTaskFromDocument(i)
                                     val ret = receivedList.add(i)
                                     Log.d(
                                         TAG, "added: $ret = " +
-                                                GsonBuilder().setPrettyPrinting().create().toJson(i)
+                                                GsonBuilder().setPrettyPrinting().create()
+                                                    .toJson(task)
                                     )
                                 }
                             },
@@ -211,7 +213,7 @@ fun MainScreen(
                         SavedTaskList(
                             modifier = Modifier.fillMaxWidth(),
                             lazyListState = lazyListState,
-                            listOfTaskReceived = receivedList,
+                            listOfTaskDocumentsReceived = receivedList,
                             selected = filter
                         )
                     }
@@ -226,7 +228,6 @@ fun MainScreen(
 fun DrawerContent(modifier: Modifier = Modifier) {
     val auth = FirebaseAuth.getInstance()
     val loginErrorMessage = "Login First"
-
     Box(
         modifier = modifier,
         content = {
@@ -261,7 +262,6 @@ fun DrawerContent(modifier: Modifier = Modifier) {
                     OptionMenu()
                 }
             )
-
         }
     )
 
@@ -498,7 +498,7 @@ fun AddTaskFAB(showFullText: Boolean, toAddTaskScreen: () -> Unit) {
 fun SavedTaskList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
-    listOfTaskReceived: SnapshotStateList<Task>,
+    listOfTaskDocumentsReceived: SnapshotStateList<DocumentSnapshot>,
     selected: MutableState<Reps>
 ) {
     LazyColumn(
@@ -506,15 +506,17 @@ fun SavedTaskList(
         state = lazyListState,
         content = {
             items(
-                count = listOfTaskReceived.size,
+                count = listOfTaskDocumentsReceived.size,
                 itemContent = {
-                    val task = listOfTaskReceived[it]
+                    val task =
+                        DatabaseFunctions.getTaskFromDocument(listOfTaskDocumentsReceived[it])
+                    val doc = listOfTaskDocumentsReceived[it]
                     if (task.isScheduledIn(selected.value.step) || selected.value == Repetitions.ALL) {
                         DetailedTaskCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(PaddingCustomValues.smallSpacing),
-                            task = task,
+                            taskDoc = doc,
                         )
                     }
                 }
@@ -525,10 +527,11 @@ fun SavedTaskList(
 
 @Composable
 fun DetailedTaskCard(
-    task: Task,
+    taskDoc: DocumentSnapshot,
     modifier: Modifier = Modifier
 ) {
     // TODO: add a UI element that tells how much time remaining till the next alarm
+    val task = DatabaseFunctions.getTaskFromDocument(taskDoc)
     Card(
         modifier = modifier,
         content = {
@@ -566,7 +569,18 @@ fun DetailedTaskCard(
                                 }
                             )
                             IconButton(
-                                onClick = { TODO("delete selected task") },
+                                onClick = {
+                                    // TODO: use a prompt
+                                    DatabaseFunctions.deleteTaskDocument(
+                                        taskDoc = taskDoc,
+                                        onSuccessListener = {
+                                            // TODO:
+                                        },
+                                        onFailureListener = {
+                                            // TODO:
+                                        }
+                                    )
+                                },
                                 content = {
                                     Icon(
                                         imageVector = Icons.Filled.Delete,

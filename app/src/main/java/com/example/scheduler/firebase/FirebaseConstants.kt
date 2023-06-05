@@ -4,7 +4,7 @@ object FirebaseConstants {
     const val parentCollectionName = "users"
     const val listOfTaskName = "taskList"
 
-    object task {
+    object TaskName {
         const val title = "title"
         const val description = "description"
         const val timeForReminderHour = "timeForReminderHour"
