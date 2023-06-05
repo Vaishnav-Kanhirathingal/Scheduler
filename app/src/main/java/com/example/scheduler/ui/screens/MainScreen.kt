@@ -35,8 +35,10 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material.icons.twotone.Build
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -69,6 +71,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.scheduler.data.Repetitions
@@ -214,7 +217,8 @@ fun MainScreen(
                             modifier = Modifier.fillMaxWidth(),
                             lazyListState = lazyListState,
                             listOfTaskDocumentsReceived = receivedList,
-                            selected = filter
+                            selected = filter,
+                            snackBarHostState = snackBarHostState
                         )
                     }
                 }
@@ -250,7 +254,6 @@ fun DrawerContent(modifier: Modifier = Modifier) {
                             .build(),
                         contentDescription = null
                     )
-                    // TODO: user image
                     DetailsRow(
                         text = auth.currentUser?.email ?: loginErrorMessage,
                         icon = Icons.Filled.Email
@@ -499,7 +502,8 @@ fun SavedTaskList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
     listOfTaskDocumentsReceived: SnapshotStateList<DocumentSnapshot>,
-    selected: MutableState<Reps>
+    selected: MutableState<Reps>,
+    snackBarHostState: SnackbarHostState
 ) {
     LazyColumn(
         modifier = modifier,
@@ -517,6 +521,7 @@ fun SavedTaskList(
                                 .fillMaxWidth()
                                 .padding(PaddingCustomValues.smallSpacing),
                             taskDoc = doc,
+                            snackBarHostState = snackBarHostState
                         )
                     }
                 }
@@ -527,6 +532,7 @@ fun SavedTaskList(
 
 @Composable
 fun DetailedTaskCard(
+    snackBarHostState: SnackbarHostState,
     taskDoc: DocumentSnapshot,
     modifier: Modifier = Modifier
 ) {
@@ -568,16 +574,34 @@ fun DetailedTaskCard(
                                     )
                                 }
                             )
+                            val deleting = remember { mutableStateOf(false) }
+                            if (deleting.value) {
+                                ShowLoadingPrompt(text = "deleting...")
+                            }
                             IconButton(
                                 onClick = {
-                                    // TODO: use a prompt
+                                    deleting.value = true
                                     DatabaseFunctions.deleteTaskDocument(
                                         taskDoc = taskDoc,
                                         onSuccessListener = {
-                                            // TODO:
+                                            deleting.value = false
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                snackBarHostState.showSnackbar(
+                                                    message = "Successfully deleted task",
+                                                    withDismissAction = true
+                                                )
+                                            }
+                                            // TODO: show snack bar
                                         },
                                         onFailureListener = {
+                                            deleting.value = false
                                             // TODO:
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                snackBarHostState.showSnackbar(
+                                                    message = "Failed to deleted task: $it",
+                                                    withDismissAction = true
+                                                )
+                                            }
                                         }
                                     )
                                 },
@@ -644,6 +668,63 @@ fun DetailsRow(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = PaddingCustomValues.smallSpacing)
+            )
+        }
+    )
+}
+
+@Composable
+fun ConfirmationBasedLoadingPrompt(
+    showPrompt: MutableState<Boolean>,
+    actionLabel: String,
+    requestMessage: String,
+    onProceed: () -> Unit
+) {
+    // TODO: verify validity
+    val proceed = remember { mutableStateOf(false) }
+    Dialog(
+        onDismissRequest = { showPrompt.value = false },
+        content = {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                content = {
+                    if (proceed.value) {
+                        onProceed()
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .padding(PaddingCustomValues.screenGap)
+                                .align(Alignment.CenterHorizontally),
+                        )
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = PaddingCustomValues.screenGap),
+                            text = actionLabel,
+                            textAlign = TextAlign.Center,
+                            fontSize = FontSizeCustomValues.extraLarge
+                        )
+                    } else {
+                        Text(text = requestMessage)
+                        Row(
+                            content = {
+                                Button(
+                                    onClick = { showPrompt.value = false },
+                                    content = {
+                                        Text(text = "cancel")
+                                    }
+                                )
+                                TextButton(
+                                    onClick = { proceed.value = true },
+                                    content = {
+                                        Text(text = "confirm")
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
             )
         }
     )

@@ -157,7 +157,7 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                 DelayTaskDay(postponeDuration = postponeDuration)
                 val savingInProgress = remember { mutableStateOf(false) }
                 if (savingInProgress.value) {
-                    ShowSavingPrompt()
+                    ShowLoadingPrompt("Saving...")
                 }
                 Button(
                     onClick = {
@@ -560,14 +560,19 @@ fun SelectNumberRange(
 
 @Composable
 @Preview(showBackground = true)
-fun ShowSavingPrompt() {
+fun ShowLoadingPromptPrev() {
+    ShowLoadingPrompt(text = "Saving...")
+}
+
+@Composable
+fun ShowLoadingPrompt(text: String) {
+
     Dialog(
         onDismissRequest = { /*TODO*/ },
         content = {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 content = {
-                    // TODO: loading gif
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -579,7 +584,7 @@ fun ShowSavingPrompt() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = PaddingCustomValues.screenGap),
-                        text = "Saving...",
+                        text = text,
                         textAlign = TextAlign.Center,
                         fontSize = FontSizeCustomValues.extraLarge
                     )
