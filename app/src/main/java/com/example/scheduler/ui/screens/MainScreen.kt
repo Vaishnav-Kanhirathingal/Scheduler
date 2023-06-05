@@ -183,29 +183,32 @@ fun MainScreen(
                 content = {
                     val receivedList = remember { mutableStateListOf<DocumentSnapshot>() }
                     Column {
-                        DatabaseFunctions.getListOfTasksAsDocuments(
-                            listReceiver = { ds ->
-                                receivedList.clear()
-                                for (i in ds) {
-                                    val task = DatabaseFunctions.getTaskFromDocument(i)
-                                    val ret = receivedList.add(i)
-                                    Log.d(
-                                        TAG, "added: $ret = " +
-                                                GsonBuilder().setPrettyPrinting().create()
-                                                    .toJson(task)
-                                    )
+                        val refreshList: () -> Unit = {
+                            DatabaseFunctions.getListOfTasksAsDocuments(
+                                listReceiver = { listOfDocumentSnapshots ->
+                                    receivedList.clear()
+                                    for (i in listOfDocumentSnapshots) {
+                                        val task = DatabaseFunctions.getTaskFromDocument(i)
+                                        val ret = receivedList.add(i)
+                                        Log.d(
+                                            TAG, "added: $ret = " +
+                                                    GsonBuilder().setPrettyPrinting().create()
+                                                        .toJson(task)
+                                        )
+                                    }
+                                },
+                                onFailure = {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        snackBarHostState.showSnackbar(
+                                            message = it,
+                                            withDismissAction = true,
+                                            duration = SnackbarDuration.Short,
+                                        )
+                                    }
                                 }
-                            },
-                            onFailure = {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    snackBarHostState.showSnackbar(
-                                        message = it,
-                                        withDismissAction = true,
-                                        duration = SnackbarDuration.Short,
-                                    )
-                                }
-                            }
-                        )
+                            )
+                        }
+                        LaunchedEffect(key1 = receivedList, block = { refreshList() })
                         FilterRow(
                             modifier = Modifier
                                 .padding(it)
@@ -217,7 +220,8 @@ fun MainScreen(
                             lazyListState = lazyListState,
                             listOfTaskDocumentsReceived = receivedList,
                             selected = filter,
-                            snackBarHostState = snackBarHostState
+                            snackBarHostState = snackBarHostState,
+                            refreshList = refreshList,
                         )
                     }
                 }
@@ -502,7 +506,8 @@ fun SavedTaskList(
     lazyListState: LazyListState,
     listOfTaskDocumentsReceived: SnapshotStateList<DocumentSnapshot>,
     selected: MutableState<Reps>,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
+    refreshList: () -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
@@ -520,7 +525,8 @@ fun SavedTaskList(
                                 .fillMaxWidth()
                                 .padding(PaddingCustomValues.smallSpacing),
                             taskDoc = doc,
-                            snackBarHostState = snackBarHostState
+                            snackBarHostState = snackBarHostState,
+                            refreshList = refreshList
                         )
                     }
                 }
@@ -533,7 +539,8 @@ fun SavedTaskList(
 fun DetailedTaskCard(
     snackBarHostState: SnackbarHostState,
     taskDoc: DocumentSnapshot,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    refreshList: () -> Unit
 ) {
     // TODO: add a UI element that tells how much time remaining till the next alarm
     val task = DatabaseFunctions.getTaskFromDocument(taskDoc)
@@ -578,7 +585,8 @@ fun DetailedTaskCard(
                             DeletePrompt(
                                 taskDoc = taskDoc,
                                 snackBarHostState = snackBarHostState,
-                                showDeletePrompt = showDeletePrompt
+                                showDeletePrompt = showDeletePrompt,
+                                refreshList = refreshList
                             )
                             //-----------------------------------------------------------------close
                             IconButton(
@@ -679,11 +687,16 @@ fun QuestionPrompt(
                             .padding(PaddingCustomValues.mediumSpacing),
                         content = {
                             Text(
-                                modifier = Modifier.padding(horizontal = PaddingCustomValues.mediumSpacing),
+                                modifier = Modifier.padding(
+                                    start = PaddingCustomValues.mediumSpacing,
+                                    end = PaddingCustomValues.mediumSpacing,
+                                    bottom = PaddingCustomValues.largeSpacing
+                                ),
                                 text = question,
-                                fontSize = FontSizeCustomValues.medium
+                                fontSize = FontSizeCustomValues.large
                             )
                             Row(
+                                horizontalArrangement = Arrangement.spacedBy(PaddingCustomValues.mediumSpacing),
                                 modifier = Modifier.fillMaxWidth(),
                                 content = {
                                     TextButton(
@@ -714,7 +727,8 @@ fun QuestionPrompt(
 fun DeletePrompt(
     taskDoc: DocumentSnapshot,
     snackBarHostState: SnackbarHostState,
-    showDeletePrompt: MutableState<Boolean>
+    showDeletePrompt: MutableState<Boolean>,
+    refreshList: () -> Unit
 ) {
     val task = DatabaseFunctions.getTaskFromDocument(taskDoc)
     val deleting = remember { mutableStateOf(false) }
@@ -733,6 +747,7 @@ fun DeletePrompt(
                                 withDismissAction = true
                             )
                         }
+                        refreshList()
                     },
                     onFailureListener = {
                         deleting.value = false
@@ -746,7 +761,7 @@ fun DeletePrompt(
                 )
             },
             onCancel = { showDeletePrompt.value = false },
-            question = "delete task with title \"${task.title}\""
+            question = "Do you want to delete the task with title \"${task.title}\"?"
         )
     }
     if (deleting.value) {
