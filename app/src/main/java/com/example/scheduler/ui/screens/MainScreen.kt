@@ -38,7 +38,6 @@ import androidx.compose.material.icons.twotone.Build
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -574,37 +573,51 @@ fun DetailedTaskCard(
                                     )
                                 }
                             )
+                            //-------------------------------------------------------deleting prompt
+                            val showDeletePrompt = remember { mutableStateOf(false) }
                             val deleting = remember { mutableStateOf(false) }
+                            if (showDeletePrompt.value) {
+                                QuestionPrompt(
+                                    onConfirm = { /*TODO*/
+                                        deleting.value = true
+                                        showDeletePrompt.value = false
+                                        DatabaseFunctions.deleteTaskDocument(
+                                            taskDoc = taskDoc,
+                                            onSuccessListener = {
+                                                deleting.value = false
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    snackBarHostState.showSnackbar(
+                                                        message = "Successfully deleted task",
+                                                        withDismissAction = true
+                                                    )
+                                                }
+                                                // TODO: show snack bar
+                                            },
+                                            onFailureListener = {
+                                                deleting.value = false
+                                                // TODO:
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    snackBarHostState.showSnackbar(
+                                                        message = "Failed to deleted task: $it",
+                                                        withDismissAction = true
+                                                    )
+                                                }
+                                            }
+                                        )
+                                    },
+                                    onCancel = { /*TODO*/
+                                        showDeletePrompt.value = false
+                                    },
+                                    question = "delete task with title \"${task.title}\""
+                                )
+                            }
+
                             if (deleting.value) {
                                 ShowLoadingPrompt(text = "deleting...")
                             }
+                            //-----------------------------------------------------------------close
                             IconButton(
-                                onClick = {
-                                    deleting.value = true
-                                    DatabaseFunctions.deleteTaskDocument(
-                                        taskDoc = taskDoc,
-                                        onSuccessListener = {
-                                            deleting.value = false
-                                            CoroutineScope(Dispatchers.IO).launch {
-                                                snackBarHostState.showSnackbar(
-                                                    message = "Successfully deleted task",
-                                                    withDismissAction = true
-                                                )
-                                            }
-                                            // TODO: show snack bar
-                                        },
-                                        onFailureListener = {
-                                            deleting.value = false
-                                            // TODO:
-                                            CoroutineScope(Dispatchers.IO).launch {
-                                                snackBarHostState.showSnackbar(
-                                                    message = "Failed to deleted task: $it",
-                                                    withDismissAction = true
-                                                )
-                                            }
-                                        }
-                                    )
-                                },
+                                onClick = { showDeletePrompt.value = true },
                                 content = {
                                     Icon(
                                         imageVector = Icons.Filled.Delete,
@@ -674,56 +687,58 @@ fun DetailsRow(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ConfirmationBasedLoadingPrompt(
-    showPrompt: MutableState<Boolean>,
-    actionLabel: String,
-    requestMessage: String,
-    onProceed: () -> Unit
+@Preview(showBackground = true)
+fun QuestionPromptPrev() {
+    QuestionPrompt(
+        onConfirm = { /*TODO*/ },
+        onCancel = { /*TODO*/ },
+        question = "do you want to delete the selected task?"
+    )
+}
+
+@Composable
+fun QuestionPrompt(
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+    question: String
 ) {
-    // TODO: verify validity
-    val proceed = remember { mutableStateOf(false) }
     Dialog(
-        onDismissRequest = { showPrompt.value = false },
+        onDismissRequest = onCancel,
         content = {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 content = {
-                    if (proceed.value) {
-                        onProceed()
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .padding(PaddingCustomValues.screenGap)
-                                .align(Alignment.CenterHorizontally),
-                        )
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = PaddingCustomValues.screenGap),
-                            text = actionLabel,
-                            textAlign = TextAlign.Center,
-                            fontSize = FontSizeCustomValues.extraLarge
-                        )
-                    } else {
-                        Text(text = requestMessage)
-                        Row(
-                            content = {
-                                Button(
-                                    onClick = { showPrompt.value = false },
-                                    content = {
-                                        Text(text = "cancel")
-                                    }
-                                )
-                                TextButton(
-                                    onClick = { proceed.value = true },
-                                    content = {
-                                        Text(text = "confirm")
-                                    }
-                                )
-                            }
-                        )
-                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(PaddingCustomValues.mediumSpacing),
+                        content = {
+                            Text(
+                                modifier = Modifier.padding(horizontal = PaddingCustomValues.mediumSpacing),
+                                text = question,
+                                fontSize = FontSizeCustomValues.medium
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                content = {
+                                    TextButton(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = onCancel,
+                                        content = {
+                                            Text(text = "cancel")
+                                        }
+                                    )
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = onConfirm,
+                                        content = {
+                                            Text(text = "confirm")
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    )
                 }
             )
         }
