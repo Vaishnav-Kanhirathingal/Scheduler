@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
@@ -67,6 +66,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -116,6 +116,32 @@ fun MainScreen(
         snapshotFlow { lazyListState.firstVisibleItemIndex }
             .collect { showFullText.value = (it == 0) }
     }
+    val receivedList = remember { mutableStateListOf<DocumentSnapshot>() }
+    val refreshList: () -> Unit = {
+        DatabaseFunctions.getListOfTasksAsDocuments(
+            listReceiver = { listOfDocumentSnapshots ->
+                receivedList.clear()
+                for (i in listOfDocumentSnapshots) {
+                    val task = DatabaseFunctions.getTaskFromDocument(i)
+                    val ret = receivedList.add(i)
+                    Log.d(
+                        TAG, "added: $ret = " +
+                                GsonBuilder().setPrettyPrinting().create()
+                                    .toJson(task)
+                    )
+                }
+            },
+            onFailure = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    snackBarHostState.showSnackbar(
+                        message = it,
+                        withDismissAction = true,
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+            }
+        )
+    }
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -124,6 +150,9 @@ fun MainScreen(
                     .fillMaxHeight()
                     .fillMaxWidth(0.7f)
                     .background(Color.White),
+                receivedList = receivedList,
+                snackBarHostState = snackBarHostState,
+                refreshList = refreshList
             )
         },
         content = {
@@ -181,33 +210,7 @@ fun MainScreen(
                     )
                 },
                 content = {
-                    val receivedList = remember { mutableStateListOf<DocumentSnapshot>() }
                     Column {
-                        val refreshList: () -> Unit = {
-                            DatabaseFunctions.getListOfTasksAsDocuments(
-                                listReceiver = { listOfDocumentSnapshots ->
-                                    receivedList.clear()
-                                    for (i in listOfDocumentSnapshots) {
-                                        val task = DatabaseFunctions.getTaskFromDocument(i)
-                                        val ret = receivedList.add(i)
-                                        Log.d(
-                                            TAG, "added: $ret = " +
-                                                    GsonBuilder().setPrettyPrinting().create()
-                                                        .toJson(task)
-                                        )
-                                    }
-                                },
-                                onFailure = {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        snackBarHostState.showSnackbar(
-                                            message = it,
-                                            withDismissAction = true,
-                                            duration = SnackbarDuration.Short,
-                                        )
-                                    }
-                                }
-                            )
-                        }
                         LaunchedEffect(key1 = receivedList, block = { refreshList() })
                         FilterRow(
                             modifier = Modifier
@@ -232,7 +235,12 @@ fun MainScreen(
 
 
 @Composable
-fun DrawerContent(modifier: Modifier = Modifier) {
+fun DrawerContent(
+    modifier: Modifier = Modifier,
+    receivedList: SnapshotStateList<DocumentSnapshot>,
+    snackBarHostState: SnackbarHostState,
+    refreshList: () -> Unit
+) {
     val auth = FirebaseAuth.getInstance()
     val loginErrorMessage = "Login First"
     Box(
@@ -265,7 +273,11 @@ fun DrawerContent(modifier: Modifier = Modifier) {
                         text = auth.currentUser?.displayName ?: loginErrorMessage,
                         icon = Icons.Filled.AccountBox
                     )
-                    OptionMenu()
+                    OptionMenu(
+                        receivedList = receivedList,
+                        snackBarHostState = snackBarHostState,
+                        refreshList = refreshList
+                    )
                 }
             )
         }
@@ -273,14 +285,14 @@ fun DrawerContent(modifier: Modifier = Modifier) {
 
 }
 
-@Composable
-@Preview(showBackground = true)
-fun OptionMenuPrev() {
-    OptionMenu(modifier = Modifier.padding(PaddingCustomValues.mediumSpacing))
-}
 
 @Composable
-fun OptionMenu(modifier: Modifier = Modifier) {
+fun OptionMenu(
+    modifier: Modifier = Modifier,
+    receivedList: SnapshotStateList<DocumentSnapshot>,
+    snackBarHostState: SnackbarHostState,
+    refreshList: () -> Unit
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.menuItemMargin),
         modifier = modifier,
@@ -303,14 +315,12 @@ fun OptionMenu(modifier: Modifier = Modifier) {
                 }
             )
             TitledSeparator(text = "Today's Tasks")
-            // TODO: show a list of today's tasks
-            testTaskList.forEach {
-                MenuTaskItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = it.title,
-                    onCancel = { TODO("cancel and remove task from firebase") }
-                )
-            }
+            MenuTaskList(
+                receivedList = receivedList,
+                snackBarHostState = snackBarHostState,
+                refreshList = refreshList
+            )
+
             TitledSeparator(text = "About")
             MenuItem(
                 icon = Icons.Default.Info,
@@ -377,13 +387,51 @@ fun MenuItem(
     )
 }
 
+@Composable
+fun MenuTaskList(
+    receivedList: SnapshotStateList<DocumentSnapshot>,
+    snackBarHostState: SnackbarHostState,
+    refreshList: () -> Unit
+) {
+    // TODO: show a list of today's tasks
+    receivedList.let { listOfDoc ->
+        if (!listOfDoc.isEmpty()) {
+            listOfDoc.forEach {
+                val task = DatabaseFunctions.getTaskFromDocument(it)
+                val showDeletePrompt = remember { mutableStateOf(false) }
+                DeletePrompt(
+                    taskDoc = it,
+                    snackBarHostState = snackBarHostState,
+                    showDeletePrompt = showDeletePrompt,
+                    refreshList = refreshList
+                )
+                MenuTaskItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = task.title,
+                    onDelete = {
+                        showDeletePrompt.value = true
+                    }
+                )
+            }
+        } else {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(PaddingCustomValues.screenGap),
+                text = "No task scheduled for today, Add a task using the \"Add Task\" button",
+                fontStyle = FontStyle.Italic
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun MenuTaskItemPrev() {
     MenuTaskItem(
         modifier = Modifier.fillMaxWidth(),
         text = testTaskList[0].title,
-        onCancel = {}
+        onDelete = {}
     )
 }
 
@@ -391,7 +439,7 @@ fun MenuTaskItemPrev() {
 fun MenuTaskItem(
     modifier: Modifier = Modifier,
     text: String,
-    onCancel: () -> Unit
+    onDelete: () -> Unit
 ) {
     Row(
         modifier = modifier,
@@ -407,10 +455,10 @@ fun MenuTaskItem(
                 text = text
             )
             IconButton(
-                onClick = onCancel,
+                onClick = onDelete,
                 content = {
                     Icon(
-                        imageVector = Icons.Filled.Close,
+                        imageVector = Icons.Filled.Delete,
                         contentDescription = null
                     )
                 }
