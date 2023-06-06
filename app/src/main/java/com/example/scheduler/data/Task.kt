@@ -1,9 +1,7 @@
 package com.example.scheduler.data
 
-import android.icu.util.Calendar
-import java.time.Duration
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 /**
  * @param title main title
@@ -18,79 +16,90 @@ import java.time.format.DateTimeFormatter
 data class Task(
     val title: String,
     val description: String,
+
     val timeForReminder: Time,
     val dateForReminder: Date,
+
     val dateWise: Boolean,
     val repeatGapDuration: Int,
+
     val snoozeDuration: Int,
     val postponeDuration: Int,
 ) {
-    /** returns the number of days till the reminder is scheduled for */
-    private fun nextReminderIsScheduledIn(): Int {
-        // TODO: check for legitimacy
-        val calenderInstance = Calendar.getInstance()
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        val today = Date(
-            dayOfMonth = calenderInstance[Calendar.DAY_OF_MONTH],
-            month = calenderInstance[Calendar.MONTH],
-            year = calenderInstance[Calendar.YEAR]
-        )
-        val todayDate = LocalDate.parse(
-            StringFunctions.getDateAsText(
-                y = today.year,
-                m = today.month,
-                d = today.dayOfMonth
-            ),
-            formatter
-        )
+    fun isScheduledIn(inDays: Int): Boolean {
+        return getDaysTillNextReminder() <= inDays
+    }
+
+    fun getDaysTillNextReminder(): Int {
+        val startDate = LocalDate
+            .of(dateForReminder.year, dateForReminder.month, dateForReminder.dayOfMonth)
+            .atTime(timeForReminder.hour, timeForReminder.minute)
+        val today = LocalDate.now()
         if (dateWise) {
-            val nextDate = LocalDate.parse(
-                StringFunctions.getDateAsText(
-                    y = if (today.month == 11 && (today.dayOfMonth > dateForReminder.dayOfMonth)) {
-                        today.year + 1
-                    } else {
-                        today.year
-                    },
-                    m = if (today.month == 11 && (today.dayOfMonth > dateForReminder.dayOfMonth)) {
-                        0
-                    } else {
-                        today.month + 1
-                    },
-                    d = dateForReminder.dayOfMonth
-                ), formatter
-            )
-            return Duration.between(todayDate.atStartOfDay(), nextDate.atStartOfDay()).toDays()
-                .toInt()
-            // TODO: get separate for date wise
-        } else {
-            val alarmSetOnDate = LocalDate.parse(
-                StringFunctions.getDateAsText(
-                    y = dateForReminder.year,
-                    m = dateForReminder.month,
-                    d = dateForReminder.dayOfMonth
-                ),
-                formatter
-            )
-            val gap =
-                Duration.between(todayDate.atStartOfDay(), alarmSetOnDate.atStartOfDay()).toDays()
-            if (repeatGapDuration == 0) {
-                // TODO:
-                return 10000
-            } else {
-                (gap % repeatGapDuration).let {
-                    return repeatGapDuration - if (it == 0L) {
-                        repeatGapDuration
-                    } else {
-                        it.toInt()
-                    }
+            // TODO:
+            val nextMonth =
+                if (today.month.value == 11 && today.dayOfMonth > startDate.dayOfMonth) {
+                    0
+                } else if (today.dayOfMonth > startDate.dayOfMonth) {
+                    today.month.value + 1
+                } else {
+                    today.month.value
                 }
+            val nextYear =
+                if (today.month.value == 11 && today.dayOfMonth > startDate.dayOfMonth) {
+                    today.year + 1
+                } else {
+                    today.year
+                }
+            val nextDate = LocalDate
+                .of(nextYear, nextMonth, startDate.dayOfMonth)
+                .atTime(timeForReminder.hour, timeForReminder.minute)
+            return ChronoUnit.DAYS.between(today, nextDate.toLocalDate()).toInt()
+        } else {
+            val diff = ChronoUnit.DAYS.between(startDate.toLocalDate(), today)
+            return if (repeatGapDuration != 0) {
+                (repeatGapDuration - (diff % repeatGapDuration)).toInt()
+            } else {
+                0
             }
         }
     }
+}
 
-    fun isScheduledIn(inDays: Int): Boolean {
-        return nextReminderIsScheduledIn() <= inDays
-    }
+fun main() {
+    val today = LocalDate.now()
+    Task(
+        title = "Meeting",
+        description = "Discuss project updates",
+        timeForReminder = Time(hour = 9, minute = 30),
+        dateForReminder = Date(dayOfMonth = 31, month = 5, year = 2023),
+        dateWise = true,
+        repeatGapDuration = 7,
+        snoozeDuration = 10,
+        postponeDuration = 15
+    )
+        .let {
+//    testTaskList.forEach {
+            println(
+                "${it.title}:\n" +
+                        "dateWise = ${it.dateWise},\n" +
+                        "startDate = ${
+                            StringFunctions.getDateAsText(
+                                it.dateForReminder.year,
+                                it.dateForReminder.month,
+                                it.dateForReminder.dayOfMonth
+                            )
+                        }, today = ${
+                            StringFunctions.getDateAsText(
+                                today.year,
+                                today.month.value,
+                                today.dayOfMonth
+                            )
+                        }\n" +
+                        "repeatGapDuration = ${it.repeatGapDuration},\n" +
+                        "getDaysTillNextReminder = ${it.getDaysTillNextReminder()}\n"
+            )
+        }
 }
 
 enum class RepetitionEnum {
@@ -156,147 +165,3 @@ object StringFunctions {
         return "$num $unit" + if (num > 1) "s" else ""
     }
 }
-
-/** delete this object, do not use in finished project */
-val testTaskList = mutableListOf(
-    Task(
-        title = "Meeting",
-        description = "Discuss project updates",
-        timeForReminder = Time(hour = 9, minute = 30),
-        dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 7,
-        snoozeDuration = 10,
-        postponeDuration = 15
-    ),
-    Task(
-        title = "Birthday",
-        description = "Buy a gift",
-        timeForReminder = Time(hour = 18, minute = 0),
-        dateForReminder = Date(dayOfMonth = 24, month = 5, year = 2023),
-        dateWise = true,
-        repeatGapDuration = 0,
-        snoozeDuration = 5,
-        postponeDuration = 10
-    ),
-    Task(
-        title = "Dentist Appointment",
-        description = "Get a dental checkup",
-        timeForReminder = Time(hour = 14, minute = 30),
-        dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 0,
-        snoozeDuration = 15,
-        postponeDuration = 30
-    ),
-    Task(
-        title = "Meeting",
-        description = "Discuss project updates",
-        timeForReminder = Time(hour = 9, minute = 30),
-        dateForReminder = Date(dayOfMonth = 15, month = 5, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 7,
-        snoozeDuration = 10,
-        postponeDuration = 15
-    ),
-    Task(
-        title = "Birthday",
-        description = "Buy a gift",
-        timeForReminder = Time(hour = 18, minute = 0),
-        dateForReminder = Date(dayOfMonth = 10, month = 9, year = 2023),
-        dateWise = true,
-        repeatGapDuration = 0,
-        snoozeDuration = 5,
-        postponeDuration = 10
-    ),
-    Task(
-        title = "Dentist Appointment",
-        description = "Get a dental checkup",
-        timeForReminder = Time(hour = 14, minute = 30),
-        dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 0,
-        snoozeDuration = 15,
-        postponeDuration = 30
-    ),
-    Task(
-        title = "Gym Workout",
-        description = "Cardio and strength training",
-        timeForReminder = Time(hour = 8, minute = 0),
-        dateForReminder = Date(dayOfMonth = 22, month = 5, year = 2023),
-        dateWise = true,
-        repeatGapDuration = 7,
-        snoozeDuration = 5,
-        postponeDuration = 10
-    ),
-    Task(
-        title = "Project Deadline",
-        description = "Submit final report",
-        timeForReminder = Time(hour = 12, minute = 0),
-        dateForReminder = Date(dayOfMonth = 30, month = 5, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 0,
-        snoozeDuration = 0,
-        postponeDuration = 0
-    ),
-    Task(
-        title = "Shopping",
-        description = "Buy groceries",
-        timeForReminder = Time(hour = 10, minute = 0),
-        dateForReminder = Date(dayOfMonth = 23, month = 5, year = 2023),
-        dateWise = true,
-        repeatGapDuration = 7,
-        snoozeDuration = 10,
-        postponeDuration = 20
-    ),
-    Task(
-        title = "Meeting",
-        description = "Discuss project updates",
-        timeForReminder = Time(hour = 9, minute = 30),
-        dateForReminder = Date(dayOfMonth = 15, month = 5, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 7,
-        snoozeDuration = 10,
-        postponeDuration = 15
-    ),
-    Task(
-        title = "Movie Night",
-        description = "Watch a new release",
-        timeForReminder = Time(hour = 20, minute = 30),
-        dateForReminder = Date(dayOfMonth = 27, month = 5, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 0,
-        snoozeDuration = 0,
-        postponeDuration = 0
-    ),
-    Task(
-        title = "Anniversary",
-        description = "Plan a surprise",
-        timeForReminder = Time(hour = 18, minute = 0),
-        dateForReminder = Date(dayOfMonth = 10, month = 6, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 0,
-        snoozeDuration = 15,
-        postponeDuration = 30
-    ),
-    Task(
-        title = "Doctor's Appointment",
-        description = "Follow-up on test results",
-        timeForReminder = Time(hour = 11, minute = 30),
-        dateForReminder = Date(dayOfMonth = 5, month = 6, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 0,
-        snoozeDuration = 0,
-        postponeDuration = 0
-    ),
-    Task(
-        title = "Conference Call",
-        description = "Discuss upcoming projects",
-        timeForReminder = Time(hour = 16, minute = 0),
-        dateForReminder = Date(dayOfMonth = 8, month = 6, year = 2023),
-        dateWise = true,
-        repeatGapDuration = 14,
-        snoozeDuration = 10,
-        postponeDuration = 20
-    )
-)
