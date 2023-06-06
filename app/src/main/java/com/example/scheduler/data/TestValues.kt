@@ -9,7 +9,7 @@ object TestValues {
             timeForReminder = Time(hour = 9, minute = 30),
             dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
             dateWise = false,
-            repeatGapDuration = 7,
+            repeatGapDuration = 47,
             snoozeDuration = 10,
             postponeDuration = 15
         ),
@@ -19,7 +19,7 @@ object TestValues {
             timeForReminder = Time(hour = 18, minute = 0),
             dateForReminder = Date(dayOfMonth = 24, month = 5, year = 2023),
             dateWise = true,
-            repeatGapDuration = 10,
+            repeatGapDuration = 40,
             snoozeDuration = 5,
             postponeDuration = 10
         ),
@@ -59,7 +59,7 @@ object TestValues {
             timeForReminder = Time(hour = 14, minute = 30),
             dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
             dateWise = false,
-            repeatGapDuration = 14,
+            repeatGapDuration = 54,
             snoozeDuration = 15,
             postponeDuration = 30
         ),
@@ -79,7 +79,7 @@ object TestValues {
             timeForReminder = Time(hour = 12, minute = 0),
             dateForReminder = Date(dayOfMonth = 30, month = 5, year = 2023),
             dateWise = false,
-            repeatGapDuration = 2,
+            repeatGapDuration = 27,
             snoozeDuration = 0,
             postponeDuration = 0
         ),
@@ -99,7 +99,7 @@ object TestValues {
             timeForReminder = Time(hour = 9, minute = 30),
             dateForReminder = Date(dayOfMonth = 15, month = 5, year = 2023),
             dateWise = false,
-            repeatGapDuration = 0,
+            repeatGapDuration = 50,
             snoozeDuration = 10,
             postponeDuration = 15
         ),

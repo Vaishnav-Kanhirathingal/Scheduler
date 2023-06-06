@@ -1,5 +1,6 @@
 package com.example.scheduler.data
 
+import com.example.scheduler.data.TestValues.testTaskList
 import com.example.scheduler.firebase.FirebaseKeys
 import com.google.firebase.firestore.DocumentSnapshot
 import java.time.LocalDate
@@ -55,17 +56,16 @@ data class Task(
             .atTime(timeForReminder.hour, timeForReminder.minute)
         val today = LocalDate.now()
         if (dateWise) {
-            // TODO:
             val nextMonth =
-                if (today.month.value == 11 && today.dayOfMonth > startDate.dayOfMonth) {
-                    0
+                if (today.month.value == 12 && today.dayOfMonth > startDate.dayOfMonth) {
+                    1
                 } else if (today.dayOfMonth > startDate.dayOfMonth) {
                     today.month.value + 1
                 } else {
                     today.month.value
                 }
             val nextYear =
-                if (today.month.value == 11 && today.dayOfMonth > startDate.dayOfMonth) {
+                if (today.month.value == 12 && today.dayOfMonth > startDate.dayOfMonth) {
                     today.year + 1
                 } else {
                     today.year
@@ -75,7 +75,9 @@ data class Task(
                 .atTime(timeForReminder.hour, timeForReminder.minute)
             return ChronoUnit.DAYS.between(today, nextDate.toLocalDate()).toInt()
         } else {
-            val diff = ChronoUnit.DAYS.between(startDate.toLocalDate(), today)
+            // TODO:
+            val startDateDate = startDate.toLocalDate()
+            val diff = ChronoUnit.DAYS.between(startDateDate, today)
             return if (repeatGapDuration != 0) {
                 (repeatGapDuration - (diff % repeatGapDuration)).toInt()
             } else {
@@ -99,34 +101,36 @@ fun main() {
         title = "Meeting",
         description = "Discuss project updates",
         timeForReminder = Time(hour = 9, minute = 30),
-        dateForReminder = Date(dayOfMonth = 31, month = 5, year = 2023),
-        dateWise = true,
+        dateForReminder = Date(dayOfMonth = 5, month = 6, year = 2023),
+        dateWise = false,
         repeatGapDuration = 7,
         snoozeDuration = 10,
         postponeDuration = 15
     )
-        .let {
-//    testTaskList.forEach {
+//        .let {
+    testTaskList.forEach {
+        if (!it.dateWise) {
             println(
-                "${it.title}:\n" +
-                        "dateWise = ${it.dateWise},\n" +
-                        "startDate = ${
-                            StringFunctions.getDateAsText(
-                                it.dateForReminder.year,
-                                it.dateForReminder.month,
-                                it.dateForReminder.dayOfMonth
-                            )
-                        }, today = ${
-                            StringFunctions.getDateAsText(
-                                today.year,
-                                today.month.value,
-                                today.dayOfMonth
-                            )
-                        }\n" +
+//                "${it.title}:\n" +
+//                        "dateWise = ${it.dateWise},\n" +
+                "startDate = ${
+                    StringFunctions.getDateAsText(
+                        it.dateForReminder.year,
+                        it.dateForReminder.month,
+                        it.dateForReminder.dayOfMonth
+                    )
+                }, today = ${
+                    StringFunctions.getDateAsText(
+                        today.year,
+                        today.month.value,
+                        today.dayOfMonth
+                    )
+                }\n" +
                         "repeatGapDuration = ${it.repeatGapDuration},\n" +
                         "getDaysTillNextReminder = ${it.getDaysTillNextReminder()}\n"
             )
         }
+    }
 }
 
 enum class RepetitionEnum {

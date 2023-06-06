@@ -65,6 +65,7 @@ import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 private const val TAG = "AddTaskPage"
 
@@ -86,13 +87,14 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
     val daysDelayed = rememberSaveable { mutableStateOf(0) }
 
     val calenderInstance = Calendar.getInstance()
+    val local = LocalDate.now()
 
     val hour = rememberSaveable { mutableStateOf(calenderInstance[Calendar.HOUR_OF_DAY]) }
     val minute = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MINUTE]) }
-    val day = rememberSaveable { mutableStateOf(calenderInstance[Calendar.DAY_OF_MONTH]) }
-//    val day = rememberSaveable { mutableStateOf(31) }
-    val month = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MONTH]) }
-    val year = rememberSaveable { mutableStateOf(calenderInstance[Calendar.YEAR]) }
+
+    val day = rememberSaveable { mutableStateOf(local.dayOfMonth) }
+    val month = rememberSaveable { mutableStateOf(local.monthValue) }
+    val year = rememberSaveable { mutableStateOf(local.year) }
 
     // TODO: show error
     val snackBarHostState = SnackbarHostState()
@@ -483,11 +485,11 @@ fun StartDatePicker(
     val datePickerDialog = DatePickerDialog(
         LocalContext.current, { _: DatePicker, y: Int, m: Int, d: Int ->
             year.value = y
-            month.value = m
+            month.value = m + 1
             day.value = d
         },
         year.value,
-        month.value,
+        month.value - 1,
         day.value
     )
 
@@ -501,7 +503,7 @@ fun StartDatePicker(
                 fontSize = FontSizeCustomValues.medium
             )
             Text(
-                text = getDateAsText(year.value, month.value + 1, day.value),
+                text = getDateAsText(year.value, month.value, day.value),
                 fontSize = FontSizeCustomValues.medium
             )
             IconButton(onClick = { datePickerDialog.show() }) {
