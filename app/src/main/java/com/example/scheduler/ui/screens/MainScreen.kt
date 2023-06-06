@@ -79,7 +79,7 @@ import com.example.scheduler.data.StringFunctions.getDateAsText
 import com.example.scheduler.data.StringFunctions.getTextWithS
 import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
-import com.example.scheduler.data.testTaskList
+import com.example.scheduler.data.TestValues.testTaskList
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.ColorCustomValues
 import com.example.scheduler.values.FontSizeCustomValues

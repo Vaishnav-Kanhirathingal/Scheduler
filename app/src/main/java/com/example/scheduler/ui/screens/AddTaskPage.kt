@@ -41,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -89,6 +90,7 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
     val hour = rememberSaveable { mutableStateOf(calenderInstance[Calendar.HOUR_OF_DAY]) }
     val minute = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MINUTE]) }
     val day = rememberSaveable { mutableStateOf(calenderInstance[Calendar.DAY_OF_MONTH]) }
+//    val day = rememberSaveable { mutableStateOf(31) }
     val month = rememberSaveable { mutableStateOf(calenderInstance[Calendar.MONTH]) }
     val year = rememberSaveable { mutableStateOf(calenderInstance[Calendar.YEAR]) }
 
@@ -158,6 +160,16 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                 val savingInProgress = remember { mutableStateOf(false) }
                 if (savingInProgress.value) {
                     ShowLoadingPrompt("Saving...")
+                }
+                AnimatedVisibility(visible = day.value > 28) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = PaddingCustomValues.screenGap),
+                        text = "*The task can't be repeated on the ${numFormatter(day.value)} of every month as it isn't applicable for every month",
+//                        textAlign = TextAlign.Left,
+                        color = Color.Red
+                    )
                 }
                 Button(
                     onClick = {
@@ -335,7 +347,8 @@ fun RepeatSchedule(
                 chipType = Repetitions.SAME_DATE,
                 modifier = Modifier.weight(1f),
                 selectedReps = selected,
-                daysDelayed = daysDelayed
+                daysDelayed = daysDelayed,
+                enabled = date.value < 28
             )
             dateWise.value = (selected.value.enumValue == RepetitionEnum.SAME_DATE)
         }
@@ -401,13 +414,15 @@ fun TimeFilterChip(
     chipType: Reps,
     modifier: Modifier,
     selectedReps: MutableState<Reps>,
-    daysDelayed: MutableState<Int>
+    daysDelayed: MutableState<Int>,
+    enabled: Boolean = true
 ) {
     val selector: (Reps) -> Unit = { reps: Reps ->
         selectedReps.value = reps
         daysDelayed.value = (daysDelayed.value / reps.step) * reps.step
     }
     FilterChip(
+        enabled = enabled,
         modifier = modifier,
         onClick = { selector(chipType) },
         label = {
