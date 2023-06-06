@@ -30,7 +30,7 @@ import com.example.scheduler.ui.destinations.AddTaskScreen
 import com.example.scheduler.ui.destinations.DetailsScreen
 import com.example.scheduler.ui.destinations.MainScreen
 import com.example.scheduler.ui.screens.AddTaskScaffold
-import com.example.scheduler.ui.screens.MainScreen
+import com.example.scheduler.ui.screens.main_screen.MainScreen
 import com.example.scheduler.ui.theme.SchedulerTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

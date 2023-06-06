@@ -1,6 +1,5 @@
 package com.example.scheduler.data
 
-import com.example.scheduler.data.TestValues.testTaskList
 import com.example.scheduler.firebase.FirebaseKeys
 import com.google.firebase.firestore.DocumentSnapshot
 import java.time.LocalDate
@@ -50,10 +49,6 @@ data class Task(
             )
     }
 
-    fun isScheduledIn(inDays: Int): Boolean {
-        return getDaysTillNextReminder() <= inDays
-    }
-
     fun getDaysTillNextReminder(): Int {
         val startDate = LocalDate
             .of(dateForReminder.year, dateForReminder.month, dateForReminder.dayOfMonth)
@@ -87,6 +82,14 @@ data class Task(
                 0
             }
         }
+    }
+
+    fun isScheduledIn(inDays: Int): Boolean {
+        return getDaysTillNextReminder() <= inDays
+    }
+
+    fun isScheduledForToday(): Boolean {
+        return getDaysTillNextReminder() == repeatGapDuration
     }
 }
 
