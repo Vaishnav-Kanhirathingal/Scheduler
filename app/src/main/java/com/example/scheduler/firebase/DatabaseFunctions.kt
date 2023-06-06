@@ -1,9 +1,7 @@
 package com.example.scheduler.firebase
 
 import android.util.Log
-import com.example.scheduler.data.Date
 import com.example.scheduler.data.Task
-import com.example.scheduler.data.Time
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,24 +14,24 @@ object DatabaseFunctions {
         onFailureListener: (error: String) -> Unit
     ) {
         val data = hashMapOf(
-            FirebaseConstants.TaskName.title to task.title,
-            FirebaseConstants.TaskName.description to task.description,
-            FirebaseConstants.TaskName.timeForReminderHour to task.timeForReminder.hour,
-            FirebaseConstants.TaskName.timeForReminderMinute to task.timeForReminder.minute,
-            FirebaseConstants.TaskName.dateForReminderDay to task.dateForReminder.dayOfMonth,
-            FirebaseConstants.TaskName.dateForReminderMonth to task.dateForReminder.month,
-            FirebaseConstants.TaskName.dateForReminderYear to task.dateForReminder.year,
-            FirebaseConstants.TaskName.dateWise to task.dateWise,
-            FirebaseConstants.TaskName.repeatGapDuration to task.repeatGapDuration,
-            FirebaseConstants.TaskName.snoozeDuration to task.snoozeDuration,
-            FirebaseConstants.TaskName.postponeDuration to task.postponeDuration,
+            FirebaseKeys.TaskName.title to task.title,
+            FirebaseKeys.TaskName.description to task.description,
+            FirebaseKeys.TaskName.timeForReminderHour to task.timeForReminder.hour,
+            FirebaseKeys.TaskName.timeForReminderMinute to task.timeForReminder.minute,
+            FirebaseKeys.TaskName.dateForReminderDay to task.dateForReminder.dayOfMonth,
+            FirebaseKeys.TaskName.dateForReminderMonth to task.dateForReminder.month,
+            FirebaseKeys.TaskName.dateForReminderYear to task.dateForReminder.year,
+            FirebaseKeys.TaskName.dateWise to task.dateWise,
+            FirebaseKeys.TaskName.repeatGapDuration to task.repeatGapDuration,
+            FirebaseKeys.TaskName.snoozeDuration to task.snoozeDuration,
+            FirebaseKeys.TaskName.postponeDuration to task.postponeDuration,
         )
         val database = FirebaseFirestore.getInstance()
         val email = FirebaseAuth.getInstance().currentUser!!.email!!
         database
-            .collection(FirebaseConstants.parentCollectionName)
+            .collection(FirebaseKeys.parentCollectionName)
             .document(email)
-            .collection(FirebaseConstants.listOfTaskName)
+            .collection(FirebaseKeys.listOfTaskName)
             .document()
             .set(data)
             .addOnSuccessListener {
@@ -54,7 +52,7 @@ object DatabaseFunctions {
         val h = hashMapOf(
             "userName" to email
         )
-        db.collection(FirebaseConstants.parentCollectionName)
+        db.collection(FirebaseKeys.parentCollectionName)
             .document(email)
             .set(h)
             .addOnSuccessListener { Log.d(TAG, "success1");onSuccess() }
@@ -71,9 +69,9 @@ object DatabaseFunctions {
         val email = FirebaseAuth.getInstance().currentUser!!.email!!
         val db = FirebaseFirestore.getInstance()
 
-        db.collection(FirebaseConstants.parentCollectionName)
+        db.collection(FirebaseKeys.parentCollectionName)
             .document(email)
-            .collection(FirebaseConstants.listOfTaskName)
+            .collection(FirebaseKeys.listOfTaskName)
             .get()
             .addOnSuccessListener {
                 listReceiver(it.documents)
@@ -83,26 +81,6 @@ object DatabaseFunctions {
             }
     }
 
-    fun getTaskFromDocument(i: DocumentSnapshot): Task {
-        return Task(
-            title = i[FirebaseConstants.TaskName.title].toString(),
-            description = i[FirebaseConstants.TaskName.description].toString(),
-            timeForReminder = Time(
-                hour = i[FirebaseConstants.TaskName.timeForReminderHour].toString().toInt(),
-                minute = i[FirebaseConstants.TaskName.timeForReminderMinute].toString().toInt(),
-            ),
-            dateForReminder = Date(
-                dayOfMonth = i[FirebaseConstants.TaskName.dateForReminderDay].toString().toInt(),
-                month = i[FirebaseConstants.TaskName.dateForReminderMonth].toString().toInt(),
-                year = i[FirebaseConstants.TaskName.dateForReminderYear].toString().toInt(),
-            ),
-            dateWise = i[FirebaseConstants.TaskName.dateWise].toString().toBoolean(),
-            repeatGapDuration = i[FirebaseConstants.TaskName.repeatGapDuration].toString().toInt(),
-            snoozeDuration = i[FirebaseConstants.TaskName.snoozeDuration].toString().toInt(),
-            postponeDuration = i[FirebaseConstants.TaskName.postponeDuration].toString().toInt(),
-        )
-    }
-
     fun deleteTaskDocument(
         taskDoc: DocumentSnapshot,
         onSuccessListener: () -> Unit,
@@ -110,9 +88,9 @@ object DatabaseFunctions {
     ) {
         val email = FirebaseAuth.getInstance().currentUser!!.email!!
         val db = FirebaseFirestore.getInstance()
-        db.collection(FirebaseConstants.parentCollectionName)
+        db.collection(FirebaseKeys.parentCollectionName)
             .document(email)
-            .collection(FirebaseConstants.listOfTaskName)
+            .collection(FirebaseKeys.listOfTaskName)
             .document(taskDoc.id)
             .delete()
             .addOnSuccessListener {

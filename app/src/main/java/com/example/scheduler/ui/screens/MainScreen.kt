@@ -79,6 +79,7 @@ import com.example.scheduler.data.StringFunctions.getDateAsText
 import com.example.scheduler.data.StringFunctions.getTextWithS
 import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
+import com.example.scheduler.data.Task
 import com.example.scheduler.data.TestValues.testTaskList
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.values.ColorCustomValues
@@ -122,7 +123,7 @@ fun MainScreen(
             listReceiver = { listOfDocumentSnapshots ->
                 receivedList.clear()
                 for (i in listOfDocumentSnapshots) {
-                    val task = DatabaseFunctions.getTaskFromDocument(i)
+                    val task = Task.fromDocument(i)
                     val ret = receivedList.add(i)
                     Log.d(
                         TAG, "added: $ret = " +
@@ -395,7 +396,7 @@ fun MenuTaskList(
 ) {
     val newList = mutableListOf<DocumentSnapshot>()
     receivedList.forEach{
-        val task = DatabaseFunctions.getTaskFromDocument(it)
+        val task = Task.fromDocument(it)
         if (task.getDaysTillNextReminder()==task.repeatGapDuration){
             newList.add(it)
         }
@@ -404,7 +405,7 @@ fun MenuTaskList(
     // TODO: show a list of today's tasks
     if (newList.isNotEmpty()) {
         newList.forEach {
-            val task = DatabaseFunctions.getTaskFromDocument(it)
+            val task = Task.fromDocument(it)
             if (task.getDaysTillNextReminder() == task.repeatGapDuration) {
                 val showDeletePrompt = remember { mutableStateOf(false) }
                 DeletePrompt(
@@ -572,8 +573,7 @@ fun SavedTaskList(
             items(
                 count = listOfTaskDocumentsReceived.size,
                 itemContent = {
-                    val task =
-                        DatabaseFunctions.getTaskFromDocument(listOfTaskDocumentsReceived[it])
+                    val task = Task.fromDocument(listOfTaskDocumentsReceived[it])
                     val doc = listOfTaskDocumentsReceived[it]
                     if (task.isScheduledIn(selected.value.step) || selected.value == Repetitions.ALL) {
                         DetailedTaskCard(
@@ -599,7 +599,7 @@ fun DetailedTaskCard(
     refreshList: () -> Unit
 ) {
     // TODO: add a UI element that tells how much time remaining till the next alarm
-    val task = DatabaseFunctions.getTaskFromDocument(taskDoc)
+    val task = Task.fromDocument(taskDoc)
     Card(
         modifier = modifier,
         content = {
@@ -786,7 +786,7 @@ fun DeletePrompt(
     showDeletePrompt: MutableState<Boolean>,
     refreshList: () -> Unit
 ) {
-    val task = DatabaseFunctions.getTaskFromDocument(taskDoc)
+    val task = Task.fromDocument(taskDoc)
     val deleting = remember { mutableStateOf(false) }
     if (showDeletePrompt.value) {
         QuestionPrompt(

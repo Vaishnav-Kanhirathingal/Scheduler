@@ -1,6 +1,6 @@
 package com.example.scheduler.firebase
 
-object FirebaseConstants {
+object FirebaseKeys {
     const val parentCollectionName = "users"
     const val listOfTaskName = "taskList"
 

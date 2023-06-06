@@ -1,5 +1,8 @@
 package com.example.scheduler.data
 
+import com.example.scheduler.data.TestValues.testTaskList
+import com.example.scheduler.firebase.FirebaseKeys
+import com.google.firebase.firestore.DocumentSnapshot
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -26,6 +29,27 @@ data class Task(
     val snoozeDuration: Int,
     val postponeDuration: Int,
 ) {
+    companion object {
+        fun fromDocument(i: DocumentSnapshot) =
+            Task(
+                title = i[FirebaseKeys.TaskName.title].toString(),
+                description = i[FirebaseKeys.TaskName.description].toString(),
+                timeForReminder = Time(
+                    hour = i[FirebaseKeys.TaskName.timeForReminderHour].toString().toInt(),
+                    minute = i[FirebaseKeys.TaskName.timeForReminderMinute].toString().toInt(),
+                ),
+                dateForReminder = Date(
+                    dayOfMonth = i[FirebaseKeys.TaskName.dateForReminderDay].toString().toInt(),
+                    month = i[FirebaseKeys.TaskName.dateForReminderMonth].toString().toInt(),
+                    year = i[FirebaseKeys.TaskName.dateForReminderYear].toString().toInt(),
+                ),
+                dateWise = i[FirebaseKeys.TaskName.dateWise].toString().toBoolean(),
+                repeatGapDuration = i[FirebaseKeys.TaskName.repeatGapDuration].toString().toInt(),
+                snoozeDuration = i[FirebaseKeys.TaskName.snoozeDuration].toString().toInt(),
+                postponeDuration = i[FirebaseKeys.TaskName.postponeDuration].toString().toInt(),
+            )
+    }
+
     fun isScheduledIn(inDays: Int): Boolean {
         return getDaysTillNextReminder() <= inDays
     }
