@@ -90,7 +90,6 @@ fun MainScreen(
     val snackBarHostState = SnackbarHostState()
     val lazyListState = rememberLazyListState()
     val drawerState = DrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope(getContext = { Dispatchers.IO })
 
     val showFullText = remember { mutableStateOf(true) }
 
@@ -143,48 +142,10 @@ fun MainScreen(
             Scaffold(
                 snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
                 topBar = {
-                    CenterAlignedTopAppBar(
-                        modifier = Modifier.fillMaxWidth(),
-                        title = {
-                            Text(
-                                text = "Task List",
-                                textAlign = TextAlign.Center
-                            )
-                        },
-                        actions = {
-                            googleSignInButton(
-                                modifier = Modifier,
-                                onSuccess = {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        snackBarHostState.showSnackbar(
-                                            message = "Login Successful",
-                                            withDismissAction = true
-                                        )
-                                    }
-                                },
-                                onFailure = {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        snackBarHostState.showSnackbar(
-                                            message = "Login Unsuccessful, reason = $it",
-                                            withDismissAction = true
-                                        )
-                                    }
-                                }
-                            )
-                        },
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    scope.launch { drawerState.open() }
-                                },
-                                content = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Menu,
-                                        contentDescription = null,
-                                    )
-                                }
-                            )
-                        },
+                    MainScreenAppBar(
+                        snackBarHostState = snackBarHostState,
+                        drawerState = drawerState,
+                        googleSignInButton = googleSignInButton,
                     )
                 },
                 floatingActionButton = {
@@ -214,6 +175,63 @@ fun MainScreen(
                 }
             )
         }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreenAppBar(
+    snackBarHostState: SnackbarHostState,
+    drawerState: DrawerState,
+    googleSignInButton: @Composable (
+        modifier: Modifier,
+        onSuccess: () -> Unit,
+        onFailure: (issue: String) -> Unit,
+    ) -> Unit
+) {
+    val scope = rememberCoroutineScope(getContext = { Dispatchers.IO })
+    CenterAlignedTopAppBar(
+        modifier = Modifier.fillMaxWidth(),
+        title = {
+            Text(
+                text = "Task List",
+                textAlign = TextAlign.Center
+            )
+        },
+        actions = {
+            googleSignInButton(
+                modifier = Modifier,
+                onSuccess = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        snackBarHostState.showSnackbar(
+                            message = "Login Successful",
+                            withDismissAction = true
+                        )
+                    }
+                },
+                onFailure = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        snackBarHostState.showSnackbar(
+                            message = "Login Unsuccessful, reason = $it",
+                            withDismissAction = true
+                        )
+                    }
+                }
+            )
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = {
+                    scope.launch { drawerState.open() }
+                },
+                content = {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = null,
+                    )
+                }
+            )
+        },
     )
 }
 
@@ -319,6 +337,7 @@ fun SavedTaskList(
                     val task = Task.fromDocument(listOfTaskDocumentsReceived[it])
                     val doc = listOfTaskDocumentsReceived[it]
                     if (task.isScheduledIn(selected.value.step) || selected.value == Repetitions.ALL) {
+                        Log.d(TAG, "task = ${task.title}, sch = ${task.getDaysTillNextReminder()}")
                         DetailedTaskCard(
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -140,9 +140,7 @@ fun OptionMenu(
             MenuItem(
                 icon = Icons.Default.AccountBox,
                 text = "Sign-out",
-                onClick = {
-                    // TODO: to settings page
-                }
+                onClick = { TODO("log out") }
             )
             TitledSeparator(text = "Today's Tasks")
             MenuTaskList(
