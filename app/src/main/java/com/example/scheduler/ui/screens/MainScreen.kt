@@ -393,11 +393,19 @@ fun MenuTaskList(
     snackBarHostState: SnackbarHostState,
     refreshList: () -> Unit
 ) {
+    val newList = mutableListOf<DocumentSnapshot>()
+    receivedList.forEach{
+        val task = DatabaseFunctions.getTaskFromDocument(it)
+        if (task.getDaysTillNextReminder()==task.repeatGapDuration){
+            newList.add(it)
+        }
+    }
+
     // TODO: show a list of today's tasks
-    receivedList.let { listOfDoc ->
-        if (!listOfDoc.isEmpty()) {
-            listOfDoc.forEach {
-                val task = DatabaseFunctions.getTaskFromDocument(it)
+    if (newList.isNotEmpty()) {
+        newList.forEach {
+            val task = DatabaseFunctions.getTaskFromDocument(it)
+            if (task.getDaysTillNextReminder() == task.repeatGapDuration) {
                 val showDeletePrompt = remember { mutableStateOf(false) }
                 DeletePrompt(
                     taskDoc = it,
@@ -413,15 +421,15 @@ fun MenuTaskList(
                     }
                 )
             }
-        } else {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(PaddingCustomValues.screenGap),
-                text = "No task scheduled for today, Add a task using the \"Add Task\" button",
-                fontStyle = FontStyle.Italic
-            )
         }
+    } else {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(PaddingCustomValues.screenGap),
+            text = "No task scheduled for today, Add a task using the \"Add Task\" button",
+            fontStyle = FontStyle.Italic
+        )
     }
 }
 
