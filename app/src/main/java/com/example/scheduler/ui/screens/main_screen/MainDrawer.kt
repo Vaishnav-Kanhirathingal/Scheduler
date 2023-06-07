@@ -55,7 +55,8 @@ fun DrawerContent(
     modifier: Modifier = Modifier,
     receivedList: SnapshotStateList<DocumentSnapshot>,
     snackBarHostState: SnackbarHostState,
-    refreshList: () -> Unit
+    refreshList: () -> Unit,
+    toSettingsPage: () -> Unit,
 ) {
     val auth = FirebaseAuth.getInstance()
     val loginErrorMessage = "Login First"
@@ -90,9 +91,11 @@ fun DrawerContent(
                         icon = Icons.Filled.AccountBox
                     )
                     OptionMenu(
+                        modifier = Modifier.fillMaxWidth(),
                         receivedList = receivedList,
                         snackBarHostState = snackBarHostState,
-                        refreshList = refreshList
+                        refreshList = refreshList,
+                        toSettingsPage = toSettingsPage
                     )
                 }
             )
@@ -123,7 +126,8 @@ fun OptionMenu(
     modifier: Modifier = Modifier,
     receivedList: SnapshotStateList<DocumentSnapshot>,
     snackBarHostState: SnackbarHostState,
-    refreshList: () -> Unit
+    refreshList: () -> Unit,
+    toSettingsPage: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.menuItemMargin),
@@ -148,15 +152,13 @@ fun OptionMenu(
             MenuItem(
                 icon = Icons.Default.Settings,
                 text = "Settings",
-                onClick = { TODO("open settings screen") }
+                onClick = toSettingsPage
             )
             TitledSeparator(text = "About")
             MenuItem(
                 icon = Icons.Default.Info,
                 text = "Documentation",
-                onClick = {
-                    // TODO: to settings page
-                }
+                onClick = { TODO("open docs") }
             )
             MenuItem(
                 icon = Icons.Default.Info,

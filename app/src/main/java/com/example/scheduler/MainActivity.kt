@@ -28,6 +28,7 @@ import coil.request.ImageRequest
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.ui.destinations.Destinations
 import com.example.scheduler.ui.screens.AddTaskScaffold
+import com.example.scheduler.ui.screens.SettingsScreen
 import com.example.scheduler.ui.screens.main_screen.MainScreen
 import com.example.scheduler.ui.theme.SchedulerTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -137,7 +138,8 @@ fun SchedulerNavHost(
                 content = {
                     MainScreen(
                         toAddTaskScreen = { navController.navigate(Destinations.AddTaskScreen) },
-                        googleSignInButton = googleSignInButton
+                        googleSignInButton = googleSignInButton,
+                        toSettingsPage = { navController.navigate(Destinations.SettingsScreen) }
                     )
                 }
             )
@@ -157,6 +159,7 @@ fun SchedulerNavHost(
                 route = Destinations.SettingsScreen,
                 content = {
                     // TODO: create UI
+                    SettingsScreen()
                 }
             )
             composable(

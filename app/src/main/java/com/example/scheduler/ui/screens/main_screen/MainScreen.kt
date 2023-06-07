@@ -85,7 +85,8 @@ fun MainScreen(
         modifier: Modifier,
         onSuccess: () -> Unit,
         onFailure: (issue: String) -> Unit,
-    ) -> Unit
+    ) -> Unit,
+    toSettingsPage: () -> Unit,
 ) {
     val snackBarHostState = SnackbarHostState()
     val lazyListState = rememberLazyListState()
@@ -135,7 +136,8 @@ fun MainScreen(
                     .background(Color.White),
                 receivedList = receivedList,
                 snackBarHostState = snackBarHostState,
-                refreshList = refreshList
+                refreshList = refreshList,
+                toSettingsPage = toSettingsPage
             )
         },
         content = {
