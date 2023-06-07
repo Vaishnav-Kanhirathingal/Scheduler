@@ -327,30 +327,42 @@ fun SavedTaskList(
     snackBarHostState: SnackbarHostState,
     refreshList: () -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier,
-        state = lazyListState,
-        content = {
-            items(
-                count = listOfTaskDocumentsReceived.size,
-                itemContent = {
-                    val task = Task.fromDocument(listOfTaskDocumentsReceived[it])
-                    val doc = listOfTaskDocumentsReceived[it]
-                    if (task.isScheduledIn(selected.value.step) || selected.value == Repetitions.ALL) {
-                        Log.d(TAG, "task = ${task.title}, sch = ${task.getDaysTillNextReminder()}")
+    val filteredList = mutableListOf<DocumentSnapshot>()
+    listOfTaskDocumentsReceived.forEach {
+        val task = Task.fromDocument(it)
+        if (task.isScheduledIn(selected.value.step) || selected.value == Repetitions.ALL) {
+            filteredList.add(it)
+            Log.d(TAG, "task = ${task.title}, sch = ${task.getDaysTillNextReminder()}")
+        }
+    }
+    if (filteredList.isEmpty()) {
+        ListEmptyText(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(30.dp)
+        )
+    } else {
+        LazyColumn(
+            modifier = modifier,
+            state = lazyListState,
+            content = {
+                items(
+                    count = filteredList.size,
+                    itemContent = {
                         DetailedTaskCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(PaddingCustomValues.smallSpacing),
-                            taskDoc = doc,
+                            taskDoc = filteredList[it],
                             snackBarHostState = snackBarHostState,
                             refreshList = refreshList
                         )
                     }
-                }
-            )
-        }
-    )
+                )
+            }
+        )
+    }
 }
 
 @Composable

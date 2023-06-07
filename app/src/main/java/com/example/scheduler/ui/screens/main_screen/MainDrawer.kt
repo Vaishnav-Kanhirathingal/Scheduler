@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -241,12 +242,10 @@ fun MenuTaskList(
             }
         }
     } else {
-        Text(
+        ListEmptyText(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(PaddingCustomValues.screenGap),
-            text = "No task scheduled for today, Add a task using the \"Add Task\" button",
-            fontStyle = FontStyle.Italic
+                .padding(PaddingCustomValues.screenGap)
         )
     }
 }
@@ -288,6 +287,31 @@ fun MenuTaskItem(
                         contentDescription = null
                     )
                 }
+            )
+        }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ListEmptyTextPrev() {
+    ListEmptyText(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    )
+}
+
+@Composable
+fun ListEmptyText(modifier: Modifier = Modifier) {
+    Box(modifier = modifier,
+        contentAlignment = Alignment.Center,
+        content = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "No task scheduled for today, Add a task using the \"Add Task\" button",
+                fontStyle = FontStyle.Italic,
+                textAlign = TextAlign.Center
             )
         }
     )
