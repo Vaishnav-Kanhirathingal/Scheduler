@@ -220,8 +220,6 @@ fun MenuTaskList(
             newList.add(it)
         }
     }
-
-    // TODO: show a list of today's tasks
     if (newList.isNotEmpty()) {
         newList.forEach {
             val task = Task.fromDocument(it)

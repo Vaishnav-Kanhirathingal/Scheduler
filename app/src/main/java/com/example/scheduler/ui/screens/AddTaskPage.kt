@@ -107,7 +107,6 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                         text = "Add Task",
                         textAlign = TextAlign.Center,
                         fontSize = FontSizeCustomValues.large
-                        // TODO: set nav up button
                     )
                 },
                 navigationIcon = {
@@ -356,7 +355,6 @@ fun RepeatSchedule(
         }
 
         AnimatedVisibility(visible = selected.value.enumValue == RepetitionEnum.SAME_DATE) {
-            // TODO: display the date of month
             Row {
                 Text(
                     text = "The given task would be repeated on ${numFormatter(date.value)} of every month",
@@ -583,9 +581,8 @@ fun ShowLoadingPromptPrev() {
 
 @Composable
 fun ShowLoadingPrompt(text: String) {
-
     Dialog(
-        onDismissRequest = { /*TODO*/ },
+        onDismissRequest = {},
         content = {
             Card(
                 modifier = Modifier.fillMaxWidth(),

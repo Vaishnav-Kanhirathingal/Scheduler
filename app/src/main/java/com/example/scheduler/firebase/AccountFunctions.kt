@@ -24,7 +24,6 @@ object AccountFunctions {
                         val user = auth.currentUser
                         Log.d(TAG, "user = ${user?.email}")
                         DatabaseFunctions.createUserDirectories(
-                            // TODO: correctly set the lambdas
                             onSuccess = onSuccess,
                             onFailure = onFailure
                         )

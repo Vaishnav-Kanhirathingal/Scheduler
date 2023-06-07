@@ -75,7 +75,6 @@ data class Task(
                 .atTime(timeForReminder.hour, timeForReminder.minute)
             return ChronoUnit.DAYS.between(today, nextDate.toLocalDate()).toInt()
         } else {
-            // TODO:
             val startDateDate = startDate.toLocalDate()
             val diff = ChronoUnit.DAYS.between(startDateDate, today)
             return if (repeatGapDuration != 0) {

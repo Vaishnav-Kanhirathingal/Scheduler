@@ -84,7 +84,6 @@ class MainActivity : ComponentActivity() {
                 contract = ActivityResultContracts.StartActivityForResult(),
                 onResult = {
                     AccountFunctions.signInGoogle(
-                        // TODO: correctly set lambda parameters
                         result = it,
                         onSuccess = onSuccess,
                         onFailure = onFailure
