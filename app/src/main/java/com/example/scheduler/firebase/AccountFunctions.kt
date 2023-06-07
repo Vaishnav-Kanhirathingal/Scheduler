@@ -10,6 +10,12 @@ object AccountFunctions {
     private val TAG: String = this::class.java.simpleName
     private val auth = FirebaseAuth.getInstance()
 
+    /** can be used to create a user and its own necessary directories
+     * @param result this is the activity result of a one tap google sign up prompt
+     * @param onSuccess a lambda to run after the function has executed successfully
+     * @param onFailure a lambda to run after the function has failed to execute. takes the
+     * exception message as parameter
+     */
     fun signInGoogle(
         result: ActivityResult,
         onSuccess: () -> Unit,

@@ -8,6 +8,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 object DatabaseFunctions {
     private val TAG = this::class.java.simpleName
+
+    /** It receives a task and adds it to the Fire-store database at the appropriate location
+     * @param task A Task object to be uploaded to firebase
+     * @param onSuccessListener a lambda to run after the function has executed successfully
+     * @param onFailureListener a lambda to run after the function has failed to execute. takes the
+     * exception message as parameter
+     */
     fun uploadTaskToFirebase(
         task: Task,
         onSuccessListener: () -> Unit,
@@ -43,6 +50,12 @@ object DatabaseFunctions {
             }
     }
 
+    /** responsible for creating user directories based on the user email. It creates the directory
+     * for where to store new tasks
+     * @param onSuccess a lambda to run after the function has executed successfully
+     * @param onFailure a lambda to run after the function has failed to execute. takes the
+     * exception message as parameter
+     */
     fun createUserDirectories(
         onSuccess: () -> Unit,
         onFailure: (issue: String) -> Unit
@@ -62,6 +75,14 @@ object DatabaseFunctions {
             }
     }
 
+    /** it takes a list receiver lambda and passes a list of tasks to it after fetching it from the
+     * fire-store
+     * @param listReceiver a lambda which is run when the list gets received from a network request.
+     * The list is passed as the parameter to the lambda
+     * @param onFailure a lambda to run after the function has failed to execute. takes the
+     * exception message as parameter
+     *
+     */
     fun getListOfTasksAsDocuments(
         listReceiver: (List<DocumentSnapshot>) -> Unit,
         onFailure: (issue: String) -> Unit
@@ -81,6 +102,14 @@ object DatabaseFunctions {
             }
     }
 
+
+    /**Takes a DocumentSnapshot object of a task and deletes it
+     * @param taskDoc a DocumentSnapshot object which can be used to delete the task object from
+     * fire-store
+     * @param onSuccessListener a lambda to run after the function has executed successfully
+     * @param onFailureListener a lambda to run after the function has failed to execute. takes the
+     * exception message as parameter
+     */
     fun deleteTaskDocument(
         taskDoc: DocumentSnapshot,
         onSuccessListener: () -> Unit,
