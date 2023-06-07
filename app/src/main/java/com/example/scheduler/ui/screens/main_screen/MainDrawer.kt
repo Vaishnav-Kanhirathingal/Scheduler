@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -135,21 +136,20 @@ fun OptionMenu(
                         top = PaddingCustomValues.screenGap,
                         start = PaddingCustomValues.menuTextSpacing
                     ),
-                text = "Account",
+                text = "Today's Tasks",
                 fontSize = FontSizeCustomValues.menuTitle
             )
-            MenuItem(
-                icon = Icons.Default.AccountBox,
-                text = "Sign-out",
-                onClick = { TODO("log out") }
-            )
-            TitledSeparator(text = "Today's Tasks")
             MenuTaskList(
                 receivedList = receivedList,
                 snackBarHostState = snackBarHostState,
                 refreshList = refreshList
             )
-
+            TitledSeparator(text = "Settings")
+            MenuItem(
+                icon = Icons.Default.Settings,
+                text = "Settings",
+                onClick = { TODO("open settings screen") }
+            )
             TitledSeparator(text = "About")
             MenuItem(
                 icon = Icons.Default.Info,
