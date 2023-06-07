@@ -164,19 +164,30 @@ class Time(
 )
 
 object StringFunctions {
-    /** gets value like 6,1 and formats it as 06:01 AM */
+    /**@param hour hour
+     * @param minute minute
+     *  @return takes value like 6,1 and formats it as 06:01 AM
+     */
     fun getTimeAsText(hour: Int, minute: Int): String {
         val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
         return "${if (hour > 12) (hour - 12).toString() else hour.toString()}:${t(minute)} ${if (hour > 12) "PM" else "AM"}"
     }
 
-    /** gets value like 2021,1,1 and formats it as 01/01/2021 */
+    /**
+     * @param y year
+     * @param m month
+     * @param d day of month
+     * @return takes value like 2021,1,1 and formats it as 01/01/2021
+     */
     fun getDateAsText(y: Int, m: Int, d: Int): String {
         val t = { i: Int -> if (i < 10) "0$i" else i.toString() }
         return "${t(d)}/${t(m)}/${t(y)}"
     }
 
-    /** gets value like 2 or 12 and returns 2nd ar 12th */
+    /**
+     * @param num a number
+     * @return takes value like 2 or 12 and returns 2nd ar 12th
+     */
     fun numFormatter(num: Int): String {
         return num.toString() +
                 if (num < 10 || num > 20) {
@@ -191,6 +202,12 @@ object StringFunctions {
                 }
     }
 
+    /**
+     * @param unit takes string which is a unit of measure. ex - `day`
+     * @param num magnitude of the unit
+     * @return if a number is greater than 1, it returns the given string with s. for example, if
+     * [unit] and [num] are "day" and 5, it returns 5 days
+     */
     fun getTextWithS(unit: String, num: Int): String {
         return "$num $unit" + if (num > 1) "s" else ""
     }
