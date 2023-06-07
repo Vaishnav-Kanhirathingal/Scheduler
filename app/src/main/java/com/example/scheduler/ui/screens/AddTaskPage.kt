@@ -273,8 +273,13 @@ fun TitleAndDescription(
             OutlinedTextField(
                 value = description.value,
                 onValueChange = {
-                    if (it.length <= descriptionLimit) {
-                        description.value = it
+                    try {
+                        if (it.length <= descriptionLimit && it.last() != '\n') {
+                            description.value = it
+                        }
+                    } catch (e: Exception) {
+                        description.value = ""
+                        e.printStackTrace()
                     }
                 },
                 label = { Text(text = "Description") },
