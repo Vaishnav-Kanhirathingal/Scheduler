@@ -26,9 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.scheduler.firebase.AccountFunctions
-import com.example.scheduler.ui.destinations.AddTaskScreen
-import com.example.scheduler.ui.destinations.DetailsScreen
-import com.example.scheduler.ui.destinations.MainScreen
+import com.example.scheduler.ui.destinations.Destinations
 import com.example.scheduler.ui.screens.AddTaskScaffold
 import com.example.scheduler.ui.screens.main_screen.MainScreen
 import com.example.scheduler.ui.theme.SchedulerTheme
@@ -131,19 +129,42 @@ fun SchedulerNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = MainScreen.route,
+        startDestination = Destinations.MainScreen,
         modifier = modifier,
         builder = {
-            composable(route = MainScreen.route) {
-                MainScreen(
-                    toAddTaskScreen = { navController.navigate(AddTaskScreen.route) },
-                    googleSignInButton = googleSignInButton
-                )
-            }
-            composable(route = AddTaskScreen.route) { AddTaskScaffold(navigateUp = { navController.navigateUp() }) }
-            composable(route = DetailsScreen.route) {
-                // TODO: add details screen
-            }
+            composable(
+                route = Destinations.MainScreen,
+                content = {
+                    MainScreen(
+                        toAddTaskScreen = { navController.navigate(Destinations.AddTaskScreen) },
+                        googleSignInButton = googleSignInButton
+                    )
+                }
+            )
+            composable(
+                route = Destinations.AddTaskScreen,
+                content = {
+                    AddTaskScaffold(navigateUp = { navController.navigateUp() })
+                }
+            )
+            composable(
+                route = Destinations.DetailsScreen,
+                content = {
+                    // TODO: add details screen
+                }
+            )
+            composable(
+                route = Destinations.SettingsScreen,
+                content = {
+                    // TODO: create UI
+                }
+            )
+            composable(
+                route = Destinations.SignUpScreen,
+                content = {
+                    // TODO: create UI
+                }
+            )
         }
     )
 }
