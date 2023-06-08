@@ -31,12 +31,22 @@ import com.example.scheduler.values.PaddingCustomValues
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun SettingsScreen() {
+fun SettingsScreenPrev() {
+    SettingsScreen(
+        navigateUp = {}
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreen(
+    navigateUp: () -> Unit
+) {
     Scaffold(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
-        topBar = { SettingsTopBar() },
+        topBar = { SettingsTopBar(navigateUp = navigateUp) },
         content = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.smallSpacing),
@@ -79,12 +89,14 @@ fun SettingsScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTopBar() {
+fun SettingsTopBar(
+    navigateUp: () -> Unit
+) {
     // TODO: top app bar
     TopAppBar(
         navigationIcon = {
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = navigateUp,
                 content = {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
                 }
