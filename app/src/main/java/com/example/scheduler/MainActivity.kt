@@ -145,9 +145,7 @@ fun SchedulerNavHost(
             )
             composable(
                 route = Destinations.AddTaskScreen,
-                content = {
-                    AddTaskScaffold(navigateUp = { navController.navigateUp() })
-                }
+                content = { AddTaskScaffold(navigateUp = { navController.navigateUp() }) }
             )
             composable(
                 route = Destinations.DetailsScreen,
@@ -157,10 +155,7 @@ fun SchedulerNavHost(
             )
             composable(
                 route = Destinations.SettingsScreen,
-                content = {
-                    // TODO: create UI
-                    SettingsScreen()
-                }
+                content = { SettingsScreen() }
             )
             composable(
                 route = Destinations.SignUpScreen,
