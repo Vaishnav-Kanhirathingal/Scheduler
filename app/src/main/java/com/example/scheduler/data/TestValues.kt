@@ -1,7 +1,7 @@
 package com.example.scheduler.data
 
+/** delete this object, do not use in finished project */
 object TestValues {
-    /** delete this object, do not use in finished project */
     val testTaskList = mutableListOf(
         Task(
             title = "Meeting",
