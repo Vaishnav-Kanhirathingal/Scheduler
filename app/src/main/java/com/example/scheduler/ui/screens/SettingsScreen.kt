@@ -48,6 +48,7 @@ fun SettingsScreen() {
                     .verticalScroll(ScrollState(0)),
                 content = {
                     ConfirmationCard(
+                        modifier = Modifier.fillMaxWidth(),
                         title = "Delete Account?",
                         warningMessage = "Deletion of account would delete any and all data " +
                                 "related to the account. This is an irreversible action.",
@@ -55,6 +56,7 @@ fun SettingsScreen() {
                         onClick = { TODO("Delete Account") }
                     )
                     ConfirmationCard(
+                        modifier = Modifier.fillMaxWidth(),
                         title = "Log Out?",
                         warningMessage = "Logging out would remove all reminders but, Would not " +
                                 "delete any tasks. Logging back in would set remaining reminders " +
@@ -62,6 +64,12 @@ fun SettingsScreen() {
                                 "of any pending tasks",
                         buttonText = "Log Out",
                         onClick = { TODO("Log Out Account") }
+                    )
+                    ConfirmationCard(
+                        title = "Clear all tasks?",
+                        warningMessage = "Clearing all tasks would remove every task and reminder from database.",
+                        buttonText = "Clear",
+                        onClick = { TODO("Clear all tasks from firebase") }
                     )
                 }
             )
@@ -95,6 +103,7 @@ fun SettingsTopBar() {
 @Preview(showBackground = true)
 fun ConfirmationCardPrev() {
     ConfirmationCard(
+        modifier = Modifier.fillMaxWidth(),
         title = "Delete Account?",
         warningMessage = "Deletion of account would delete any and all data related to the account. This is an irreversible action.",
         buttonText = "Delete Account",
@@ -104,13 +113,14 @@ fun ConfirmationCardPrev() {
 
 @Composable
 fun ConfirmationCard(
+    modifier: Modifier = Modifier,
     title: String,
     warningMessage: String,
     buttonText: String,
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         content = {
             Column(
                 modifier = Modifier
