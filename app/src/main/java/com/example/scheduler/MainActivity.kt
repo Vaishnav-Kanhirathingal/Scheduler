@@ -1,5 +1,7 @@
 package com.example.scheduler
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,8 +25,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.scheduler.background.ReminderWork
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.ui.destinations.Destinations
 import com.example.scheduler.ui.screens.AddTaskScaffold
@@ -41,6 +46,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannel()
+
+        val workManager = WorkManager.getInstance(this)
+        workManager.enqueue(OneTimeWorkRequest.from(ReminderWork::class.java))
+
         auth = FirebaseAuth.getInstance()
         setContent {
             SchedulerTheme {
@@ -63,6 +73,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun createNotificationChannel() {
+        val channel =
+            NotificationChannel(
+                ReminderWork.channelID,
+                "name",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+        val manager: NotificationManager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
     }
 
     @Composable
