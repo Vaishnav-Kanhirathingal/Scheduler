@@ -9,18 +9,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -138,7 +134,11 @@ fun SchedulerNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Destinations.SignUpScreen,
+        startDestination = if (FirebaseAuth.getInstance().currentUser == null) {
+            Destinations.SignUpScreen
+        } else {
+            Destinations.MainScreen
+        },
         modifier = modifier,
         builder = {
             composable(
@@ -164,9 +164,8 @@ fun SchedulerNavHost(
                     SignUpScreen(
                         googleSignInButton = googleSignInButton,
                         navigateToMainScreen = {
-                            navController.navigate(Destinations.MainScreen) {
-                                launchSingleTop = true
-                            }
+                            // TODO: make this on top
+                            navController.navigate(Destinations.MainScreen)
                         }
                     )
                 }
