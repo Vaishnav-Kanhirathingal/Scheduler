@@ -18,7 +18,14 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
     }
 
     override fun doWork(): Result {
-        TODO("Not yet implemented")
+        try {
+            // TODO: get task
+
+            return Result.success()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Result.failure()
+        }
     }
 }
 

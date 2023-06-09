@@ -30,10 +30,12 @@ import androidx.work.WorkManager
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.scheduler.background.ReminderWork
+import com.example.scheduler.background.TaskReminderWorker
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.ui.destinations.Destinations
 import com.example.scheduler.ui.screens.AddTaskScaffold
 import com.example.scheduler.ui.screens.SettingsScreen
+import com.example.scheduler.ui.screens.SignUpScreen
 import com.example.scheduler.ui.screens.main_screen.MainScreen
 import com.example.scheduler.ui.theme.SchedulerTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -78,7 +80,7 @@ class MainActivity : ComponentActivity() {
     private fun createNotificationChannel() {
         val channel =
             NotificationChannel(
-                ReminderWork.channelID,
+                TaskReminderWorker.channelID,
                 "name",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
@@ -174,9 +176,7 @@ fun SchedulerNavHost(
             )
             composable(
                 route = Destinations.SignUpScreen,
-                content = {
-                    // TODO: create UI
-                }
+                content = { SignUpScreen() }
             )
         }
     )
