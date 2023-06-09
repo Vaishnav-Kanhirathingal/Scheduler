@@ -7,28 +7,26 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.scheduler.background.ReminderWork
 import com.example.scheduler.background.TaskReminderWorker
 import com.example.scheduler.firebase.AccountFunctions
@@ -38,6 +36,7 @@ import com.example.scheduler.ui.screens.SettingsScreen
 import com.example.scheduler.ui.screens.SignUpScreen
 import com.example.scheduler.ui.screens.main_screen.MainScreen
 import com.example.scheduler.ui.theme.SchedulerTheme
+import com.example.scheduler.values.PaddingCustomValues
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -112,30 +111,16 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             )
-        IconButton(
+        ElevatedButton(
             modifier = modifier,
             onClick = { startForResult.launch(googleSignInClient.signInIntent) },
             content = {
-                val imageModifier = Modifier
-                    .clip(CircleShape)
-                    .border(width = 1.dp, color = Color.Black, shape = CircleShape)
-                val user = FirebaseAuth.getInstance().currentUser
-                if (user == null) {
-                    Icon(
-                        modifier = imageModifier,
-                        imageVector = Icons.Filled.AccountCircle,
-                        contentDescription = null
-                    )
-                } else {
-                    AsyncImage(
-                        modifier = imageModifier,
-                        model = ImageRequest.Builder(this)
-                            .data(user.photoUrl)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = null
-                    )
-                }
+                Icon(
+                    modifier = Modifier.padding(all = PaddingCustomValues.mediumSpacing),
+                    painter = painterResource(id = R.drawable.google_icon),
+                    contentDescription = null
+                )
+                Text(text = "Google Sign In")
             }
         )
     }
@@ -153,7 +138,7 @@ fun SchedulerNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Destinations.MainScreen,
+        startDestination = Destinations.SignUpScreen,
         modifier = modifier,
         builder = {
             composable(
@@ -161,7 +146,6 @@ fun SchedulerNavHost(
                 content = {
                     MainScreen(
                         toAddTaskScreen = { navController.navigate(Destinations.AddTaskScreen) },
-                        googleSignInButton = googleSignInButton,
                         toSettingsPage = { navController.navigate(Destinations.SettingsScreen) }
                     )
                 }
@@ -176,7 +160,16 @@ fun SchedulerNavHost(
             )
             composable(
                 route = Destinations.SignUpScreen,
-                content = { SignUpScreen() }
+                content = {
+                    SignUpScreen(
+                        googleSignInButton = googleSignInButton,
+                        navigateToMainScreen = {
+                            navController.navigate(Destinations.MainScreen) {
+                                launchSingleTop = true
+                            }
+                        }
+                    )
+                }
             )
         }
     )

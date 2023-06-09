@@ -3,6 +3,7 @@ package com.example.scheduler.ui.screens.main_screen
 import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
@@ -53,11 +56,15 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.scheduler.data.Repetitions
 import com.example.scheduler.data.Reps
 import com.example.scheduler.data.StringFunctions.getDateAsText
@@ -69,6 +76,7 @@ import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.ui.prompt.DeletePrompt
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -79,15 +87,7 @@ private const val TAG = "MainScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
-    toAddTaskScreen: () -> Unit,
-    googleSignInButton: @Composable (
-        modifier: Modifier,
-        onSuccess: () -> Unit,
-        onFailure: (issue: String) -> Unit,
-    ) -> Unit,
-    toSettingsPage: () -> Unit,
-) {
+fun MainScreen(toAddTaskScreen: () -> Unit, toSettingsPage: () -> Unit) {
     val snackBarHostState = SnackbarHostState()
     val lazyListState = rememberLazyListState()
     val drawerState = DrawerState(DrawerValue.Closed)
@@ -144,11 +144,7 @@ fun MainScreen(
             Scaffold(
                 snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
                 topBar = {
-                    MainScreenAppBar(
-                        snackBarHostState = snackBarHostState,
-                        drawerState = drawerState,
-                        googleSignInButton = googleSignInButton,
-                    )
+                    MainScreenAppBar(drawerState = drawerState)
                 },
                 floatingActionButton = {
                     AddTaskFAB(
@@ -182,15 +178,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreenAppBar(
-    snackBarHostState: SnackbarHostState,
-    drawerState: DrawerState,
-    googleSignInButton: @Composable (
-        modifier: Modifier,
-        onSuccess: () -> Unit,
-        onFailure: (issue: String) -> Unit,
-    ) -> Unit
-) {
+fun MainScreenAppBar(drawerState: DrawerState) {
     val scope = rememberCoroutineScope(getContext = { Dispatchers.IO })
     CenterAlignedTopAppBar(
         modifier = Modifier.fillMaxWidth(),
@@ -201,25 +189,27 @@ fun MainScreenAppBar(
             )
         },
         actions = {
-            googleSignInButton(
-                modifier = Modifier,
-                onSuccess = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        snackBarHostState.showSnackbar(
-                            message = "Login Successful",
-                            withDismissAction = true
-                        )
-                    }
-                },
-                onFailure = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        snackBarHostState.showSnackbar(
-                            message = "Login Unsuccessful, reason = $it",
-                            withDismissAction = true
-                        )
-                    }
-                }
-            )
+
+            val imageModifier = Modifier
+                .clip(CircleShape)
+                .border(width = 1.dp, color = Color.Black, shape = CircleShape)
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user == null) {
+                Icon(
+                    modifier = imageModifier,
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = null
+                )
+            } else {
+                AsyncImage(
+                    modifier = imageModifier,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(user.photoUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null
+                )
+            }
         },
         navigationIcon = {
             IconButton(
