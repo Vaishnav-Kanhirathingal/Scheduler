@@ -1,9 +1,9 @@
 package com.example.scheduler.data
 
-import com.example.scheduler.data.TestValues.testTaskList
 import com.example.scheduler.firebase.FirebaseKeys
 import com.google.firebase.firestore.DocumentSnapshot
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 /**
@@ -92,44 +92,49 @@ data class Task(
     fun isScheduledForToday(): Boolean {
         return getDaysTillNextReminder() == repeatGapDuration
     }
+
+    @Throws(Exception::class)
+    fun getTimeRemainingTillReminder(): Time {
+        if (isScheduledForToday()) {
+            val scheduled =
+                LocalDate.now().atTime(timeForReminder.hour, timeForReminder.minute, 0, 0)
+            val timeNow = LocalDateTime.now()
+            val hoursLeft = scheduled.hour - timeNow.hour
+            val minutesLeft = scheduled.minute - timeNow.minute
+            return if (hoursLeft < 0 || (hoursLeft == 0 && minutesLeft < 0)) {
+                throw Exception("time for reminder has already elapsed")
+            } else {
+                if (minutesLeft < 0) {
+                    Time(hoursLeft - 1, 60 + minutesLeft)
+                } else {
+                    Time(hoursLeft, minutesLeft)
+                }
+            }
+        } else {
+            throw Exception("Task isn't scheduled for today")
+        }
+    }
 }
 
 fun main() {
-    val today = LocalDate.now()
     Task(
         title = "Meeting",
         description = "Discuss project updates",
-        timeForReminder = Time(hour = 9, minute = 30),
+        timeForReminder = Time(hour = 15, minute = 30),
         dateForReminder = Date(dayOfMonth = 5, month = 6, year = 2023),
         dateWise = false,
-        repeatGapDuration = 7,
+        repeatGapDuration = 8,
         snoozeDuration = 10,
         postponeDuration = 15
     )
-//        .let {
-    testTaskList.forEach {
-        if (!it.dateWise) {
-            println(
-//                "${it.title}:\n" +
-//                        "dateWise = ${it.dateWise},\n" +
-                "startDate = ${
-                    StringFunctions.getDateAsText(
-                        it.dateForReminder.year,
-                        it.dateForReminder.month,
-                        it.dateForReminder.dayOfMonth
-                    )
-                }, today = ${
-                    StringFunctions.getDateAsText(
-                        today.year,
-                        today.month.value,
-                        today.dayOfMonth
-                    )
-                }\n" +
-                        "repeatGapDuration = ${it.repeatGapDuration},\n" +
-                        "getDaysTillNextReminder = ${it.getDaysTillNextReminder()}\n"
-            )
+        .let { task ->
+//    testTaskList.forEach { task ->
+            if (!task.dateWise) {
+                task.getTimeRemainingTillReminder().let {
+                    println("TimeRemainingTillReminder ${it.hour}:${it.minute}")
+                }
+            }
         }
-    }
 }
 
 enum class RepetitionEnum {
