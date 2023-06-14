@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
@@ -143,9 +142,7 @@ fun MainScreen(toAddTaskScreen: () -> Unit, toSettingsPage: () -> Unit) {
         content = {
             Scaffold(
                 snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-                topBar = {
-                    MainScreenAppBar(drawerState = drawerState)
-                },
+                topBar = { MainScreenAppBar(drawerState = drawerState) },
                 floatingActionButton = {
                     AddTaskFAB(
                         showFullText = showFullText.value,
@@ -160,6 +157,10 @@ fun MainScreen(toAddTaskScreen: () -> Unit, toSettingsPage: () -> Unit) {
                                 .padding(it)
                                 .fillMaxWidth(),
                             filterSelected = filter
+                        )
+                        Divider(
+                            modifier = Modifier.fillMaxWidth(),
+                            thickness = PaddingCustomValues.lineThickness
                         )
                         SavedTaskList(
                             modifier = Modifier.fillMaxWidth(),
@@ -189,33 +190,21 @@ fun MainScreenAppBar(drawerState: DrawerState) {
             )
         },
         actions = {
-
             val imageModifier = Modifier
                 .clip(CircleShape)
                 .border(width = 1.dp, color = Color.Black, shape = CircleShape)
-            val user = FirebaseAuth.getInstance().currentUser
-            if (user == null) {
-                Icon(
-                    modifier = imageModifier,
-                    imageVector = Icons.Filled.AccountCircle,
-                    contentDescription = null
-                )
-            } else {
-                AsyncImage(
-                    modifier = imageModifier,
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(user.photoUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null
-                )
-            }
+            AsyncImage(
+                modifier = imageModifier,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(FirebaseAuth.getInstance().currentUser!!.photoUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null
+            )
         },
         navigationIcon = {
             IconButton(
-                onClick = {
-                    scope.launch { drawerState.open() }
-                },
+                onClick = { scope.launch { drawerState.open() } },
                 content = {
                     Icon(
                         imageVector = Icons.Filled.Menu,
