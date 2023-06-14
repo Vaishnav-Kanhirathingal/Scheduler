@@ -10,7 +10,6 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -47,8 +45,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.scheduler.data.Date
 import com.example.scheduler.data.RepetitionEnum
 import com.example.scheduler.data.Repetitions
@@ -59,6 +55,7 @@ import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
 import com.example.scheduler.data.Time
 import com.example.scheduler.firebase.DatabaseFunctions
+import com.example.scheduler.ui.prompt.ShowLoadingPrompt
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 import com.google.gson.GsonBuilder
@@ -582,45 +579,6 @@ fun SelectNumberRange(
             Icon(imageVector = Icons.Filled.Add, contentDescription = null)
         }
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun ShowLoadingPromptPrev() {
-    ShowLoadingPrompt(text = "Saving...")
-}
-
-@Composable
-fun ShowLoadingPrompt(text: String) {
-    Dialog(
-        onDismissRequest = {},
-        content = {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                content = {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .padding(PaddingCustomValues.screenGap)
-                            .align(Alignment.CenterHorizontally),
-                    )
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = PaddingCustomValues.screenGap),
-                        text = text,
-                        textAlign = TextAlign.Center,
-                        fontSize = FontSizeCustomValues.extraLarge
-                    )
-                }
-            )
-        },
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        )
-    )
 }
 
 @Composable
