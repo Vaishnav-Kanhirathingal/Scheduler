@@ -17,6 +17,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -25,24 +27,39 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.scheduler.firebase.AccountFunctions
+import com.example.scheduler.ui.prompt.ShowLoadingPrompt
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun SettingsScreenPrev() {
     SettingsScreen(
-        navigateUp = {}
+        navigateUp = {},
+        navigateToSignUpScreen = {}
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
-    navigateUp: () -> Unit
-) {
+fun SettingsScreen(navigateUp: () -> Unit, navigateToSignUpScreen: () -> Unit) {
+    val snackBarHostState = SnackbarHostState()
+    val showSnackBar: (String) -> Unit = { msg: String ->
+        CoroutineScope(Dispatchers.IO).launch {
+            snackBarHostState.showSnackbar(
+                message = msg,
+                withDismissAction = true
+            )
+        }
+    }
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
@@ -57,13 +74,28 @@ fun SettingsScreen(
                     .padding(horizontal = PaddingCustomValues.largeSpacing)
                     .verticalScroll(ScrollState(0)),
                 content = {
+                    val showLoading = remember { mutableStateOf(false) }
+                    val deleteAccStr = "Deleting account..."
+                    val clearingTaskListStr = "Clearing Tasks..."
+                    val loadingText = remember { mutableStateOf(deleteAccStr) }
+                    if (showLoading.value) {
+                        ShowLoadingPrompt(text = loadingText.value)
+                    }
                     ConfirmationCard(
                         modifier = Modifier.fillMaxWidth(),
                         title = "Delete Account?",
                         warningMessage = "Deletion of account would delete any and all data " +
                                 "related to the account. This is an irreversible action.",
                         buttonText = "Delete Account",
-                        onClick = { TODO("Delete Account") }
+                        onClick = {
+                            loadingText.value = deleteAccStr
+                            showLoading.value = true
+                            AccountFunctions.deleteUserAccount(
+                                notifyUser = showSnackBar,
+                                onSuccess = navigateToSignUpScreen,
+                                dismissLoadingPrompt = { showLoading.value = false }
+                            )
+                        }
                     )
                     ConfirmationCard(
                         modifier = Modifier.fillMaxWidth(),
@@ -73,13 +105,21 @@ fun SettingsScreen(
                                 "back. This means that while logged out, you would not be reminded " +
                                 "of any pending tasks",
                         buttonText = "Log Out",
-                        onClick = { TODO("Log Out Account") }
+                        onClick = {
+                            FirebaseAuth.getInstance().signOut()
+                            navigateToSignUpScreen()
+                            // TODO: navigate to signUp screen
+                        }
                     )
                     ConfirmationCard(
                         title = "Clear all tasks?",
                         warningMessage = "Clearing all tasks would remove every task and reminder from database.",
                         buttonText = "Clear",
-                        onClick = { TODO("Clear all tasks from firebase") }
+                        onClick = {
+                            loadingText.value = clearingTaskListStr
+                            showLoading.value = true
+                            TODO("Clear all tasks from firebase")
+                        }
                     )
                 }
             )

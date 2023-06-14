@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 
 object AccountFunctions {
     private val TAG: String = this::class.java.simpleName
@@ -40,6 +41,43 @@ object AccountFunctions {
             }.addOnFailureListener {
                 onFailure(it.message ?: "Failed to get signed in account from intent")
                 it.printStackTrace()
+            }
+    }
+
+    fun deleteUserAccount(
+        notifyUser: (String) -> Unit,
+        onSuccess: () -> Unit,
+        dismissLoadingPrompt: () -> Unit
+    ) {
+        // TODO: can't delete tasks
+        val user = FirebaseAuth.getInstance().currentUser!!
+        FirebaseFirestore
+            .getInstance()
+            .collection(FirebaseKeys.parentCollectionName)
+            .document(user.email!!)
+            .delete()
+            .addOnSuccessListener {
+                Log.d(TAG, "deleted database")
+                user.delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "deleted account")
+                        try {
+                            onSuccess()
+                        } catch (e: Exception) {
+                            dismissLoadingPrompt()
+                            e.printStackTrace()
+                        }
+                    }
+                    .addOnFailureListener {
+                        dismissLoadingPrompt()
+                        it.printStackTrace()
+                        notifyUser("failed to delete account")
+                    }
+            }
+            .addOnFailureListener {
+                dismissLoadingPrompt()
+                it.printStackTrace()
+                notifyUser("failed to delete account")
             }
     }
 }

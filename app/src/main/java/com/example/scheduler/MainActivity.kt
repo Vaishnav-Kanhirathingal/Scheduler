@@ -156,7 +156,12 @@ fun SchedulerNavHost(
             )
             composable(
                 route = Destinations.SettingsScreen,
-                content = { SettingsScreen(navigateUp = { navController.navigateUp() }) }
+                content = {
+                    SettingsScreen(
+                        navigateUp = { navController.navigateUp() },
+                        navigateToSignUpScreen = { navController.navigate(Destinations.SignUpScreen) }
+                    )
+                }
             )
             composable(
                 route = Destinations.SignUpScreen,
