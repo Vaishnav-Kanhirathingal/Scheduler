@@ -193,9 +193,10 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                             postponeDuration = postponeDuration.value
                         )
                         Log.d(
-                            TAG,
-                            "gson str = ${GsonBuilder().setPrettyPrinting().create().toJson(task)}"
+                            TAG, "gson str = " +
+                                    GsonBuilder().setPrettyPrinting().create().toJson(task)
                         )
+
                         DatabaseFunctions.uploadTaskToFirebase(
                             task = task,
                             onSuccessListener = navigateUp,
@@ -207,7 +208,6 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                                         withDismissAction = true
                                     )
                                 }
-                                // TODO: set something
                             }
                         )
                         // TODO: add a un dismissable prompt to show saving in progress
@@ -257,7 +257,10 @@ fun TitleAndDescription(
                     IconButton(
                         onClick = { title.value = "" },
                         content = {
-                            Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
+                            Icon(
+                                imageVector = Icons.Filled.Refresh,
+                                contentDescription = null
+                            )
                         }
                     )
                 },
@@ -288,7 +291,10 @@ fun TitleAndDescription(
                     IconButton(
                         onClick = { description.value = "" },
                         content = {
-                            Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
+                            Icon(
+                                imageVector = Icons.Filled.Refresh,
+                                contentDescription = null
+                            )
                         }
                     )
                 },

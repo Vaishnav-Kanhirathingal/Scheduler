@@ -1,5 +1,7 @@
 package com.example.scheduler.ui.screens.main_screen
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +50,6 @@ import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
-
 
 @Composable
 fun DrawerContent(
@@ -133,6 +134,16 @@ fun OptionMenu(
         verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.menuItemMargin),
         modifier = modifier,
         content = {
+            val context = LocalContext.current
+            val openUrl = { url: String ->
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(url)
+                    )
+                )
+
+            }
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -158,12 +169,12 @@ fun OptionMenu(
             MenuItem(
                 icon = Icons.Default.Info,
                 text = "Documentation",
-                onClick = { TODO("open docs") }
+                onClick = { openUrl("https://github.com/Vaishnav-Kanhirathingal/Scheduler/blob/main/README.md") }
             )
             MenuItem(
                 icon = Icons.Default.Info,
                 text = "Git-Hub Releases",
-                onClick = { TODO("open github") }
+                onClick = { openUrl("https://github.com/Vaishnav-Kanhirathingal/Scheduler/releases") }
             )
             TitledSeparator(text = "Exit")
             MenuItem(

@@ -92,7 +92,6 @@ fun SettingsScreen(
 fun SettingsTopBar(
     navigateUp: () -> Unit
 ) {
-    // TODO: top app bar
     TopAppBar(
         navigationIcon = {
             IconButton(
