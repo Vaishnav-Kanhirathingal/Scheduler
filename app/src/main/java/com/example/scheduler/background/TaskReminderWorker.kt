@@ -10,6 +10,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.scheduler.R
 import com.example.scheduler.data.Task
+import com.google.gson.Gson
 
 class TaskReminderWorker(private val context: Context, workerParameters: WorkerParameters) :
     Worker(context, workerParameters) {
@@ -20,7 +21,13 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
     override fun doWork(): Result {
         try {
             // TODO: get task
-
+            val task =
+                Gson().fromJson(inputData.getString(WorkerConstants.taskKey), Task::class.java)
+            showNotification(
+                task = task,
+                context = context,
+                taskID = inputData.getString(WorkerConstants.documentIDKey) ?: "error_getting_id"
+            )
             return Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
