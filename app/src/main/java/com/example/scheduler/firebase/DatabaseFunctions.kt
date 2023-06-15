@@ -162,7 +162,7 @@ object DatabaseFunctions {
                             }
                             .addOnFailureListener { e ->
                                 e.printStackTrace()
-                                // TODO:
+                                notifyUser("Failed to delete a task. Repeat the process to make a re-attempt")
                             }
                     }
                 }
@@ -170,7 +170,6 @@ object DatabaseFunctions {
             .addOnFailureListener { e ->
                 e.printStackTrace()
                 notifyUser("failed to get list of tasks")
-                // TODO:
             }
     }
 }

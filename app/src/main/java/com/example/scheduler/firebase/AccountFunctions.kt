@@ -49,35 +49,43 @@ object AccountFunctions {
         onSuccess: () -> Unit,
         dismissLoadingPrompt: () -> Unit
     ) {
-        // TODO: can't delete tasks
+        val failureMessage = "failed to delete account"
         val user = FirebaseAuth.getInstance().currentUser!!
-        FirebaseFirestore
+        val userDocRef = FirebaseFirestore
             .getInstance()
             .collection(FirebaseKeys.parentCollectionName)
             .document(user.email!!)
-            .delete()
-            .addOnSuccessListener {
-                Log.d(TAG, "deleted database")
-                user.delete()
-                    .addOnSuccessListener {
-                        Log.d(TAG, "deleted account")
-                        try {
-                            onSuccess()
-                        } catch (e: Exception) {
-                            dismissLoadingPrompt()
-                            e.printStackTrace()
-                        }
+        val listCollection = userDocRef.collection(FirebaseKeys.listOfTaskName)
+        val standardOnFailure = { e: Exception ->
+            dismissLoadingPrompt()
+            e.printStackTrace()
+            notifyUser(failureMessage)
+        }
+        listCollection.get().addOnSuccessListener {
+            var counter = 0
+            val size = it.documents.size
+            it.documents.forEach { taskDS ->
+                listCollection.document(taskDS.id).delete().addOnSuccessListener {
+                    counter++
+                    if (counter == size) {
+                        Log.d(TAG, "deleted task list")
+                        userDocRef.delete().addOnSuccessListener {
+                            Log.d(TAG, "deleted user document")
+                            // TODO: requires recent login
+                            user.delete().addOnSuccessListener {
+                                Log.d(TAG, "deleted account")
+                                dismissLoadingPrompt()
+                                try {
+                                    onSuccess()
+                                } catch (e: Exception) {
+                                    notifyUser("Failed to navigate to sign up screen")
+                                    e.printStackTrace()
+                                }
+                            }.addOnFailureListener(standardOnFailure)
+                        }.addOnFailureListener(standardOnFailure)
                     }
-                    .addOnFailureListener {
-                        dismissLoadingPrompt()
-                        it.printStackTrace()
-                        notifyUser("failed to delete account")
-                    }
+                }.addOnFailureListener(standardOnFailure)
             }
-            .addOnFailureListener {
-                dismissLoadingPrompt()
-                it.printStackTrace()
-                notifyUser("failed to delete account")
-            }
+        }.addOnFailureListener(standardOnFailure)
     }
 }
