@@ -11,8 +11,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.firebase.DatabaseFunctions
@@ -37,7 +42,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun SettingsScreenPrev() {
@@ -91,6 +95,7 @@ fun SettingsScreen(navigateUp: () -> Unit, navigateToSignUpScreen: () -> Unit) {
                         onClick = {
                             loadingText.value = deleteAccStr
                             showLoading.value = true
+                            // TODO: verify by login
                             AccountFunctions.deleteUserAccount(
                                 notifyUser = showSnackBar,
                                 onSuccess = navigateToSignUpScreen,
@@ -109,7 +114,6 @@ fun SettingsScreen(navigateUp: () -> Unit, navigateToSignUpScreen: () -> Unit) {
                         onClick = {
                             FirebaseAuth.getInstance().signOut()
                             navigateToSignUpScreen()
-                            // TODO: navigate to signUp screen
                         }
                     )
                     ConfirmationCard(
@@ -175,6 +179,14 @@ fun ConfirmationCard(
     onClick: () -> Unit
 ) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color(
+                red = 0xFF,
+                green = 0x00,
+                blue = 0x00,
+                alpha = 0x16
+            )
+        ),
         modifier = modifier,
         content = {
             Column(
@@ -182,13 +194,27 @@ fun ConfirmationCard(
                     .fillMaxWidth()
                     .padding(PaddingCustomValues.mediumSpacing),
                 content = {
-                    Text(
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth(),
-                        text = title,
-                        fontSize = FontSizeCustomValues.large
+                        content = {
+                            Text(
+                                text = title,
+                                fontSize = FontSizeCustomValues.large,
+                                color = Color.Red
+                            )
+                            Divider(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = PaddingCustomValues.cardSpacing),
+                                color = Color.Red,
+                                thickness = PaddingCustomValues.lineThickness
+                            )
+                        }
                     )
                     Text(
                         modifier = Modifier.fillMaxWidth(),
+                        color = Color(red = 0xAA, green = 0x44, blue = 0x44),
                         text = warningMessage
                     )
                     val checked = remember { mutableStateOf(false) }
@@ -197,6 +223,7 @@ fun ConfirmationCard(
                         verticalAlignment = Alignment.CenterVertically,
                         content = {
                             Checkbox(
+                                colors = CheckboxDefaults.colors(checkedColor = Color.Red),
                                 checked = checked.value,
                                 onCheckedChange = {
                                     checked.value = checked.value.not()
@@ -210,6 +237,7 @@ fun ConfirmationCard(
                         }
                     )
                     Button(
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                         enabled = checked.value,
                         modifier = Modifier.align(Alignment.End),
                         onClick = onClick,
