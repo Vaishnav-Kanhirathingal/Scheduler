@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.scheduler.firebase.AccountFunctions
+import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.ui.prompt.ShowLoadingPrompt
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
@@ -66,12 +67,12 @@ fun SettingsScreen(navigateUp: () -> Unit, navigateToSignUpScreen: () -> Unit) {
         topBar = { SettingsTopBar(navigateUp = navigateUp) },
         content = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.smallSpacing),
+                verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.cardSpacing),
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .padding(it)
-                    .padding(horizontal = PaddingCustomValues.largeSpacing)
+                    .padding(horizontal = PaddingCustomValues.cardSpacing)
                     .verticalScroll(ScrollState(0)),
                 content = {
                     val showLoading = remember { mutableStateOf(false) }
@@ -118,7 +119,10 @@ fun SettingsScreen(navigateUp: () -> Unit, navigateToSignUpScreen: () -> Unit) {
                         onClick = {
                             loadingText.value = clearingTaskListStr
                             showLoading.value = true
-                            TODO("Clear all tasks from firebase")
+                            DatabaseFunctions.deleteAllTasks(
+                                notifyUser = showSnackBar,
+                                dismissLoadingPrompt = { showLoading.value = false }
+                            )
                         }
                     )
                 }

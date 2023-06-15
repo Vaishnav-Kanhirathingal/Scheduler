@@ -62,13 +62,13 @@ object DatabaseFunctions {
     ) {
         val db = FirebaseFirestore.getInstance()
         val email = FirebaseAuth.getInstance().currentUser!!.email!!
-        val h = hashMapOf(
-            "userName" to email
-        )
         db.collection(FirebaseKeys.parentCollectionName)
             .document(email)
-            .set(h)
-            .addOnSuccessListener { Log.d(TAG, "success1");onSuccess() }
+            .set(hashMapOf("userName" to email))
+            .addOnSuccessListener {
+                Log.d(TAG, "createUserDirectories success")
+                onSuccess()
+            }
             .addOnFailureListener { e ->
                 e.printStackTrace()
                 onFailure(e.message ?: "failed to create directories in the database")
@@ -128,6 +128,49 @@ object DatabaseFunctions {
             }.addOnFailureListener {
                 it.printStackTrace()
                 onFailureListener(it.message ?: "deleteTaskDocument error")
+            }
+    }
+
+    fun deleteAllTasks(
+        notifyUser: (String) -> Unit,
+        dismissLoadingPrompt: () -> Unit
+    ) {
+        val email = FirebaseAuth.getInstance().currentUser!!.email!!
+        val listCollection = FirebaseFirestore
+            .getInstance()
+            .collection(FirebaseKeys.parentCollectionName)
+            .document(email)
+            .collection(FirebaseKeys.listOfTaskName)
+
+        listCollection.get()
+            .addOnSuccessListener {
+                var counter = 0
+                val size = it.documents.size
+                if (size == 0) {
+                    dismissLoadingPrompt()
+                    notifyUser("Deleted all tasks")
+
+                } else {
+                    it.documents.forEach { ds ->
+                        listCollection.document(ds.id).delete()
+                            .addOnSuccessListener {
+                                counter++
+                                if (counter == size) {
+                                    dismissLoadingPrompt()
+                                    notifyUser("Deleted all tasks")
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                e.printStackTrace()
+                                // TODO:
+                            }
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                e.printStackTrace()
+                notifyUser("failed to get list of tasks")
+                // TODO:
             }
     }
 }

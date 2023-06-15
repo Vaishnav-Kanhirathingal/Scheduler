@@ -14,6 +14,8 @@ object PaddingCustomValues {
     val menuItemMargin = 6.dp
 
     val lineThickness = 1.dp
+
+    val cardSpacing = 6.dp
 }
 
 object FontSizeCustomValues {
