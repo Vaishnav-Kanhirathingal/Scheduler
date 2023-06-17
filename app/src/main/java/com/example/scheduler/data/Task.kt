@@ -2,6 +2,7 @@ package com.example.scheduler.data
 
 import com.example.scheduler.firebase.FirebaseKeys
 import com.google.firebase.firestore.DocumentSnapshot
+import java.io.Serializable
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -30,8 +31,8 @@ data class Task(
     val postponeDuration: Int,
 ) {
     companion object {
-        fun fromDocument(i: DocumentSnapshot) =
-            Task(
+        fun fromDocument(i: DocumentSnapshot): Task {
+            return Task(
                 title = i[FirebaseKeys.TaskName.title].toString(),
                 description = i[FirebaseKeys.TaskName.description].toString(),
                 timeForReminder = Time(
@@ -48,6 +49,22 @@ data class Task(
                 snoozeDuration = i[FirebaseKeys.TaskName.snoozeDuration].toString().toInt(),
                 postponeDuration = i[FirebaseKeys.TaskName.postponeDuration].toString().toInt(),
             )
+        }
+    }
+    fun toHashMap(): HashMap<String,Serializable>{
+        return hashMapOf(
+            FirebaseKeys.TaskName.title to this.title,
+            FirebaseKeys.TaskName.description to this.description,
+            FirebaseKeys.TaskName.timeForReminderHour to this.timeForReminder.hour,
+            FirebaseKeys.TaskName.timeForReminderMinute to this.timeForReminder.minute,
+            FirebaseKeys.TaskName.dateForReminderDay to this.dateForReminder.dayOfMonth,
+            FirebaseKeys.TaskName.dateForReminderMonth to this.dateForReminder.month,
+            FirebaseKeys.TaskName.dateForReminderYear to this.dateForReminder.year,
+            FirebaseKeys.TaskName.dateWise to this.dateWise,
+            FirebaseKeys.TaskName.repeatGapDuration to this.repeatGapDuration,
+            FirebaseKeys.TaskName.snoozeDuration to this.snoozeDuration,
+            FirebaseKeys.TaskName.postponeDuration to this.postponeDuration,
+        )
     }
 
     fun getDaysTillNextReminder(): Int {

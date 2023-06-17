@@ -20,19 +20,7 @@ object DatabaseFunctions {
         onSuccessListener: () -> Unit,
         onFailureListener: (error: String) -> Unit
     ) {
-        val data = hashMapOf(
-            FirebaseKeys.TaskName.title to task.title,
-            FirebaseKeys.TaskName.description to task.description,
-            FirebaseKeys.TaskName.timeForReminderHour to task.timeForReminder.hour,
-            FirebaseKeys.TaskName.timeForReminderMinute to task.timeForReminder.minute,
-            FirebaseKeys.TaskName.dateForReminderDay to task.dateForReminder.dayOfMonth,
-            FirebaseKeys.TaskName.dateForReminderMonth to task.dateForReminder.month,
-            FirebaseKeys.TaskName.dateForReminderYear to task.dateForReminder.year,
-            FirebaseKeys.TaskName.dateWise to task.dateWise,
-            FirebaseKeys.TaskName.repeatGapDuration to task.repeatGapDuration,
-            FirebaseKeys.TaskName.snoozeDuration to task.snoozeDuration,
-            FirebaseKeys.TaskName.postponeDuration to task.postponeDuration,
-        )
+        val data = task.toHashMap()
         val database = FirebaseFirestore.getInstance()
         val email = FirebaseAuth.getInstance().currentUser!!.email!!
         database
