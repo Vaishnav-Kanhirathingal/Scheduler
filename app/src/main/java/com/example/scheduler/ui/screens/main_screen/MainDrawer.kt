@@ -44,7 +44,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.scheduler.data.Task
 import com.example.scheduler.data.TestValues
-import com.example.scheduler.ui.prompt.DeletePrompt
+import com.example.scheduler.ui.prompt.DeleteTaskPrompt
 import com.example.scheduler.values.ColorCustomValues
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
@@ -239,7 +239,7 @@ fun MenuTaskList(
             val task = Task.fromDocument(it)
             if (task.isScheduledForToday()) {
                 val showDeletePrompt = remember { mutableStateOf(false) }
-                DeletePrompt(
+                DeleteTaskPrompt(
                     taskDoc = it,
                     snackBarHostState = snackBarHostState,
                     showDeletePrompt = showDeletePrompt,

@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Build
@@ -72,7 +71,7 @@ import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
 import com.example.scheduler.firebase.DatabaseFunctions
-import com.example.scheduler.ui.prompt.DeletePrompt
+import com.example.scheduler.ui.prompt.DeleteTaskPrompt
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 import com.google.firebase.auth.FirebaseAuth
@@ -166,7 +165,7 @@ fun MainScreen(toAddTaskScreen: () -> Unit, toSettingsPage: () -> Unit) {
                             modifier = Modifier.fillMaxWidth(),
                             lazyListState = lazyListState,
                             listOfTaskDocumentsReceived = receivedList,
-                            selected = filter,
+                            filter = filter,
                             snackBarHostState = snackBarHostState,
                             refreshList = refreshList,
                         )
@@ -304,16 +303,19 @@ fun SavedTaskList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
     listOfTaskDocumentsReceived: SnapshotStateList<DocumentSnapshot>,
-    selected: MutableState<Reps>,
+    filter: MutableState<Reps>,
     snackBarHostState: SnackbarHostState,
     refreshList: () -> Unit
 ) {
     val filteredList = mutableListOf<DocumentSnapshot>()
     listOfTaskDocumentsReceived.forEach {
         val task = Task.fromDocument(it)
-        if (task.isScheduledIn(selected.value.step) || selected.value == Repetitions.ALL) {
-            filteredList.add(it)
-            Log.d(TAG, "task = ${task.title}, sch = ${task.getDaysTillNextReminder()}")
+        when (filter.value) {
+            Repetitions.ALL -> filteredList.add(it)
+            Repetitions.DAY -> if (task.isScheduledForToday()) filteredList.add(it)
+            Repetitions.WEEK -> if (task.isScheduledIn(Repetitions.WEEK.step)) filteredList.add(it)
+            Repetitions.MONTH -> if (task.isScheduledIn(Repetitions.MONTH.step)) filteredList.add(it)
+            else -> throw Exception("out of order filter")
         }
     }
     if (filteredList.isEmpty()) {
@@ -353,7 +355,6 @@ fun DetailedTaskCard(
     modifier: Modifier = Modifier,
     refreshList: () -> Unit
 ) {
-    // TODO: add a UI element that tells how much time remaining till the next alarm
     val task = Task.fromDocument(taskDoc)
     Card(
         modifier = modifier,
@@ -367,6 +368,7 @@ fun DetailedTaskCard(
                         content = {
                             Icon(
                                 imageVector =
+                                // TODO: fix this
                                 when {
                                     task.isScheduledIn(Repetitions.DAY.step) -> Icons.Outlined.Build
                                     task.isScheduledIn(Repetitions.WEEK.step) -> Icons.TwoTone.Build
@@ -382,18 +384,9 @@ fun DetailedTaskCard(
                                     .padding(horizontal = PaddingCustomValues.mediumSpacing),
                                 fontSize = FontSizeCustomValues.large
                             )
-                            IconButton(
-                                onClick = { TODO("move to edit page for the selected task") },
-                                content = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Edit,
-                                        contentDescription = null
-                                    )
-                                }
-                            )
                             //-------------------------------------------------------deleting prompt
                             val showDeletePrompt = remember { mutableStateOf(false) }
-                            DeletePrompt(
+                            DeleteTaskPrompt(
                                 taskDoc = taskDoc,
                                 snackBarHostState = snackBarHostState,
                                 showDeletePrompt = showDeletePrompt,
