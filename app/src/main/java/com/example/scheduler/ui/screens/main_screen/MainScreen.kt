@@ -17,16 +17,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material.icons.twotone.Build
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
@@ -58,11 +54,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.scheduler.R
 import com.example.scheduler.data.Repetitions
 import com.example.scheduler.data.Reps
 import com.example.scheduler.data.StringFunctions.getDateAsText
@@ -367,14 +365,7 @@ fun DetailedTaskCard(
                         verticalAlignment = Alignment.CenterVertically,
                         content = {
                             Icon(
-                                imageVector =
-                                // TODO: fix this
-                                when {
-                                    task.isScheduledIn(Repetitions.DAY.step) -> Icons.Outlined.Build
-                                    task.isScheduledIn(Repetitions.WEEK.step) -> Icons.TwoTone.Build
-                                    task.isScheduledIn(Repetitions.MONTH.step) -> Icons.Filled.Build
-                                    else -> Icons.Outlined.Warning
-                                },
+                                painter = painterResource(id = R.drawable.task_24),
                                 contentDescription = null
                             )
                             Text(
@@ -422,7 +413,6 @@ fun DetailedTaskCard(
                                 ),
                         icon = Icons.Outlined.DateRange
                     )
-
                     DetailsRow(
                         text = if (task.dateWise) {
                             "Repeated on the ${numFormatter(task.dateForReminder.dayOfMonth)} of every month"
