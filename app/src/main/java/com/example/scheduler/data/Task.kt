@@ -51,7 +51,8 @@ data class Task(
             )
         }
     }
-    fun toHashMap(): HashMap<String,Serializable>{
+
+    fun toHashMap(): HashMap<String, Serializable> {
         return hashMapOf(
             FirebaseKeys.TaskName.title to this.title,
             FirebaseKeys.TaskName.description to this.description,

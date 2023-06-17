@@ -24,7 +24,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.scheduler.data.Task
 import com.example.scheduler.firebase.DatabaseFunctions
-import com.example.scheduler.ui.screens.main_screen.DetailedTaskCard
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 import com.google.firebase.firestore.DocumentSnapshot
@@ -42,7 +41,6 @@ fun DeleteTaskPrompt(
     val task = Task.fromDocument(taskDoc)
     val deleting = remember { mutableStateOf(false) }
     if (showDeletePrompt.value) {
-        //------------------------------------------------------------------------------------------
         val onCancel = { showDeletePrompt.value = false }
         Dialog(
             onDismissRequest = onCancel,
@@ -117,7 +115,6 @@ fun DeleteTaskPrompt(
                 )
             }
         )
-        //------------------------------------------------------------------------------------------
     }
     if (deleting.value) {
         ShowLoadingPrompt(text = "deleting...")
