@@ -49,6 +49,7 @@ object AccountFunctions {
         onSuccess: () -> Unit,
         dismissLoadingPrompt: () -> Unit
     ) {
+        Log.d(TAG, "started delete user")
         val failureMessage = "failed to delete account"
         val user = FirebaseAuth.getInstance().currentUser!!
         val userDocRef = FirebaseFirestore
@@ -61,30 +62,39 @@ object AccountFunctions {
             e.printStackTrace()
             notifyUser(failureMessage)
         }
+
+        val deleteUserDocAndAcc = {
+            userDocRef.delete().addOnSuccessListener {
+                Log.d(TAG, "deleted user document")
+                // TODO: requires recent login
+                user.delete().addOnSuccessListener {
+                    Log.d(TAG, "deleted account")
+                    dismissLoadingPrompt()
+                    try {
+                        onSuccess()
+                    } catch (e: Exception) {
+                        notifyUser("Failed to navigate to sign up screen")
+                        e.printStackTrace()
+                    }
+                }.addOnFailureListener(standardOnFailure)
+            }.addOnFailureListener(standardOnFailure)
+        }
+
         listCollection.get().addOnSuccessListener {
             var counter = 0
             val size = it.documents.size
-            it.documents.forEach { taskDS ->
-                listCollection.document(taskDS.id).delete().addOnSuccessListener {
-                    counter++
-                    if (counter == size) {
-                        Log.d(TAG, "deleted task list")
-                        userDocRef.delete().addOnSuccessListener {
-                            Log.d(TAG, "deleted user document")
-                            // TODO: requires recent login
-                            user.delete().addOnSuccessListener {
-                                Log.d(TAG, "deleted account")
-                                dismissLoadingPrompt()
-                                try {
-                                    onSuccess()
-                                } catch (e: Exception) {
-                                    notifyUser("Failed to navigate to sign up screen")
-                                    e.printStackTrace()
-                                }
-                            }.addOnFailureListener(standardOnFailure)
-                        }.addOnFailureListener(standardOnFailure)
-                    }
-                }.addOnFailureListener(standardOnFailure)
+            if (size == 0) {
+                deleteUserDocAndAcc()
+            } else {
+                it.documents.forEach { taskDS ->
+                    listCollection.document(taskDS.id).delete().addOnSuccessListener {
+                        counter++
+                        if (counter == size) {
+                            Log.d(TAG, "deleted task list")
+                            deleteUserDocAndAcc()
+                        }
+                    }.addOnFailureListener(standardOnFailure)
+                }
             }
         }.addOnFailureListener(standardOnFailure)
     }
