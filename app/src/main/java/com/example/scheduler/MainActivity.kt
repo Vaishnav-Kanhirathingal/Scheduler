@@ -43,11 +43,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createNotificationChannel()
-
-        val workManager = WorkManager.getInstance(this)
-        workManager.enqueue(OneTimeWorkRequest.from(ReminderWork::class.java))
-
+        startWorker()
         auth = FirebaseAuth.getInstance()
         setContent {
             SchedulerTheme {
@@ -70,6 +66,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun startWorker() {
+        createNotificationChannel()
+        val workManager = WorkManager.getInstance(this)
+        workManager.enqueue(OneTimeWorkRequest.from(ReminderWork::class.java))
     }
 
     private fun createNotificationChannel() {
