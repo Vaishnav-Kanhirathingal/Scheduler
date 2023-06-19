@@ -302,7 +302,7 @@ fun TitleAndDescription(
                         textAlign = TextAlign.End
                     )
                 },
-                maxLines = 5
+                maxLines = 6
             )
         }
     }

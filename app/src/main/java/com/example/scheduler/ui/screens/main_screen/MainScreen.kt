@@ -68,6 +68,7 @@ import com.example.scheduler.data.StringFunctions.getTextWithS
 import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
 import com.example.scheduler.data.Task
+import com.example.scheduler.data.TestValues
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.example.scheduler.ui.prompt.DeleteTaskPrompt
 import com.example.scheduler.values.FontSizeCustomValues
@@ -331,13 +332,23 @@ fun SavedTaskList(
                 items(
                     count = filteredList.size,
                     itemContent = {
+                        val taskDoc = filteredList[it]
+                        val task = Task.fromDocument(filteredList[it])
+
+                        val showDeletePrompt = remember { mutableStateOf(false) }
+                        DeleteTaskPrompt(
+                            taskDoc = taskDoc,
+                            snackBarHostState = snackBarHostState,
+                            showDeletePrompt = showDeletePrompt,
+                            refreshList = refreshList
+                        )
+
                         DetailedTaskCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(PaddingCustomValues.smallSpacing),
-                            taskDoc = filteredList[it],
-                            snackBarHostState = snackBarHostState,
-                            refreshList = refreshList
+                            task = task,
+                            onDelete = { showDeletePrompt.value = true }
                         )
                     }
                 )
@@ -346,14 +357,24 @@ fun SavedTaskList(
     }
 }
 
+@Preview
+@Composable
+fun DetailedTaskCardPrev() {
+    DetailedTaskCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(PaddingCustomValues.smallSpacing),
+        task = TestValues.testTaskList[0],
+        onDelete = {}
+    )
+}
+
 @Composable
 fun DetailedTaskCard(
-    snackBarHostState: SnackbarHostState,
-    taskDoc: DocumentSnapshot,
+    task: Task,
     modifier: Modifier = Modifier,
-    refreshList: () -> Unit
+    onDelete: () -> Unit
 ) {
-    val task = Task.fromDocument(taskDoc)
     Card(
         modifier = modifier,
         content = {
@@ -375,17 +396,8 @@ fun DetailedTaskCard(
                                     .padding(horizontal = PaddingCustomValues.mediumSpacing),
                                 fontSize = FontSizeCustomValues.large
                             )
-                            //-------------------------------------------------------deleting prompt
-                            val showDeletePrompt = remember { mutableStateOf(false) }
-                            DeleteTaskPrompt(
-                                taskDoc = taskDoc,
-                                snackBarHostState = snackBarHostState,
-                                showDeletePrompt = showDeletePrompt,
-                                refreshList = refreshList
-                            )
-                            //-----------------------------------------------------------------close
                             IconButton(
-                                onClick = { showDeletePrompt.value = true },
+                                onClick = onDelete,
                                 content = {
                                     Icon(
                                         imageVector = Icons.Filled.Delete,
