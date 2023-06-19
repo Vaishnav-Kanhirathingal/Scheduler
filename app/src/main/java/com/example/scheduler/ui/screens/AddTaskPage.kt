@@ -234,8 +234,8 @@ fun TitleAndDescription(
             verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.mediumSpacing),
             modifier = Modifier.padding(PaddingCustomValues.mediumSpacing)
         ) {
-            val titleLimit = 25
-            val descriptionLimit = 100
+            val titleLimit = 35
+            val descriptionLimit = 500
             OutlinedTextField(
                 value = title.value,
                 onValueChange = {

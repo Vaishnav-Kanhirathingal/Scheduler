@@ -9,6 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.scheduler.R
+import com.example.scheduler.data.StringFunctions
 import com.example.scheduler.data.Task
 import com.google.gson.Gson
 
@@ -16,10 +17,12 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
     Worker(context, workerParameters) {
     companion object {
         const val channelID = "notification_id"
+        const val snoozeRequestCode = 1
+        const val postponeRequestCode = 2
     }
 
     override fun doWork(): Result {
-        try {
+        return try {
             // TODO: get task
             val task =
                 Gson().fromJson(inputData.getString(WorkerConstants.taskKey), Task::class.java)
@@ -28,10 +31,10 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
                 context = context,
                 taskID = inputData.getString(WorkerConstants.documentIDKey) ?: "error_getting_id"
             )
-            return Result.success()
+            Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
-            return Result.failure()
+            Result.failure()
         }
     }
 }
@@ -39,10 +42,17 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
 fun showNotification(task: Task, context: Context, taskID: String) {
     val notification = NotificationCompat
         .Builder(context, TaskReminderWorker.channelID)
-        .setContentTitle(task.title)
+        .setContentTitle(
+            StringFunctions.getTimeAsText(
+                task.timeForReminder.hour,
+                task.timeForReminder.minute
+            ) + ": " + task.title
+        )
         .setContentText(task.description)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
+        .setSmallIcon(R.mipmap.ic_launcher_round)
         .build()
+
     if (
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
         != PackageManager.PERMISSION_GRANTED
@@ -55,3 +65,4 @@ fun showNotification(task: Task, context: Context, taskID: String) {
         NotificationManagerCompat.from(context).notify(taskID, 1, notification)
     }
 }
+
