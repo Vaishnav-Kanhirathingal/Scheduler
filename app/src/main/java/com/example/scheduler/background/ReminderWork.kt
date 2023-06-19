@@ -34,9 +34,7 @@ class ReminderWork(private val context: Context, workerParameters: WorkerParamet
                                     .setInputData(getData(task, documentSnap.id))
                                     .setInitialDelay(
                                         ((timeRemaining.hour * 60) + timeRemaining.minute).toLong(),
-//                                    10,
                                         TimeUnit.MINUTES
-//                                    TimeUnit.SECONDS
                                     )
                                     .build()
                                 workManager.enqueueUniqueWork(
