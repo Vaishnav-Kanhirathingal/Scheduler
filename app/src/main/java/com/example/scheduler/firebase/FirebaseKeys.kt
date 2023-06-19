@@ -18,7 +18,6 @@ object FirebaseKeys {
         const val dateForReminderYear = "dateForReminderYear"
         const val dateWise = "dateWise"
         const val repeatGapDuration = "repeatGapDuration"
-        const val snoozeDuration = "snoozeDuration"
         const val postponeDuration = "postponeDuration"
     }
 }

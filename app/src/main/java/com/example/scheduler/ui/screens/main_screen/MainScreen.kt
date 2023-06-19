@@ -424,9 +424,8 @@ fun DetailedTaskCard(
                         icon = Icons.Outlined.Refresh
                     )
                     DetailsRow(
-                        text = getTextWithS(unit = "minute", num = task.snoozeDuration) + " or " +
-                                getTextWithS(unit = "day", num = task.postponeDuration),
-                        icon = Icons.Outlined.ArrowForward
+                        text = getTextWithS(unit = "day", num = task.postponeDuration),
+                        icon = Icons.Outlined.ArrowForward // TODO: set new icon for skip
                     )
                 }
             )

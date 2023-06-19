@@ -18,8 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -79,7 +79,6 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
     val description = rememberSaveable { mutableStateOf("") }
     val dateWise = rememberSaveable { mutableStateOf(false) }
 
-    val snoozeDuration = rememberSaveable { mutableStateOf(1) }
     val postponeDuration = rememberSaveable { mutableStateOf(1) }
     val daysDelayed = rememberSaveable { mutableStateOf(0) }
 
@@ -118,7 +117,7 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                     IconButton(
                         onClick = { TODO("show help or guide") },
                         content = {// TODO: replace the vector image for help circled
-                            Icon(imageVector = Icons.Filled.Send, contentDescription = null)
+                            Icon(imageVector = Icons.Filled.Info, contentDescription = null)
                         }
                     )
                 }
@@ -153,7 +152,6 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                 StartTimePicker(hour = hour, minute = minute)
                 StartDatePicker(day = day, month = month, year = year)
                 RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed, date = day)
-                DelayTaskTime(snoozeDuration = snoozeDuration)
                 DelayTaskDay(postponeDuration = postponeDuration)
                 val savingInProgress = remember { mutableStateOf(false) }
                 if (savingInProgress.value) {
@@ -186,7 +184,6 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                             ),
                             dateWise = dateWise.value,
                             repeatGapDuration = daysDelayed.value,
-                            snoozeDuration = snoozeDuration.value,
                             postponeDuration = postponeDuration.value
                         )
                         Log.d(
@@ -207,7 +204,7 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                                 }
                             }
                         )
-                        // TODO: add a un dismissable prompt to show saving in progress
+                        // TODO: add a un dismissible prompt to show saving in progress
                     },
                     modifier = Modifier
                         .align(Alignment.End)
@@ -318,7 +315,6 @@ fun RepeatSchedulePreview() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RepeatSchedule(
     modifier: Modifier = Modifier,
@@ -515,26 +511,6 @@ fun StartDatePicker(
             IconButton(onClick = { datePickerDialog.show() }) {
                 Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
             }
-        }
-    }
-}
-
-@Composable
-fun DelayTaskTime(modifier: Modifier = Modifier, snoozeDuration: MutableState<Int>) {
-    Card(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "Snooze Duration",
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(PaddingCustomValues.mediumSpacing),
-                fontSize = FontSizeCustomValues.medium
-            )
-            SelectNumberRange(
-                unit = "min",
-                value = snoozeDuration,
-                rangeMin = 1
-            )
         }
     }
 }

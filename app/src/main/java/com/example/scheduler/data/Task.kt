@@ -14,7 +14,6 @@ import java.time.temporal.ChronoUnit
  * @param dateForReminder date for the first reminder
  * @param dateWise this value tells if the task repeats on a particular date of the month or based on the value of [repeatGapDuration]
  * @param repeatGapDuration repeat in _____ days this is for recurring events
- * @param snoozeDuration time delay allowed for reminder within the same day
  * @param postponeDuration how many days we can postpone the task
  * */
 data class Task(
@@ -27,7 +26,6 @@ data class Task(
     val dateWise: Boolean,
     val repeatGapDuration: Int,
 
-    val snoozeDuration: Int,
     val postponeDuration: Int,
 ) {
     companion object {
@@ -46,7 +44,6 @@ data class Task(
                 ),
                 dateWise = i[FirebaseKeys.TaskName.dateWise].toString().toBoolean(),
                 repeatGapDuration = i[FirebaseKeys.TaskName.repeatGapDuration].toString().toInt(),
-                snoozeDuration = i[FirebaseKeys.TaskName.snoozeDuration].toString().toInt(),
                 postponeDuration = i[FirebaseKeys.TaskName.postponeDuration].toString().toInt(),
             )
         }
@@ -63,7 +60,6 @@ data class Task(
             FirebaseKeys.TaskName.dateForReminderYear to this.dateForReminder.year,
             FirebaseKeys.TaskName.dateWise to this.dateWise,
             FirebaseKeys.TaskName.repeatGapDuration to this.repeatGapDuration,
-            FirebaseKeys.TaskName.snoozeDuration to this.snoozeDuration,
             FirebaseKeys.TaskName.postponeDuration to this.postponeDuration,
         )
     }
@@ -142,7 +138,6 @@ fun main() {
         dateForReminder = Date(dayOfMonth = 5, month = 6, year = 2023),
         dateWise = false,
         repeatGapDuration = 8,
-        snoozeDuration = 10,
         postponeDuration = 15
     )
         .let { task ->

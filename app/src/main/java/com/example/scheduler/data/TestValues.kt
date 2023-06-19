@@ -10,7 +10,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
             dateWise = false,
             repeatGapDuration = 47,
-            snoozeDuration = 10,
             postponeDuration = 15
         ),
         Task(
@@ -20,7 +19,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 24, month = 5, year = 2023),
             dateWise = true,
             repeatGapDuration = 40,
-            snoozeDuration = 5,
             postponeDuration = 10
         ),
         Task(
@@ -30,7 +28,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
             dateWise = false,
             repeatGapDuration = 19,
-            snoozeDuration = 15,
             postponeDuration = 30
         ),
         Task(
@@ -40,7 +37,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 15, month = 5, year = 2023),
             dateWise = false,
             repeatGapDuration = 7,
-            snoozeDuration = 10,
             postponeDuration = 15
         ),
         Task(
@@ -50,7 +46,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 10, month = 9, year = 2023),
             dateWise = true,
             repeatGapDuration = 8,
-            snoozeDuration = 5,
             postponeDuration = 10
         ),
         Task(
@@ -60,7 +55,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
             dateWise = false,
             repeatGapDuration = 54,
-            snoozeDuration = 15,
             postponeDuration = 30
         ),
         Task(
@@ -70,7 +64,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 22, month = 5, year = 2023),
             dateWise = true,
             repeatGapDuration = 20,
-            snoozeDuration = 5,
             postponeDuration = 10
         ),
         Task(
@@ -80,7 +73,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 30, month = 5, year = 2023),
             dateWise = false,
             repeatGapDuration = 27,
-            snoozeDuration = 0,
             postponeDuration = 0
         ),
         Task(
@@ -90,7 +82,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 23, month = 5, year = 2023),
             dateWise = true,
             repeatGapDuration = 7,
-            snoozeDuration = 10,
             postponeDuration = 20
         ),
         Task(
@@ -100,7 +91,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 15, month = 5, year = 2023),
             dateWise = false,
             repeatGapDuration = 50,
-            snoozeDuration = 10,
             postponeDuration = 15
         ),
         Task(
@@ -110,7 +100,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 27, month = 5, year = 2023),
             dateWise = false,
             repeatGapDuration = 8,
-            snoozeDuration = 0,
             postponeDuration = 0
         ),
         Task(
@@ -120,7 +109,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 10, month = 6, year = 2023),
             dateWise = false,
             repeatGapDuration = 6,
-            snoozeDuration = 15,
             postponeDuration = 30
         ),
         Task(
@@ -130,7 +118,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 5, month = 6, year = 2023),
             dateWise = false,
             repeatGapDuration = 0,
-            snoozeDuration = 0,
             postponeDuration = 0
         ),
         Task(
@@ -140,7 +127,6 @@ object TestValues {
             dateForReminder = Date(dayOfMonth = 8, month = 6, year = 2023),
             dateWise = true,
             repeatGapDuration = 14,
-            snoozeDuration = 10,
             postponeDuration = 20
         )
     )
