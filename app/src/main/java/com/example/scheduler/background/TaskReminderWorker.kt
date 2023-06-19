@@ -1,13 +1,18 @@
 package com.example.scheduler.background
 
 import android.Manifest
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.example.scheduler.MainActivity
 import com.example.scheduler.R
 import com.example.scheduler.data.StringFunctions
 import com.example.scheduler.data.Task
@@ -17,8 +22,11 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
     Worker(context, workerParameters) {
     companion object {
         const val channelID = "notification_id"
-        const val snoozeRequestCode = 1
-        const val postponeRequestCode = 2
+        const val activityRequestCode = 1
+        const val dismissRequestCode = 2
+        const val snoozeRequestCode = 3
+        const val postponeRequestCode = 4
+
     }
 
     override fun doWork(): Result {
@@ -40,6 +48,22 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
 }
 
 fun showNotification(task: Task, context: Context, taskID: String) {
+    // TODO: add actions - dismiss, postpone, snooze
+    val activityIntent = Intent(context, MainActivity::class.java)
+    val activityPendingIntent = PendingIntent
+        .getActivity(
+            context,
+            TaskReminderWorker.activityRequestCode,
+            activityIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+    val dismissPendingIntent = PendingIntent.getBroadcast(
+        context, TaskReminderWorker.dismissRequestCode,
+        Intent(context, DismissNotificationReceiver::class.java),
+        PendingIntent.FLAG_IMMUTABLE
+    )
+    // TODO: fix action button
+
     val notification = NotificationCompat
         .Builder(context, TaskReminderWorker.channelID)
         .setContentTitle(
@@ -51,8 +75,10 @@ fun showNotification(task: Task, context: Context, taskID: String) {
         .setContentText(task.description)
         .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
         .setSmallIcon(R.mipmap.ic_launcher_round)
+//        .setOngoing(true)
+        .setContentIntent(activityPendingIntent)
+        .addAction(R.drawable.task_24, "dismiss", dismissPendingIntent)
         .build()
-
     if (
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
         != PackageManager.PERMISSION_GRANTED
@@ -66,3 +92,9 @@ fun showNotification(task: Task, context: Context, taskID: String) {
     }
 }
 
+class DismissNotificationReceiver : BroadcastReceiver() {
+    val TAG = this::class.simpleName
+    override fun onReceive(context: Context?, intent: Intent?) {
+        Log.d(TAG, "received dismiss work")
+    }
+}
