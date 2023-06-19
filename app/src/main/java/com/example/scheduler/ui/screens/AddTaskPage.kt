@@ -17,9 +17,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -41,14 +41,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.scheduler.R
 import com.example.scheduler.data.Date
 import com.example.scheduler.data.RepetitionEnum
 import com.example.scheduler.data.Repetitions
 import com.example.scheduler.data.Reps
+import com.example.scheduler.data.StringFunctions
 import com.example.scheduler.data.StringFunctions.getDateAsText
 import com.example.scheduler.data.StringFunctions.getTimeAsText
 import com.example.scheduler.data.StringFunctions.numFormatter
@@ -252,7 +255,7 @@ fun TitleAndDescription(
                         onClick = { title.value = "" },
                         content = {
                             Icon(
-                                imageVector = Icons.Filled.Refresh,
+                                imageVector = Icons.Filled.Delete,
                                 contentDescription = null
                             )
                         }
@@ -286,7 +289,7 @@ fun TitleAndDescription(
                         onClick = { description.value = "" },
                         content = {
                             Icon(
-                                imageVector = Icons.Filled.Refresh,
+                                imageVector = Icons.Filled.Delete,
                                 contentDescription = null
                             )
                         }
@@ -385,14 +388,16 @@ fun RepeatSchedule(
                         }
                     },
                     content = {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+                        Icon(
+                            painter = painterResource(id = (R.drawable.remove_24)),
+                            contentDescription = null
+                        )
                     }
                 )
                 val display = daysDelayed.value / selected.value.step
                 Text(
-                    text = "$display ${selected.value.timeUnit}${if (display > 1) "s" else ""} ${
-                        if (selected.value.enumValue != RepetitionEnum.DAY) "[${daysDelayed.value}d]" else ""
-                    }",
+                    text = "${StringFunctions.getTextWithS(selected.value.timeUnit, display)} " +
+                            if (selected.value.enumValue != RepetitionEnum.DAY) "[${daysDelayed.value}d]" else "",
                     fontSize = FontSizeCustomValues.medium
                 )
                 IconButton(
@@ -530,7 +535,7 @@ fun DelayTaskDay(modifier: Modifier = Modifier, postponeDuration: MutableState<I
                 unit = "day",
                 value = postponeDuration,
                 rangeMin = 1,
-                rangeMax = 15
+                rangeMax = 5
             )
         }
     }
@@ -545,7 +550,7 @@ fun SelectNumberRange(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = { if (value.value > rangeMin) value.value-- }) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+            Icon(painter = painterResource(id = R.drawable.remove_24), contentDescription = null)
         }
         Text(
             text = "${value.value} $unit${if (value.value > 1) "s" else ""}",
