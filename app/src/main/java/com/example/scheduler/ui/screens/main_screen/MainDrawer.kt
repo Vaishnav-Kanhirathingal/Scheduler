@@ -28,20 +28,24 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.scheduler.R
 import com.example.scheduler.data.Task
 import com.example.scheduler.data.TestValues
 import com.example.scheduler.ui.prompt.DeleteTaskPrompt
@@ -127,6 +131,17 @@ fun TitledSeparator(text: String) {
 }
 
 @Composable
+@Preview(showBackground = true, widthDp = 250)
+fun OptionMenuPrev() {
+    OptionMenu(
+        receivedList = remember { mutableStateListOf() },
+        snackBarHostState = SnackbarHostState(),
+        refreshList = {},
+        toSettingsPage = {}
+    )
+}
+
+@Composable
 fun OptionMenu(
     modifier: Modifier = Modifier,
     receivedList: SnapshotStateList<DocumentSnapshot>,
@@ -169,14 +184,19 @@ fun OptionMenu(
                 text = "Settings",
                 onClick = toSettingsPage
             )
-            TitledSeparator(text = "About")
             MenuItem(
                 icon = Icons.Default.Info,
+                text = "App Info",
+                onClick = { TODO("make new screen") }
+            )
+            TitledSeparator(text = "About")
+            MenuItem(
+                iconPainter = painterResource(id = R.drawable.developer_guide_24),
                 text = "Documentation",
                 onClick = { openUrl("https://github.com/Vaishnav-Kanhirathingal/Scheduler/blob/main/README.md") }
             )
             MenuItem(
-                icon = Icons.Default.Info,
+                iconPainter = painterResource(id = R.drawable.github_icon_24),
                 text = "Git-Hub Releases",
                 onClick = { openUrl("https://github.com/Vaishnav-Kanhirathingal/Scheduler/releases") }
             )
@@ -211,13 +231,40 @@ fun MenuItem(
         onClick = onClick,
         content = {
             Icon(
-                modifier = Modifier.padding(end = PaddingCustomValues.mediumSpacing),
                 imageVector = icon,
                 contentDescription = null,
                 tint = ColorCustomValues.sideMenuIconColor
             )
             Text(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = PaddingCustomValues.mediumSpacing),
+                text = text,
+                color = ColorCustomValues.sideMenuTextColor
+            )
+        }
+    )
+}
+
+@Composable
+fun MenuItem(
+    iconPainter: Painter,
+    text: String,
+    onClick: () -> Unit
+) {
+    TextButton(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        content = {
+            Icon(
+                painter = iconPainter,
+                contentDescription = null,
+                tint = ColorCustomValues.sideMenuIconColor
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = PaddingCustomValues.mediumSpacing),
                 text = text,
                 color = ColorCustomValues.sideMenuTextColor
             )
