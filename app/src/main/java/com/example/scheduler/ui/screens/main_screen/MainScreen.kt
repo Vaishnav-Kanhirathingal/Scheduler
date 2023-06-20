@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
@@ -52,7 +51,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -412,7 +410,12 @@ fun DetailedTaskCard(
                         thickness = 1.dp,
                         color = Color(0, 0, 0)
                     )
-                    DetailsRow(text = task.description, icon = Icons.Outlined.Info)
+                    DetailsRow(
+                        text = task.description,
+                        DetailIcon = {
+                            Icon(imageVector = Icons.Outlined.Info, contentDescription = null)
+                        }
+                    )
                     DetailsRow(
                         text = getTimeAsText(
                             hour = task.timeForReminder.hour,
@@ -423,7 +426,9 @@ fun DetailedTaskCard(
                                     m = task.dateForReminder.month,
                                     d = task.dateForReminder.dayOfMonth
                                 ),
-                        icon = Icons.Outlined.DateRange
+                        DetailIcon = {
+                            Icon(imageVector = Icons.Outlined.DateRange, contentDescription = null)
+                        }
                     )
                     DetailsRow(
                         text = if (task.dateWise) {
@@ -433,11 +438,18 @@ fun DetailedTaskCard(
                         } else {
                             "Repeated every ${getTextWithS("day", task.repeatGapDuration)}"
                         },
-                        icon = Icons.Outlined.Refresh
+                        DetailIcon = {
+                            Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
+                        }
                     )
                     DetailsRow(
                         text = getTextWithS(unit = "day", num = task.postponeDuration),
-                        icon = Icons.Outlined.ArrowForward // TODO: set new icon for skip
+                        DetailIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.skip_next_24),
+                                contentDescription = null
+                            )
+                        }
                     )
                 }
             )
@@ -448,7 +460,7 @@ fun DetailedTaskCard(
 @Composable
 fun DetailsRow(
     text: String,
-    icon: ImageVector,
+    DetailIcon: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -457,7 +469,7 @@ fun DetailsRow(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         content = {
-            Icon(imageVector = icon, contentDescription = null)
+            DetailIcon()
             Text(
                 text = text,
                 modifier = Modifier

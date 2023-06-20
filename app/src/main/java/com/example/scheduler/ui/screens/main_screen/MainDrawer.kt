@@ -85,11 +85,15 @@ fun DrawerContent(
                     )
                     DetailsRow(
                         text = auth.currentUser?.email ?: loginErrorMessage,
-                        icon = Icons.Filled.Email
+                        DetailIcon = {
+                            Icon(imageVector = Icons.Filled.Email, contentDescription = null)
+                        }
                     )
                     DetailsRow(
                         text = auth.currentUser?.displayName ?: loginErrorMessage,
-                        icon = Icons.Filled.AccountBox
+                        DetailIcon = {
+                            Icon(imageVector = Icons.Filled.AccountBox, contentDescription = null)
+                        }
                     )
                     OptionMenu(
                         modifier = Modifier.fillMaxWidth(),
