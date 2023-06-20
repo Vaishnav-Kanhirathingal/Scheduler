@@ -82,7 +82,11 @@ private const val TAG = "MainScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(toAddTaskScreen: () -> Unit, toSettingsPage: () -> Unit) {
+fun MainScreen(
+    toAddTaskScreen: () -> Unit,
+    toSettingsPage: () -> Unit,
+    toAppInfoScreen: () -> Unit
+) {
     val snackBarHostState = SnackbarHostState()
     val lazyListState = rememberLazyListState()
     val drawerState = DrawerState(DrawerValue.Closed)
@@ -132,7 +136,8 @@ fun MainScreen(toAddTaskScreen: () -> Unit, toSettingsPage: () -> Unit) {
                 receivedList = receivedList,
                 snackBarHostState = snackBarHostState,
                 refreshList = refreshList,
-                toSettingsPage = toSettingsPage
+                toSettingsPage = toSettingsPage,
+                toAppInfoScreen = toAppInfoScreen
             )
         },
         content = {

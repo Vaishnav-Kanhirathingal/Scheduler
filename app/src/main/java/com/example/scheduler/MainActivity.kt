@@ -28,6 +28,7 @@ import com.example.scheduler.background.TaskReminderWorker
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.ui.destinations.Destinations
 import com.example.scheduler.ui.screens.AddTaskScaffold
+import com.example.scheduler.ui.screens.AppInfoScreen
 import com.example.scheduler.ui.screens.SettingsScreen
 import com.example.scheduler.ui.screens.SignUpScreen
 import com.example.scheduler.ui.screens.main_screen.MainScreen
@@ -148,7 +149,8 @@ fun SchedulerNavHost(
                 content = {
                     MainScreen(
                         toAddTaskScreen = { navController.navigate(Destinations.AddTaskScreen) },
-                        toSettingsPage = { navController.navigate(Destinations.SettingsScreen) }
+                        toSettingsPage = { navController.navigate(Destinations.SettingsScreen) },
+                        toAppInfoScreen = { navController.navigate(Destinations.AppInfoScreen) },
                     )
                 }
             )
@@ -176,6 +178,10 @@ fun SchedulerNavHost(
                         }
                     )
                 }
+            )
+            composable(
+                route = Destinations.AppInfoScreen,
+                content = { AppInfoScreen(back = { navController.navigateUp() }) }
             )
         }
     )

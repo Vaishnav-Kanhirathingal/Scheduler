@@ -7,4 +7,5 @@ object Destinations {
     const val AddTaskScreen = "AddTaskScreen"
     const val SettingsScreen = "SettingsScreen"
     const val SignUpScreen = "SignUpScreen"
+    const val AppInfoScreen = "AppInfoScreen"
 }

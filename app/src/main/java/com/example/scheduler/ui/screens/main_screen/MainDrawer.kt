@@ -62,6 +62,7 @@ fun DrawerContent(
     snackBarHostState: SnackbarHostState,
     refreshList: () -> Unit,
     toSettingsPage: () -> Unit,
+    toAppInfoScreen: () -> Unit,
 ) {
     val auth = FirebaseAuth.getInstance()
     val loginErrorMessage = "Login First"
@@ -104,7 +105,8 @@ fun DrawerContent(
                         receivedList = receivedList,
                         snackBarHostState = snackBarHostState,
                         refreshList = refreshList,
-                        toSettingsPage = toSettingsPage
+                        toSettingsPage = toSettingsPage,
+                        toAppInfoScreen = toAppInfoScreen
                     )
                 }
             )
@@ -137,7 +139,8 @@ fun OptionMenuPrev() {
         receivedList = remember { mutableStateListOf() },
         snackBarHostState = SnackbarHostState(),
         refreshList = {},
-        toSettingsPage = {}
+        toSettingsPage = {},
+        toAppInfoScreen = {}
     )
 }
 
@@ -148,6 +151,7 @@ fun OptionMenu(
     snackBarHostState: SnackbarHostState,
     refreshList: () -> Unit,
     toSettingsPage: () -> Unit,
+    toAppInfoScreen: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(PaddingCustomValues.menuItemMargin),
@@ -187,7 +191,7 @@ fun OptionMenu(
             MenuItem(
                 icon = Icons.Default.Info,
                 text = "App Info",
-                onClick = { TODO("make new screen") }
+                onClick = toAppInfoScreen
             )
             TitledSeparator(text = "About")
             MenuItem(
