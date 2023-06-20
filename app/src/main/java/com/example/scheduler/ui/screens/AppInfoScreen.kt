@@ -23,10 +23,17 @@ import com.example.scheduler.R
 import com.example.scheduler.values.FontSizeCustomValues
 import com.example.scheduler.values.PaddingCustomValues
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 @Preview
-fun AppInfoScreen() {
+fun AppInfoScreenPrev() {
+    AppInfoScreen {
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppInfoScreen(back: () -> Unit) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
