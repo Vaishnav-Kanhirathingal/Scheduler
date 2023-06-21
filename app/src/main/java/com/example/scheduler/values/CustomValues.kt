@@ -16,6 +16,7 @@ object PaddingCustomValues {
     val lineThickness = 1.dp
 
     val cardSpacing = 6.dp
+    val infoScreenCardSpacing = 3.dp
 }
 
 object FontSizeCustomValues {
