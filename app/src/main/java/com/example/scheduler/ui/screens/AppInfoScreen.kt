@@ -197,21 +197,6 @@ fun AppInfoCard(
 }
 
 @Composable
-fun TitleAndDescription(title: String, description: String) {
-    Text(
-        modifier = Modifier
-            .padding(bottom = PaddingCustomValues.mediumSpacing)
-            .fillMaxWidth(),
-        text = title,
-        fontSize = FontSizeCustomValues.large
-    )
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = description// TODO:
-    )
-}
-
-@Composable
 fun LinkIconButton(
     painter: Painter,
     link: String

@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -95,6 +96,11 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
     val month = rememberSaveable { mutableStateOf(local.monthValue) }
     val year = rememberSaveable { mutableStateOf(local.year) }
 
+    val titleLow = 5
+    val titleLowLimitError = title.value.length <= titleLow
+    val descriptionLow = 10
+    val descriptionLowLimitError = description.value.length <= descriptionLow
+
     // TODO: show error
     val snackBarHostState = SnackbarHostState()
     Scaffold(
@@ -151,7 +157,12 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                         ),
                     fontWeight = FontWeight.Bold
                 )
-                TitleAndDescription(title, description)
+                TitleAndDescription(
+                    title = title,
+                    description = description,
+                    titleLowLimitError = titleLowLimitError,
+                    descriptionLowLimitError = descriptionLowLimitError
+                )
                 StartTimePicker(hour = hour, minute = minute)
                 StartDatePicker(day = day, month = month, year = year)
                 RepeatSchedule(dateWise = dateWise, daysDelayed = daysDelayed, date = day)
@@ -165,49 +176,62 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = PaddingCustomValues.screenGap),
-                        text = "*The task can't be repeated on the ${numFormatter(day.value)} of every month as it isn't applicable for every month",
-//                        textAlign = TextAlign.Left,
-                        color = Color.Red
+                        text = "*The task can't be repeated on the ${numFormatter(day.value)} of every month as it causes an exception for february",
+                        textAlign = TextAlign.End,
+                        color = Color.Red,
+                        lineHeight = FontSizeCustomValues.addTaskWarningSize,
+                        fontSize = FontSizeCustomValues.addTaskWarningSize
                     )
                 }
                 Button(
                     onClick = {
-                        savingInProgress.value = true
-                        val task = Task(
-                            title = title.value,
-                            description = description.value,
-                            timeForReminder = Time(
-                                hour = hour.value,
-                                minute = minute.value
-                            ),
-                            dateForReminder = Date(
-                                dayOfMonth = day.value,
-                                month = month.value,
-                                year = year.value
-                            ),
-                            dateWise = dateWise.value,
-                            repeatGapDuration = daysDelayed.value,
-                            postponeDuration = postponeDuration.value
-                        )
-                        Log.d(
-                            TAG, "gson str = " +
-                                    GsonBuilder().setPrettyPrinting().create().toJson(task)
-                        )
-
-                        DatabaseFunctions.uploadTaskToFirebase(
-                            task = task,
-                            onSuccessListener = navigateUp,
-                            onFailureListener = { issue ->
-                                savingInProgress.value = false
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    snackBarHostState.showSnackbar(
-                                        message = "Database Error: $issue",
-                                        withDismissAction = true
-                                    )
-                                }
+                        if (titleLowLimitError || descriptionLowLimitError) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                snackBarHostState.showSnackbar(
+                                    message = if (titleLowLimitError) {
+                                        "title length should be greater than $titleLow"
+                                    } else {
+                                        "description should be greater than $descriptionLow"
+                                    },
+                                    withDismissAction = true
+                                )
                             }
-                        )
-                        // TODO: add a un dismissible prompt to show saving in progress
+                        } else {
+                            savingInProgress.value = true
+                            val task = Task(
+                                title = title.value,
+                                description = description.value,
+                                timeForReminder = Time(
+                                    hour = hour.value,
+                                    minute = minute.value
+                                ),
+                                dateForReminder = Date(
+                                    dayOfMonth = day.value,
+                                    month = month.value,
+                                    year = year.value
+                                ),
+                                dateWise = dateWise.value,
+                                repeatGapDuration = daysDelayed.value,
+                                postponeDuration = postponeDuration.value
+                            )
+                            Log.d(
+                                TAG, "gson str = " +
+                                        GsonBuilder().setPrettyPrinting().create().toJson(task)
+                            )
+                            DatabaseFunctions.uploadTaskToFirebase(
+                                task = task,
+                                onSuccessListener = navigateUp,
+                                onFailureListener = { issue ->
+                                    savingInProgress.value = false
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        snackBarHostState.showSnackbar(
+                                            message = "Database Error: $issue",
+                                            withDismissAction = true
+                                        )
+                                    }
+                                }
+                            )
+                        }
                     },
                     modifier = Modifier
                         .align(Alignment.End)
@@ -227,7 +251,10 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
 @Composable
 fun TitleAndDescription(
     title: MutableState<String>,
-    description: MutableState<String>, modifier: Modifier = Modifier
+    description: MutableState<String>,
+    modifier: Modifier = Modifier,
+    titleLowLimitError: Boolean,
+    descriptionLowLimitError: Boolean,
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -263,10 +290,18 @@ fun TitleAndDescription(
                 },
                 singleLine = true,
                 supportingText = {
-                    Text(
-                        text = "${title.value.length}/$titleLimit",
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.End
+                        content = {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.error,
+                                text = if (titleLowLimitError) "title length should be more"
+                                else ""
+
+                            )
+                            Text(text = "${title.value.length}/$titleLimit")
+                        }
                     )
                 }
             )
@@ -296,10 +331,18 @@ fun TitleAndDescription(
                     )
                 },
                 supportingText = {
-                    Text(
-                        text = "${description.value.length}/$descriptionLimit",
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.End
+                        content = {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.error,
+                                text = if (descriptionLowLimitError) "description length should be more"
+                                else ""
+
+                            )
+                            Text(text = "${description.value.length}/$descriptionLimit")
+                        }
                     )
                 },
                 maxLines = 6

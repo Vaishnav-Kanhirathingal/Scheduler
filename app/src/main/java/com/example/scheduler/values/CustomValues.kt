@@ -26,6 +26,8 @@ object FontSizeCustomValues {
     val extraSmall = 11.sp
 
     val menuTitle = 20.sp
+
+    val addTaskWarningSize = 14.sp
 }
 
 object ColorCustomValues {
