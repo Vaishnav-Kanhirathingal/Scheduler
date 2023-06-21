@@ -12,7 +12,6 @@ import com.example.scheduler.data.Task
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import java.util.concurrent.TimeUnit
 
 class ReminderWork(private val context: Context, workerParameters: WorkerParameters) :
     Worker(context, workerParameters) {
@@ -26,16 +25,10 @@ class ReminderWork(private val context: Context, workerParameters: WorkerParamet
                     it.forEach { documentSnap ->
                         val task = Task.fromDocument(i = documentSnap)
                         if (task.isScheduledForToday()) {
-                            // TODO: add timed reminder for each
                             try {
-                                val timeRemaining = task.getTimeRemainingTillReminder()
                                 val oneTimeWorkRequest = OneTimeWorkRequest
                                     .Builder(TaskReminderWorker::class.java)
                                     .setInputData(getData(task, documentSnap.id))
-                                    .setInitialDelay(
-                                        ((timeRemaining.hour * 60) + timeRemaining.minute).toLong(),
-                                        TimeUnit.MINUTES
-                                    )
                                     .build()
                                 workManager.enqueueUniqueWork(
                                     documentSnap.id,

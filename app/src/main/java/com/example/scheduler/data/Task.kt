@@ -6,6 +6,7 @@ import java.io.Serializable
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
 
 /**
  * @param title main title
@@ -140,14 +141,15 @@ fun main() {
         repeatGapDuration = 8,
         postponeDuration = 15
     )
-        .let { task ->
-//    testTaskList.forEach { task ->
-            if (!task.dateWise) {
-                task.getTimeRemainingTillReminder().let {
-                    println("TimeRemainingTillReminder ${it.hour}:${it.minute}")
-                }
-            }
-        }
+
+    val cal: Calendar = Calendar.getInstance()
+//    cal.add(Calendar.DAY_OF_YEAR, 1)
+//    cal.set(Calendar.HOUR_OF_DAY, 0)
+//    cal.set(Calendar.MINUTE, 0)
+//    cal.set(Calendar.SECOND, 0)
+    cal.add(Calendar.SECOND,10)
+    val initialDelay: Long = cal.timeInMillis - System.currentTimeMillis()
+    print(initialDelay)
 }
 
 enum class RepetitionEnum {

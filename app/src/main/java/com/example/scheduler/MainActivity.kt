@@ -3,6 +3,7 @@ package com.example.scheduler
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -21,7 +22,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.work.OneTimeWorkRequest
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.example.scheduler.background.ReminderWork
 import com.example.scheduler.background.TaskReminderWorker
@@ -37,6 +41,8 @@ import com.example.scheduler.values.PaddingCustomValues
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     private val TAG = this::class.java.simpleName
@@ -44,7 +50,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startWorker()
+        startWorker(replaceWork = true)
         auth = FirebaseAuth.getInstance()
         setContent {
             SchedulerTheme {
@@ -69,10 +75,40 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startWorker() {
+    private fun startWorker(replaceWork: Boolean = false) {
+        // TODO: test this out, use a refresh button with replaceWork as true
         createNotificationChannel()
-        val workManager = WorkManager.getInstance(this)
-        workManager.enqueue(OneTimeWorkRequest.from(ReminderWork::class.java))
+
+        val cal: Calendar = Calendar.getInstance()
+//        cal.add(Calendar.DAY_OF_YEAR, 1)
+//        cal.set(Calendar.HOUR_OF_DAY, 0)
+//        cal.set(Calendar.MINUTE, 0)
+//        cal.set(Calendar.SECOND, 0)
+
+        cal.add(Calendar.SECOND,3)
+
+        val initialDelay: Long = cal.timeInMillis - System.currentTimeMillis()
+
+        val constraints = Constraints
+            .Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val periodicWorkRequest = PeriodicWorkRequest
+            .Builder(ReminderWork::class.java, 1L, TimeUnit.DAYS)
+            .setConstraints(constraints)
+            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+            .build()
+
+        WorkManager
+            .getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "reminder_initiator",
+                if (replaceWork) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE else ExistingPeriodicWorkPolicy.KEEP,
+                periodicWorkRequest
+            )
+
+        Log.d(TAG, "Assigned work")
     }
 
     private fun createNotificationChannel() {
