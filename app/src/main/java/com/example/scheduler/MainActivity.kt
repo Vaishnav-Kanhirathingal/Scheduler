@@ -50,6 +50,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // TODO: remove replace work
         startWorker(replaceWork = true)
         auth = FirebaseAuth.getInstance()
         setContent {
@@ -95,7 +96,7 @@ class MainActivity : ComponentActivity() {
             .build()
 
         val periodicWorkRequest = PeriodicWorkRequest
-            .Builder(ReminderWork::class.java, 1L, TimeUnit.DAYS)
+            .Builder(ReminderWork::class.java, 20L, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .build()

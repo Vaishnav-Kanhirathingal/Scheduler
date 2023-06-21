@@ -165,7 +165,6 @@ fun OptionMenu(
                         Uri.parse(url)
                     )
                 )
-
             }
             Text(
                 modifier = Modifier
