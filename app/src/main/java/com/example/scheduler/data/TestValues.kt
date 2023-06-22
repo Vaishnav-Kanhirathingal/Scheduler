@@ -7,7 +7,7 @@ object TestValues {
             title = "Meeting",
             description = "Discuss project updates",
             timeForReminder = Time(hour = 9, minute = 30),
-            dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
+            dateForReminder = Date(dayOfMonth = 10, month = 6, year = 2023),
             dateWise = false,
             repeatGapDuration = 47,
             postponeDuration = 15
@@ -16,7 +16,7 @@ object TestValues {
             title = "Birthday",
             description = "Buy a gift",
             timeForReminder = Time(hour = 18, minute = 0),
-            dateForReminder = Date(dayOfMonth = 24, month = 5, year = 2023),
+            dateForReminder = Date(dayOfMonth = 11, month = 6, year = 2023),
             dateWise = true,
             repeatGapDuration = 40,
             postponeDuration = 10
@@ -25,34 +25,34 @@ object TestValues {
             title = "Dentist Appointment",
             description = "Get a dental checkup",
             timeForReminder = Time(hour = 14, minute = 30),
-            dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
+            dateForReminder = Date(dayOfMonth = 21, month = 6, year = 2023),
             dateWise = false,
-            repeatGapDuration = 19,
+            repeatGapDuration = 0,
             postponeDuration = 30
         ),
         Task(
             title = "Meeting",
             description = "Discuss project updates",
             timeForReminder = Time(hour = 9, minute = 30),
-            dateForReminder = Date(dayOfMonth = 15, month = 5, year = 2023),
+            dateForReminder = Date(dayOfMonth = 22, month = 6, year = 2023),
             dateWise = false,
-            repeatGapDuration = 7,
+            repeatGapDuration = 0,
             postponeDuration = 15
         ),
         Task(
             title = "Birthday",
             description = "Buy a gift",
             timeForReminder = Time(hour = 18, minute = 0),
-            dateForReminder = Date(dayOfMonth = 10, month = 9, year = 2023),
+            dateForReminder = Date(dayOfMonth = 23, month = 6, year = 2023),
             dateWise = true,
-            repeatGapDuration = 8,
+            repeatGapDuration = 0,
             postponeDuration = 10
         ),
         Task(
             title = "Dentist Appointment",
             description = "Get a dental checkup",
             timeForReminder = Time(hour = 14, minute = 30),
-            dateForReminder = Date(dayOfMonth = 25, month = 5, year = 2023),
+            dateForReminder = Date(dayOfMonth = 25, month = 6, year = 2023),
             dateWise = false,
             repeatGapDuration = 54,
             postponeDuration = 30
@@ -88,9 +88,9 @@ object TestValues {
             title = "Meeting",
             description = "Discuss project updates",
             timeForReminder = Time(hour = 9, minute = 30),
-            dateForReminder = Date(dayOfMonth = 15, month = 5, year = 2023),
+            dateForReminder = Date(dayOfMonth = 21, month = 6, year = 2023),
             dateWise = false,
-            repeatGapDuration = 50,
+            repeatGapDuration = 0,
             postponeDuration = 15
         ),
         Task(
@@ -115,7 +115,7 @@ object TestValues {
             title = "Doctor's Appointment",
             description = "Follow-up on test results",
             timeForReminder = Time(hour = 11, minute = 30),
-            dateForReminder = Date(dayOfMonth = 5, month = 6, year = 2023),
+            dateForReminder = Date(dayOfMonth = 22, month = 6, year = 2023),
             dateWise = false,
             repeatGapDuration = 0,
             postponeDuration = 0
@@ -123,10 +123,10 @@ object TestValues {
         Task(
             title = "Conference Call",
             description = "Discuss upcoming projects",
-            timeForReminder = Time(hour = 16, minute = 0),
-            dateForReminder = Date(dayOfMonth = 8, month = 6, year = 2023),
+            timeForReminder = Time(hour = 16, minute = 10),
+            dateForReminder= Date(dayOfMonth = 24, month = 6, year = 2023),
             dateWise = true,
-            repeatGapDuration = 14,
+            repeatGapDuration = 0,
             postponeDuration = 20
         )
     )
