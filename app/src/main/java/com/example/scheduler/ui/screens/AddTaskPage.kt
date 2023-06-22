@@ -183,6 +183,18 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                         fontSize = FontSizeCustomValues.addTaskWarningSize
                     )
                 }
+                AnimatedVisibility(visible = daysDelayed.value == 0) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = PaddingCustomValues.screenGap),
+                        text = "*The task won't be repeated",
+                        textAlign = TextAlign.End,
+                        color = Color.Red,
+                        lineHeight = FontSizeCustomValues.addTaskWarningSize,
+                        fontSize = FontSizeCustomValues.addTaskWarningSize
+                    )
+                }
                 Button(
                     onClick = {
                         if (titleLowLimitError || descriptionLowLimitError) {
