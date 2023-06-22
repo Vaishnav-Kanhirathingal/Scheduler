@@ -6,7 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.util.Log
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -23,10 +23,12 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
     companion object {
         const val channelID = "notification_id"
         const val activityRequestCode = 1
-        const val dismissRequestCode = 2
-        const val snoozeRequestCode = 3
-        const val postponeRequestCode = 4
 
+        const val dismissRequestCode = 2
+        const val postponeRequestCode = 3
+
+        const val dismissAction = "dismiss_notification"
+        const val postponeAction = "postpone_notification"
     }
 
     override fun doWork(): Result {
@@ -49,20 +51,21 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
 
 fun showNotification(task: Task, context: Context, taskID: String) {
     // TODO: add actions - dismiss, postpone, snooze
-    val activityIntent = Intent(context, MainActivity::class.java)
-    val activityPendingIntent = PendingIntent
-        .getActivity(
-            context,
-            TaskReminderWorker.activityRequestCode,
-            activityIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
+    //----------------------------------------------------------------------------------------------
+    val actIntent = Intent(context, MainActivity::class.java)
+    val actPending = PendingIntent.getActivity(context, 0, actIntent, PendingIntent.FLAG_IMMUTABLE)
+    //----------------------------------------------------------------------------------------------
     val dismissPendingIntent = PendingIntent.getBroadcast(
-        context, TaskReminderWorker.dismissRequestCode,
-        Intent(context, DismissNotificationReceiver::class.java),
+        context,
+        TaskReminderWorker.dismissRequestCode,
+        Intent(
+            context,
+            SchedulerBroadcastReceiver::class.java
+        ).apply { action = TaskReminderWorker.dismissAction },
         PendingIntent.FLAG_IMMUTABLE
     )
-    // TODO: fix action button
+    //----------------------------------------------------------------------------------------------
+
 
     val notification = NotificationCompat
         .Builder(context, TaskReminderWorker.channelID)
@@ -75,26 +78,33 @@ fun showNotification(task: Task, context: Context, taskID: String) {
         .setContentText(task.description)
         .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
         .setSmallIcon(R.mipmap.ic_launcher_round)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 //        .setOngoing(true)
-        .setContentIntent(activityPendingIntent)
         .addAction(R.drawable.task_24, "dismiss", dismissPendingIntent)
         .build()
     if (
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
         != PackageManager.PERMISSION_GRANTED
     ) {
-        // TODO: Consider calling ActivityCompat#requestPermissions here to request the missing
-        //  permissions, and then overriding public void onRequestPermissionsResult(int requestCode,
-        //  String[] permissions, int[] grantResults) to handle the case where the user grants the
-        //  permission. See the documentation for ActivityCompat#requestPermissions for more details.
+        // TODO: get notification permission
     } else {
         NotificationManagerCompat.from(context).notify(taskID, 1, notification)
     }
 }
 
-class DismissNotificationReceiver : BroadcastReceiver() {
-    val TAG = this::class.simpleName
+class SchedulerBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d(TAG, "received dismiss work")
+        when (intent!!.action) {
+            TaskReminderWorker.dismissAction -> {
+                Toast.makeText(context, "notification button working", Toast.LENGTH_LONG).show()
+            }
+            else -> {
+                // TODO:
+            }
+        }
+        val notificationId = intent.getIntExtra("NOTIFICATION_ID", 0)
+        val notificationManager = NotificationManagerCompat.from(context!!)
+        notificationManager.cancel(notificationId)
+
     }
 }

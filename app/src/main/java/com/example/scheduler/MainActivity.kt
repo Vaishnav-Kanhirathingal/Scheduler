@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.example.scheduler.background.ReminderWork
@@ -51,7 +52,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // TODO: remove replace work
-        startWorker(replaceWork = true)
+//        startWorker(replaceWork = true)
+        startTestWorker()
         auth = FirebaseAuth.getInstance()
         setContent {
             SchedulerTheme {
@@ -110,6 +112,21 @@ class MainActivity : ComponentActivity() {
             )
 
         Log.d(TAG, "Assigned work")
+    }
+
+    private fun startTestWorker() {
+        createNotificationChannel()
+        val constraints = Constraints
+            .Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        WorkManager.getInstance(this)
+            .enqueue(
+                OneTimeWorkRequest
+                    .Builder(ReminderWork::class.java)
+                    .setConstraints(constraints)
+                    .build()
+            )
     }
 
     private fun createNotificationChannel() {
