@@ -6,7 +6,6 @@ import java.io.Serializable
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.Calendar
 
 /**
  * @param title main title
@@ -70,42 +69,53 @@ data class Task(
             .of(dateForReminder.year, dateForReminder.month, dateForReminder.dayOfMonth)
             .atTime(timeForReminder.hour, timeForReminder.minute)
         val today = LocalDate.now()
-        if (dateWise) {
-            val nextMonth =
-                if (today.month.value == 12 && today.dayOfMonth > startDate.dayOfMonth) {
-                    1
-                } else if (today.dayOfMonth > startDate.dayOfMonth) {
-                    today.month.value + 1
-                } else {
-                    today.month.value
-                }
-            val nextYear =
-                if (today.month.value == 12 && today.dayOfMonth > startDate.dayOfMonth) {
-                    today.year + 1
-                } else {
-                    today.year
-                }
-            val nextDate = LocalDate
-                .of(nextYear, nextMonth, startDate.dayOfMonth)
-                .atTime(timeForReminder.hour, timeForReminder.minute)
-            return ChronoUnit.DAYS.between(today, nextDate.toLocalDate()).toInt()
-        } else {
+
+        if (repeatGapDuration == 0) {
             val startDateDate = startDate.toLocalDate()
-            val diff = ChronoUnit.DAYS.between(startDateDate, today)
-            return if (repeatGapDuration != 0) {
-                (repeatGapDuration - (diff % repeatGapDuration)).toInt()
+            val diff = ChronoUnit.DAYS.between(today, startDateDate)
+            return  diff.toInt()
+        } else {
+            if (dateWise) {
+                val nextMonth =
+                    if (today.month.value == 12 && today.dayOfMonth > startDate.dayOfMonth) {
+                        1
+                    } else if (today.dayOfMonth > startDate.dayOfMonth) {
+                        today.month.value + 1
+                    } else {
+                        today.month.value
+                    }
+                val nextYear =
+                    if (today.month.value == 12 && today.dayOfMonth > startDate.dayOfMonth) {
+                        today.year + 1
+                    } else {
+                        today.year
+                    }
+                val nextDate = LocalDate
+                    .of(nextYear, nextMonth, startDate.dayOfMonth)
+                    .atTime(timeForReminder.hour, timeForReminder.minute)
+                return ChronoUnit.DAYS.between(today, nextDate.toLocalDate()).toInt()
             } else {
-                0
+                val startDateDate = startDate.toLocalDate()
+                val diff = ChronoUnit.DAYS.between(startDateDate, today)
+                return (repeatGapDuration - (diff % repeatGapDuration)).toInt()
             }
         }
     }
 
     fun isScheduledIn(inDays: Int): Boolean {
-        return getDaysTillNextReminder() <= inDays
+        val x = getDaysTillNextReminder()
+        return if (x < 0) {
+            false
+        } else
+            x <= inDays
     }
 
     fun isScheduledForToday(): Boolean {
-        return getDaysTillNextReminder() == repeatGapDuration
+        val x = getDaysTillNextReminder()
+        return if (x < 0) {
+            false
+        } else
+            x == repeatGapDuration
     }
 
     @Throws(Exception::class)
@@ -141,20 +151,25 @@ fun main() {
         repeatGapDuration = 8,
         postponeDuration = 15
     )
-
-    val cal: Calendar = Calendar.getInstance()
-//    cal.add(Calendar.DAY_OF_YEAR, 1)
-//    cal.set(Calendar.HOUR_OF_DAY, 0)
-//    cal.set(Calendar.MINUTE, 0)
-//    cal.set(Calendar.SECOND, 0)
-    cal.add(Calendar.SECOND,10)
-    val initialDelay: Long = cal.timeInMillis - System.currentTimeMillis()
-    print(initialDelay)
+//        .let {
+    TestValues.testTaskList.forEach {
+        if (it.repeatGapDuration == 0) {
+            println(
+                "start = " +
+                        StringFunctions.getDateAsText(
+                            y = it.dateForReminder.year,
+                            m = it.dateForReminder.month,
+                            d = it.dateForReminder.dayOfMonth
+                        ) +
+                        "\t rep = ${it.repeatGapDuration}\tdate wise = ${it.dateWise}\t rem = " +
+                        it.getDaysTillNextReminder().toString()+"\tscheduled 7 = ${it.isScheduledIn(7)}"
+            )
+        }
+    }
 }
 
 enum class RepetitionEnum {
     DAY, WEEK, MONTH, SAME_DATE, ALL
-
 }
 
 /** @param step can't be zero */
