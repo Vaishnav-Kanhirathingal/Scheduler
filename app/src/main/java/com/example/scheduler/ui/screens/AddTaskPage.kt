@@ -124,8 +124,8 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                 },
                 actions = {
                     IconButton(
-                        onClick = { TODO("show help or guide") },
-                        content = {// TODO: replace the vector image for help circled
+                        onClick = { TODO("go to add task doc") },
+                        content = {
                             Icon(imageVector = Icons.Filled.Info, contentDescription = null)
                         }
                     )

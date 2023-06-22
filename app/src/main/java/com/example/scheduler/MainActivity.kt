@@ -81,12 +81,12 @@ class MainActivity : ComponentActivity() {
         createNotificationChannel()
 
         val cal: Calendar = Calendar.getInstance()
-//        cal.add(Calendar.DAY_OF_YEAR, 1)
-//        cal.set(Calendar.HOUR_OF_DAY, 0)
-//        cal.set(Calendar.MINUTE, 0)
-//        cal.set(Calendar.SECOND, 0)
+        cal.add(Calendar.DAY_OF_YEAR, 1)
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
 
-        cal.add(Calendar.SECOND,3)
+//        cal.add(Calendar.SECOND,3)
 
         val initialDelay: Long = cal.timeInMillis - System.currentTimeMillis()
 
@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
             .build()
 
         val periodicWorkRequest = PeriodicWorkRequest
-            .Builder(ReminderWork::class.java, 20L, TimeUnit.MINUTES)
+            .Builder(ReminderWork::class.java, 1L, TimeUnit.DAYS)
             .setConstraints(constraints)
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .build()
