@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -19,6 +20,8 @@ import com.google.gson.Gson
 
 class TaskReminderWorker(private val context: Context, workerParameters: WorkerParameters) :
     Worker(context, workerParameters) {
+    val TAG = this::class.java.simpleName
+
     companion object {
         const val channelID = "notification_id"
 
@@ -29,6 +32,8 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
         const val postponeAction = "postpone_notification"
 
         const val notificationTagKey = "notification_key"
+        const val taskKey = "our_task_key"
+
         const val notificationId = 1
     }
 
@@ -51,39 +56,41 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
 }
 
 fun showNotification(task: Task, context: Context, taskID: String) {
+    val TAG = "showNotification"
     if (
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
         != PackageManager.PERMISSION_GRANTED
     ) {
         // TODO: get notification permission
     } else {
+        // TODO: add actions - dismiss, postpone
         //------------------------------------------------------------------------------------------
-        // TODO: add actions - dismiss, postpone, snooze
-        val dismissIntent = Intent(context, SchedulerBroadcastReceiver::class.java).apply {
-            action = TaskReminderWorker.dismissAction
-            putExtra(TaskReminderWorker.notificationTagKey, taskID)
+        val basicBroadcastIntent = Intent(context, SchedulerBroadcastReceiver::class.java).apply {
+            val taskStr: String = Gson().toJson(task)
+            putExtra(TaskReminderWorker.notificationTagKey, taskID)//adding values
+            putExtra(TaskReminderWorker.taskKey, taskStr)//adding values
         }
+
+        //------------------------------------------------------------------------------------------
         val dismissPendingIntent =
             PendingIntent.getBroadcast(
                 context,
                 TaskReminderWorker.dismissRequestCode,
-                dismissIntent,
+                basicBroadcastIntent.apply { action = TaskReminderWorker.dismissAction },
                 Intent.FILL_IN_DATA or PendingIntent.FLAG_IMMUTABLE
             )
 
         //------------------------------------------------------------------------------------------
-        val postponeIntent = Intent(context, SchedulerBroadcastReceiver::class.java).apply {
-            action = TaskReminderWorker.postponeAction
-            putExtra(TaskReminderWorker.notificationTagKey, taskID)
-        }
         val postponePendingIntent =
             PendingIntent.getBroadcast(
                 context,
                 TaskReminderWorker.postponeRequestCode,
-                postponeIntent,
+                basicBroadcastIntent.apply { action = TaskReminderWorker.postponeAction },
                 Intent.FILL_IN_DATA or PendingIntent.FLAG_IMMUTABLE
             )
         //------------------------------------------------------------------------------------------
+
+        // here, I have verified that both extras have been added using .hasExtra()
 
         val notification = NotificationCompat
             .Builder(context, TaskReminderWorker.channelID)
@@ -96,8 +103,8 @@ fun showNotification(task: Task, context: Context, taskID: String) {
             .setContentText(task.description)
             .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
             .setSmallIcon(R.mipmap.ic_launcher_round)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+//            .setOngoing(true)
             .addAction(R.drawable.task_24, "dismiss", dismissPendingIntent)
             .addAction(
                 R.drawable.skip_next_24,
@@ -107,20 +114,37 @@ fun showNotification(task: Task, context: Context, taskID: String) {
             .build()
         NotificationManagerCompat.from(context)
             .notify(taskID, TaskReminderWorker.notificationId, notification)
+
+        Log.d(TAG, "key combo = $taskID,${TaskReminderWorker.notificationId}")
     }
 }
 
 class SchedulerBroadcastReceiver : BroadcastReceiver() {
+    val TAG = this::class.java.simpleName
     override fun onReceive(context: Context?, intent: Intent?) {
-        when (intent!!.action) {
+        Log.d(TAG, "has extra for task = ${intent!!.hasExtra(TaskReminderWorker.taskKey)}")//false
+        Log.d(
+            TAG,
+            "has extra for nID = ${intent.hasExtra(TaskReminderWorker.notificationTagKey)}"
+        )//true
+
+        val notificationTag = intent.getStringExtra(TaskReminderWorker.notificationTagKey)
+        val taskString = intent.getStringExtra(TaskReminderWorker.taskKey)
+
+        Log.d(TAG, "values = $notificationTag, $taskString")
+
+        Log.d(TAG, "key combo = $notificationTag,${TaskReminderWorker.notificationId}")
+
+        when (intent.action) {
             TaskReminderWorker.dismissAction -> {
-                val notificationTag = intent.getStringExtra(TaskReminderWorker.notificationTagKey)
+                Toast.makeText(
+                    context, "dismiss $notificationTag, task = $taskString", Toast.LENGTH_LONG
+                ).show()
 
                 NotificationManagerCompat
                     .from(context!!)
                     .cancel(notificationTag, TaskReminderWorker.notificationId)
 
-                Toast.makeText(context, "dismiss $notificationTag", Toast.LENGTH_LONG).show()
             }
 
             TaskReminderWorker.postponeAction -> {
@@ -131,6 +155,5 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
                 // TODO:
             }
         }
-
     }
 }

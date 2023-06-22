@@ -28,7 +28,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.example.scheduler.background.ReminderWork
+import com.example.scheduler.background.CollectiveReminderWorker
 import com.example.scheduler.background.TaskReminderWorker
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.ui.destinations.Destinations
@@ -98,7 +98,7 @@ class MainActivity : ComponentActivity() {
             .build()
 
         val periodicWorkRequest = PeriodicWorkRequest
-            .Builder(ReminderWork::class.java, 1L, TimeUnit.DAYS)
+            .Builder(CollectiveReminderWorker::class.java, 1L, TimeUnit.DAYS)
             .setConstraints(constraints)
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .build()
@@ -123,7 +123,7 @@ class MainActivity : ComponentActivity() {
         WorkManager.getInstance(this)
             .enqueue(
                 OneTimeWorkRequest
-                    .Builder(ReminderWork::class.java)
+                    .Builder(CollectiveReminderWorker::class.java)
                     .setConstraints(constraints)
                     .build()
             )

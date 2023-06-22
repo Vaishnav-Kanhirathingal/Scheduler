@@ -13,7 +13,7 @@ import com.example.scheduler.firebase.DatabaseFunctions
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
-class ReminderWork(private val context: Context, workerParameters: WorkerParameters) :
+class CollectiveReminderWorker(private val context: Context, workerParameters: WorkerParameters) :
     Worker(context, workerParameters) {
     val TAG: String = this::class.java.simpleName
 
@@ -42,6 +42,8 @@ class ReminderWork(private val context: Context, workerParameters: WorkerParamet
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
+                        } else {
+                            Log.d(TAG, "work not added for ${documentSnap.id}")
                         }
                     }
                 },
