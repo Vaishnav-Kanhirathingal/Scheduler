@@ -12,7 +12,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.example.scheduler.MainActivity
 import com.example.scheduler.R
 import com.example.scheduler.data.StringFunctions
 import com.example.scheduler.data.Task
@@ -22,7 +21,6 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
     Worker(context, workerParameters) {
     companion object {
         const val channelID = "notification_id"
-        const val activityRequestCode = 1
 
         const val dismissRequestCode = 2
         const val postponeRequestCode = 3
@@ -50,44 +48,55 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
 }
 
 fun showNotification(task: Task, context: Context, taskID: String) {
-    // TODO: add actions - dismiss, postpone, snooze
-    //----------------------------------------------------------------------------------------------
-    val actIntent = Intent(context, MainActivity::class.java)
-    val actPending = PendingIntent.getActivity(context, 0, actIntent, PendingIntent.FLAG_IMMUTABLE)
-    //----------------------------------------------------------------------------------------------
-    val dismissPendingIntent = PendingIntent.getBroadcast(
-        context,
-        TaskReminderWorker.dismissRequestCode,
-        Intent(
-            context,
-            SchedulerBroadcastReceiver::class.java
-        ).apply { action = TaskReminderWorker.dismissAction },
-        PendingIntent.FLAG_IMMUTABLE
-    )
-    //----------------------------------------------------------------------------------------------
-
-
-    val notification = NotificationCompat
-        .Builder(context, TaskReminderWorker.channelID)
-        .setContentTitle(
-            StringFunctions.getTimeAsText(
-                task.timeForReminder.hour,
-                task.timeForReminder.minute
-            ) + ": " + task.title
-        )
-        .setContentText(task.description)
-        .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
-        .setSmallIcon(R.mipmap.ic_launcher_round)
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//        .setOngoing(true)
-        .addAction(R.drawable.task_24, "dismiss", dismissPendingIntent)
-        .build()
     if (
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
         != PackageManager.PERMISSION_GRANTED
     ) {
         // TODO: get notification permission
     } else {
+        //----------------------------------------------------------------------------------------------
+        // TODO: add actions - dismiss, postpone, snooze
+        val dismissPendingIntent = PendingIntent.getBroadcast(
+            context,
+            TaskReminderWorker.dismissRequestCode,
+            Intent(
+                context,
+                SchedulerBroadcastReceiver::class.java
+            ).apply { action = TaskReminderWorker.dismissAction },
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val postponePendingIntent = PendingIntent.getBroadcast(
+            context,
+            TaskReminderWorker.postponeRequestCode,
+            Intent(
+                context,
+                SchedulerBroadcastReceiver::class.java
+            ).apply { action = TaskReminderWorker.postponeAction },
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        //----------------------------------------------------------------------------------------------
+
+        val notification = NotificationCompat
+            .Builder(context, TaskReminderWorker.channelID)
+            .setContentTitle(
+                StringFunctions.getTimeAsText(
+                    task.timeForReminder.hour,
+                    task.timeForReminder.minute
+                ) + ": " + task.title
+            )
+            .setContentText(task.description)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
+            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//        .setOngoing(true)
+            .addAction(R.drawable.task_24, "dismiss", dismissPendingIntent)
+            .addAction(
+                R.drawable.skip_next_24,
+                "postpone ${StringFunctions.getTextWithS("day", task.postponeDuration)}",
+                postponePendingIntent
+            )
+            .build()
         NotificationManagerCompat.from(context).notify(taskID, 1, notification)
     }
 }
@@ -96,8 +105,13 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent!!.action) {
             TaskReminderWorker.dismissAction -> {
-                Toast.makeText(context, "notification button working", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "dismiss", Toast.LENGTH_LONG).show()
             }
+
+            TaskReminderWorker.postponeAction -> {
+                Toast.makeText(context, "postpone", Toast.LENGTH_LONG).show()
+            }
+
             else -> {
                 // TODO:
             }
