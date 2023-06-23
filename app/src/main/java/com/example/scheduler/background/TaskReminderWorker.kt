@@ -10,12 +10,19 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.scheduler.R
 import com.example.scheduler.data.StringFunctions
 import com.example.scheduler.data.Task
 import com.google.gson.Gson
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class TaskReminderWorker(private val context: Context, workerParameters: WorkerParameters) :
     Worker(context, workerParameters) {
@@ -40,11 +47,15 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
         return try {
             // TODO: get task
             val task =
-                Gson().fromJson(inputData.getString(WorkerConstants.taskKey), Task::class.java)
+                Gson().fromJson(
+                    inputData.getString(WorkerConstants.CollectiveWorker.taskKey),
+                    Task::class.java
+                )
             showNotification(
                 task = task,
                 context = context,
-                taskID = inputData.getString(WorkerConstants.documentIDKey) ?: "error_getting_id"
+                taskID = inputData.getString(WorkerConstants.CollectiveWorker.documentIDKey)
+                    ?: "error_getting_id"
             )
             Result.success()
         } catch (e: Exception) {
@@ -63,10 +74,12 @@ fun showNotification(task: Task, context: Context, taskID: String) {
     } else {
         // TODO: add actions - dismiss, postpone
         //------------------------------------------------------------------------------------------
+        val notificationId = Random.nextInt()
         val basicBroadcastIntent = Intent(context, SchedulerBroadcastReceiver::class.java).apply {
             val taskStr: String = Gson().toJson(task)
             putExtra(TaskReminderWorker.notificationTagKey, taskID)//adding values
             putExtra(TaskReminderWorker.taskKey, taskStr)//adding values
+            putExtra(WorkerConstants.TaskWorker.notificationIdKey, notificationId)
         }
         val dismissPendingIntent =
             PendingIntent.getBroadcast(
@@ -82,7 +95,6 @@ fun showNotification(task: Task, context: Context, taskID: String) {
                 basicBroadcastIntent.apply { action = TaskReminderWorker.postponeAction },
                 Intent.FILL_IN_DATA or PendingIntent.FLAG_IMMUTABLE
             )
-
         val notification =
             NotificationCompat
                 .Builder(context, TaskReminderWorker.channelID)
@@ -112,7 +124,7 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
     val TAG = this::class.java.simpleName
     override fun onReceive(context: Context?, intent: Intent?) {
         // TODO: fix: action on one notification runs code of another
-        val notificationTag = intent!!.getStringExtra(TaskReminderWorker.notificationTagKey)
+        val docId = intent!!.getStringExtra(TaskReminderWorker.notificationTagKey)!!
         val task =
             Gson().fromJson(intent.getStringExtra(TaskReminderWorker.taskKey)!!, Task::class.java)
 
@@ -123,11 +135,26 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
                 ).show()
                 NotificationManagerCompat
                     .from(context!!)
-                    .cancel(notificationTag, TaskReminderWorker.notificationId)
+                    .cancel(docId, TaskReminderWorker.notificationId)
             }
 
             TaskReminderWorker.postponeAction -> {
-                Toast.makeText(context, "postpone", Toast.LENGTH_LONG).show()
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED).build()
+                val oneTimeWorkRequest = OneTimeWorkRequest
+                    .Builder(TaskReminderWorker::class.java)
+                    .setInputData(CollectiveReminderWorker.getData(task, docId))
+                    .setConstraints(constraints)
+                    .setInitialDelay(10, TimeUnit.SECONDS)
+                    .build()
+                val workManager = WorkManager.getInstance(context!!)
+                workManager.enqueueUniqueWork(
+                    docId,
+                    ExistingWorkPolicy.REPLACE,
+                    oneTimeWorkRequest
+                )
+                Toast.makeText(context, "task : [${task.title}] : postponed", Toast.LENGTH_LONG)
+                    .show()
             }
 
             else -> {

@@ -2,8 +2,10 @@ package com.example.scheduler.background
 
 import android.content.Context
 import android.util.Log
+import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
@@ -26,9 +28,12 @@ class CollectiveReminderWorker(private val context: Context, workerParameters: W
                         val task = Task.fromDocument(i = documentSnap)
                         if (task.isScheduledForToday()) {
                             try {
+                                val constraints = Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED).build()
                                 val oneTimeWorkRequest = OneTimeWorkRequest
                                     .Builder(TaskReminderWorker::class.java)
                                     .setInputData(getData(task, documentSnap.id))
+                                    .setConstraints(constraints)
                                     .build()
                                 workManager.enqueueUniqueWork(
                                     documentSnap.id,
@@ -60,14 +65,9 @@ class CollectiveReminderWorker(private val context: Context, workerParameters: W
         fun getData(task: Task, id: String): Data {
             return Data
                 .Builder()
-                .putString(WorkerConstants.taskKey, Gson().toJson(task))
-                .putString(WorkerConstants.documentIDKey, id)
+                .putString(WorkerConstants.CollectiveWorker.taskKey, Gson().toJson(task))
+                .putString(WorkerConstants.CollectiveWorker.documentIDKey, id)
                 .build()
         }
     }
-}
-
-object WorkerConstants {
-    const val taskKey = "task_key"
-    const val documentIDKey = "document_id"
 }

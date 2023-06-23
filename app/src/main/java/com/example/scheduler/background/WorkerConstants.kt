@@ -8,5 +8,7 @@ object WorkerConstants {
 
     object TaskWorker {
         const val notificationIdKey = "notification_id_key"
+        const val notificationTagKey = "notification_tag_key"
+        const val taskKey = "our_task_key"
     }
 }
