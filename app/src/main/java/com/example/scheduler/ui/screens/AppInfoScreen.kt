@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.scheduler.R
@@ -48,7 +50,6 @@ fun AppInfoScreenPrev() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppInfoScreen(back: () -> Unit) {
-    // TODO: add correct description
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -63,7 +64,6 @@ fun AppInfoScreen(back: () -> Unit) {
                     )
                 }
             )
-            // TODO:
         },
         content = {
             AppInfoContent(paddingValues = it)
@@ -76,7 +76,8 @@ fun AppInfoContent(paddingValues: PaddingValues) {
     Column(
         modifier = Modifier
             .padding(paddingValues)
-            .padding(horizontal = PaddingCustomValues.infoScreenCardSpacing),
+            .padding(horizontal = PaddingCustomValues.infoScreenCardSpacing)
+            .verticalScroll(ScrollState(0)),
         content = {
             Spacer(
                 modifier = Modifier
@@ -84,8 +85,16 @@ fun AppInfoContent(paddingValues: PaddingValues) {
                     .padding(bottom = 10.dp)
             )
             AppInfoCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(PaddingCustomValues.infoScreenCardSpacing),
                 title = "SCHEDULER",
-                description = "description",
+                description = "Scheduler is an app which a user can use to create tasks. Tasks " +
+                        "scheduled for the day would show up as a permanent or ongoing notification. " +
+                        "Once the user has completed the task, He/She can dismiss the task. If the task " +
+                        "is pending, they can postpone the task to new date. This app ensures that the " +
+                        "user does not have to open the app every time to track his tasks. Scheduler " +
+                        "simplifies the task of keeping track of daily activities to be done.",
                 bottomContent = {
                     val context = LocalContext.current
                     TextButton(
@@ -110,10 +119,18 @@ fun AppInfoContent(paddingValues: PaddingValues) {
                     )
                 }
             )
-            // TODO: add self card
             AppInfoCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(PaddingCustomValues.infoScreenCardSpacing)
+                    .padding(bottom = PaddingCustomValues.screenGap),
                 title = "DEVELOPER",
-                description = "description",
+                description = "Hello, Vaishnav here, I am a Kotlin based android developer from Vasai, " +
+                        "Maharashtra, India. I started my android journey near start november 2021. " +
+                        "Since then I have been continuously making projects based on the Kotlin language. " +
+                        "Scheduler is a new project I undertook to understand and practice Compose to " +
+                        "improve my skills in using the compose architecture. You can find my accounts " +
+                        "and github linked below. Click on the buttons to open respective apps.",
                 bottomContent = {
                     Row(
                         modifier = Modifier
@@ -162,14 +179,13 @@ fun AppInfoContent(paddingValues: PaddingValues) {
 fun AppInfoCard(
     title: String,
     description: String,
-    bottomContent: @Composable () -> Unit
+    bottomContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = PaddingCustomValues.infoScreenCardSpacing),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(PaddingCustomValues.infoScreenCardSpacing),
+        modifier = modifier,
         content = {
             Column(
                 modifier = Modifier
@@ -187,7 +203,8 @@ fun AppInfoCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = PaddingCustomValues.mediumSpacing),
-                        text = description// TODO:
+                        text = description,
+                        fontFamily = FontFamily.Monospace
                     )
                     bottomContent()
                 }
@@ -210,7 +227,6 @@ fun LinkIconButton(
                     Uri.parse(link)
                 )
             )
-
         },
         content = {
             Image(painter = painter, contentDescription = null)
