@@ -4,8 +4,9 @@ import com.example.scheduler.firebase.FirebaseKeys
 import com.google.firebase.firestore.DocumentSnapshot
 import java.io.Serializable
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
+import java.util.Random
 
 /**
  * @param title main title
@@ -64,7 +65,8 @@ data class Task(
         )
     }
 
-    fun getDaysTillNextReminder(): Int {
+    @Deprecated("depreciated due to harder readability of code")
+    private fun getDaysTillNextReminder(): Int {
         val startDate = LocalDate
             .of(dateForReminder.year, dateForReminder.month, dateForReminder.dayOfMonth)
             .atTime(timeForReminder.hour, timeForReminder.minute)
@@ -73,7 +75,7 @@ data class Task(
         if (repeatGapDuration == 0) {
             val startDateDate = startDate.toLocalDate()
             val diff = ChronoUnit.DAYS.between(today, startDateDate)
-            return  diff.toInt()
+            return diff.toInt()
         } else {
             if (dateWise) {
                 val nextMonth =
@@ -102,8 +104,49 @@ data class Task(
         }
     }
 
+    private fun getDaysTillNextReminderNew(): Int {
+        val startDay = Calendar.getInstance().apply {
+            set(Calendar.YEAR, dateForReminder.year)
+            set(Calendar.MONTH, dateForReminder.month - 1)
+            set(Calendar.DAY_OF_MONTH, dateForReminder.dayOfMonth)
+            set(Calendar.HOUR, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+
+        val calenderStartOfToday = Calendar.getInstance().apply {
+            set(Calendar.HOUR, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+
+        if (repeatGapDuration == 0) {
+            val diffChroma = ChronoUnit.DAYS.between(
+                calenderStartOfToday.toInstant(), startDay.toInstant()
+            )
+            return diffChroma.toInt()
+        } else {
+            if (dateWise) {
+                val nextDateCal = Calendar.getInstance().apply {
+                    if (this[Calendar.DAY_OF_MONTH] > this@Task.dateForReminder.dayOfMonth) {
+                        add(Calendar.MONTH, 1)
+                    }
+                    set(Calendar.DAY_OF_MONTH, this@Task.dateForReminder.dayOfMonth)
+                }
+                return ChronoUnit.DAYS.between(
+                    calenderStartOfToday.toInstant(),
+                    nextDateCal.toInstant()
+                ).toInt()
+            } else {
+                val diff =
+                    ChronoUnit.DAYS.between(startDay.toInstant(), calenderStartOfToday.toInstant())
+                return (repeatGapDuration - (diff % repeatGapDuration)).toInt()
+            }
+        }
+    }
+
     fun isScheduledIn(inDays: Int): Boolean {
-        val x = getDaysTillNextReminder()
+        val x = getDaysTillNextReminderNew()
         return if (x < 0) {
             false
         } else
@@ -111,59 +154,31 @@ data class Task(
     }
 
     fun isScheduledForToday(): Boolean {
-        val x = getDaysTillNextReminder()
+        val x = getDaysTillNextReminderNew()
         return if (x < 0) {
             false
         } else
             x == repeatGapDuration
     }
-
-    @Throws(Exception::class)
-    fun getTimeRemainingTillReminder(): Time {
-        if (isScheduledForToday()) {
-            val scheduled =
-                LocalDate.now().atTime(timeForReminder.hour, timeForReminder.minute, 0, 0)
-            val timeNow = LocalDateTime.now()
-            val hoursLeft = scheduled.hour - timeNow.hour
-            val minutesLeft = scheduled.minute - timeNow.minute
-            return if (hoursLeft < 0 || (hoursLeft == 0 && minutesLeft < 0)) {
-                throw Exception("time for reminder has already elapsed")
-            } else {
-                if (minutesLeft < 0) {
-                    Time(hoursLeft - 1, 60 + minutesLeft)
-                } else {
-                    Time(hoursLeft, minutesLeft)
-                }
-            }
-        } else {
-            throw Exception("Task isn't scheduled for today")
-        }
-    }
 }
 
 fun main() {
-    Task(
-        title = "Meeting",
-        description = "Discuss project updates",
-        timeForReminder = Time(hour = 15, minute = 30),
-        dateForReminder = Date(dayOfMonth = 5, month = 6, year = 2023),
-        dateWise = false,
-        repeatGapDuration = 8,
-        postponeDuration = 15
-    )
-//        .let {
-    TestValues.testTaskList.forEach {
-        if (it.repeatGapDuration == 0) {
-            println(
-                "start = " +
-                        StringFunctions.getDateAsText(
-                            y = it.dateForReminder.year,
-                            m = it.dateForReminder.month,
-                            d = it.dateForReminder.dayOfMonth
-                        ) +
-                        "\t rep = ${it.repeatGapDuration}\tdate wise = ${it.dateWise}\t rem = " +
-                        it.getDaysTillNextReminder().toString()+"\tscheduled 7 = ${it.isScheduledIn(7)}"
-            )
+    val random = Random()
+    repeat(10) {
+        Task(
+            title = "Meeting",
+            description = "Discuss project updates",
+            timeForReminder = Time(hour = random.nextInt(23), minute = random.nextInt(59)),
+            dateForReminder = Date(
+                dayOfMonth = random.nextInt(27) + 1,
+                month = 7,
+                year = 2023
+            ),
+            dateWise = random.nextBoolean(),
+            repeatGapDuration = random.nextInt(30),
+            postponeDuration = 15
+        ).let {
+            // TODO:
         }
     }
 }
