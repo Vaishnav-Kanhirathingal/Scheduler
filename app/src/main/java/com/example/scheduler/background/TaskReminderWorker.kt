@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -103,10 +104,13 @@ fun showNotification(task: Task, context: Context, taskID: String) {
     }
 }
 
+/** this class is a BroadcastReceiver which is responsible for handling actions performed on
+ * notifications produced bby TaskWorker.
+ */
 class SchedulerBroadcastReceiver : BroadcastReceiver() {
     private val TAG = this::class.java.simpleName
     override fun onReceive(context: Context?, intent: Intent?) {
-        // TODO: fix: action on one notification runs code of another
+        // TODO: check if initial delay works properly
         val docId = intent!!.getStringExtra(WorkerConstants.TaskWorker.notificationTagKey)!!
         val task =
             Gson().fromJson(
@@ -114,9 +118,9 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
                 Task::class.java
             )
 
-        NotificationManagerCompat
-            .from(context!!)
+        NotificationManagerCompat.from(context!!)
             .cancel(docId, WorkerConstants.TaskWorker.notificationId)
+
         when (intent.action) {
             WorkerConstants.TaskWorker.Action.dismiss -> {
                 Toast.makeText(
@@ -131,9 +135,9 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
                     .Builder(TaskReminderWorker::class.java)
                     .setInputData(CollectiveReminderWorker.getData(task, docId))
                     .setConstraints(constraints)
-                    .setInitialDelay(10, TimeUnit.SECONDS)
+                    .setInitialDelay(task.timeAfterDelayMillis(), TimeUnit.MILLISECONDS)
                     .build()
-                val workManager = WorkManager.getInstance(context!!)
+                val workManager = WorkManager.getInstance(context)
                 workManager.enqueueUniqueWork(
                     docId,
                     ExistingWorkPolicy.REPLACE,
@@ -143,9 +147,7 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
                     .show()
             }
 
-            else -> {
-                // TODO:
-            }
+            else -> Log.d(TAG, "action button error")
         }
     }
 }
