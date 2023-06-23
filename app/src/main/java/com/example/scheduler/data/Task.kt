@@ -30,6 +30,8 @@ data class Task(
     val postponeDuration: Int,
 ) {
     companion object {
+        /** extracts a Task object from a [DocumentSnapshot] object
+         */
         fun fromDocument(i: DocumentSnapshot): Task {
             return Task(
                 title = i[FirebaseKeys.TaskName.title].toString(),
@@ -50,6 +52,8 @@ data class Task(
         }
     }
 
+    /** from the [Task] object, creates a [HashMap] which can be used to store data to fire store
+     */
     fun toHashMap(): HashMap<String, Serializable> {
         return hashMapOf(
             FirebaseKeys.TaskName.title to this.title,
@@ -65,7 +69,10 @@ data class Task(
         )
     }
 
-    @Deprecated("depreciated due to harder readability of code")
+    /** depreciated, use [Task.getDaysTillNextReminderNew] instead
+     *  @return days until the task is scheduled again
+     */
+    @Deprecated("depreciated due to harder readability of code. use Task.getDaysTillNextReminderNew instead")
     private fun getDaysTillNextReminder(): Int {
         val startDate = LocalDate
             .of(dateForReminder.year, dateForReminder.month, dateForReminder.dayOfMonth)
@@ -104,6 +111,8 @@ data class Task(
         }
     }
 
+    /** @return days until the task is scheduled again
+     */
     private fun getDaysTillNextReminderNew(): Int {
         val startDay = Calendar.getInstance().apply {
             set(Calendar.YEAR, dateForReminder.year)
@@ -145,6 +154,8 @@ data class Task(
         }
     }
 
+    /** uses [Task.getDaysTillNextReminderNew] to return if the task is scheduled within the given days
+     */
     fun isScheduledIn(inDays: Int): Boolean {
         val x = getDaysTillNextReminderNew()
         return if (x < 0) {
@@ -153,6 +164,8 @@ data class Task(
             x <= inDays
     }
 
+    /** @return true if task is scheduled for today
+     */
     fun isScheduledForToday(): Boolean {
         val x = getDaysTillNextReminderNew()
         return if (x < 0) {
@@ -161,6 +174,9 @@ data class Task(
             x == repeatGapDuration
     }
 
+    /** @return time in millis till the task is scheduled after the user requests the task to be
+     * postponed to a later date.
+     */
     fun timeAfterDelayMillis(): Long {
         val now = Calendar.getInstance()
         val later = Calendar.getInstance().apply {
@@ -232,6 +248,8 @@ class Time(
     val minute: Int
 )
 
+/** custom string formatting functions
+ */
 object StringFunctions {
     /**@param hour hour
      * @param minute minute
