@@ -29,7 +29,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.example.scheduler.background.CollectiveReminderWorker
-import com.example.scheduler.background.TaskReminderWorker
+import com.example.scheduler.background.WorkerConstants
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.ui.destinations.Destinations
 import com.example.scheduler.ui.screens.AddTaskScaffold
@@ -132,7 +132,7 @@ class MainActivity : ComponentActivity() {
     private fun createNotificationChannel() {
         val channel =
             NotificationChannel(
-                TaskReminderWorker.channelID,
+                WorkerConstants.channelID,
                 "name",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
