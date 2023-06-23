@@ -109,13 +109,13 @@ data class Task(
             set(Calendar.YEAR, dateForReminder.year)
             set(Calendar.MONTH, dateForReminder.month - 1)
             set(Calendar.DAY_OF_MONTH, dateForReminder.dayOfMonth)
-            set(Calendar.HOUR, 0)
+            set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
         }
 
         val calenderStartOfToday = Calendar.getInstance().apply {
-            set(Calendar.HOUR, 0)
+            set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
         }
@@ -160,15 +160,26 @@ data class Task(
         } else
             x == repeatGapDuration
     }
+
+    fun timeAfterDelayMillis(): Long {
+        val now = Calendar.getInstance()
+        val later = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_MONTH, postponeDuration)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+        return ChronoUnit.MILLIS.between(now.toInstant(), later.toInstant())
+    }
 }
 
 fun main() {
     val random = Random()
-    repeat(10) {
+    repeat(1) {
         Task(
             title = "Meeting",
             description = "Discuss project updates",
-            timeForReminder = Time(hour = random.nextInt(23), minute = random.nextInt(59)),
+            timeForReminder = Time(hour = 14, minute = 0),
             dateForReminder = Date(
                 dayOfMonth = random.nextInt(27) + 1,
                 month = 7,
@@ -176,9 +187,17 @@ fun main() {
             ),
             dateWise = random.nextBoolean(),
             repeatGapDuration = random.nextInt(30),
-            postponeDuration = 15
+            postponeDuration = 2
         ).let {
             // TODO:
+            println(
+                "timeAfterDelay = " +
+                        it.timeAfterDelayMillis().toString() +
+                        " | time = " + StringFunctions.getTimeAsText(
+                    hour = it.timeForReminder.hour,
+                    minute = it.timeForReminder.minute
+                ) + "days = ${it.postponeDuration}\n"
+            )
         }
     }
 }
