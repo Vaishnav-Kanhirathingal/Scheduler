@@ -7,6 +7,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 
+/** contains all the firebase functions related to account activities
+ */
 object AccountFunctions {
     private val TAG: String = this::class.java.simpleName
     private val auth = FirebaseAuth.getInstance()
@@ -44,6 +46,11 @@ object AccountFunctions {
             }
     }
 
+    /** deletes user account along with all its data
+     * @param notifyUser a lambda which takes a string to be displayed to the user
+     * @param onSuccess runs when the process is completed
+     * @param dismissLoadingPrompt a lambda which dismisses the active loading animation prompt
+     */
     fun deleteUserAccount(
         notifyUser: (String) -> Unit,
         onSuccess: () -> Unit,
@@ -66,7 +73,7 @@ object AccountFunctions {
         val deleteUserDocAndAcc = {
             userDocRef.delete().addOnSuccessListener {
                 Log.d(TAG, "deleted user document")
-                // TODO: requires recent login
+                // TODO: fix: requires recent login
                 user.delete().addOnSuccessListener {
                     Log.d(TAG, "deleted account")
                     dismissLoadingPrompt()

@@ -119,6 +119,10 @@ object DatabaseFunctions {
             }
     }
 
+    /** deletes all tasks stored in the current user's document
+     * @param notifyUser a lambda which takes a string to be displayed to the user
+     * @param dismissLoadingPrompt a lambda which dismisses the active loading animation prompt
+     */
     fun deleteAllTasks(
         notifyUser: (String) -> Unit,
         dismissLoadingPrompt: () -> Unit
