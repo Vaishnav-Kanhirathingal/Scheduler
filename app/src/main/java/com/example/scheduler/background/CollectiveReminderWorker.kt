@@ -14,6 +14,7 @@ import com.example.scheduler.data.Task
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+
 /** This worker class fetches all tasks from fire store and performs actions based on which task is
  * scheduled for the day.
  */

@@ -124,7 +124,7 @@ object TestValues {
             title = "Conference Call",
             description = "Discuss upcoming projects",
             timeForReminder = Time(hour = 16, minute = 10),
-            dateForReminder= Date(dayOfMonth = 24, month = 6, year = 2023),
+            dateForReminder = Date(dayOfMonth = 24, month = 6, year = 2023),
             dateWise = true,
             repeatGapDuration = 0,
             postponeDuration = 20

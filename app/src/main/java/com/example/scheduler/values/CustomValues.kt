@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/** the app's custom padding values
+ */
 object PaddingCustomValues {
     val screenGap = 20.dp
     val largeSpacing = 16.dp
@@ -19,6 +21,8 @@ object PaddingCustomValues {
     val infoScreenCardSpacing = 3.dp
 }
 
+/** the app's custom font-size values
+ */
 object FontSizeCustomValues {
     val extraLarge = 28.sp
     val large = 20.sp
