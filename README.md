@@ -1,6 +1,12 @@
 # Scheduler
 
+Scheduler is an application which helps in scheduling tasks for you so that you don't have to
+remember them. Scheduler creates un-dismissible notification which you can remove by pressing a
+dismiss button. The app also allows you to postpone the task by up to 5 days
+
 ## Why
+
+## Releases
 
 ## Documentation
 
