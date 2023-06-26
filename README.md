@@ -6,7 +6,17 @@ dismiss button. The app also allows you to postpone the task by up to 5 days
 
 ## Why
 
+An issue with keeping reminders is you have to go into the apps or maybe a notepad to check what
+tasks are scheduled for today. This increases the chances of you forgetting the existence of such a
+list of task. With this app, you can schedule a task for a specific day and the app would create an
+un-dismissible which the user can dismiss if the tasks gets completed or can have it postponed if he
+wants to. This means that the notification would be present till either the user dismisses it or
+postpones it for another day.
+
 ## Releases
+
+App releases or APKs can be found in
+the [release](https://github.com/Vaishnav-Kanhirathingal/Scheduler/releases) section.
 
 ## Documentation
 
