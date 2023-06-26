@@ -19,6 +19,7 @@ App releases or APKs can be found in
 the [release](https://github.com/Vaishnav-Kanhirathingal/Scheduler/releases) section.
 
 ## Documentation
+This section contains the documentation for the Scheduler app.
 
 ### Signing up (Sign up screen)
 
@@ -28,7 +29,13 @@ the [release](https://github.com/Vaishnav-Kanhirathingal/Scheduler/releases) sec
 
 ### filters on the main screen
 
+### deleting task from main screen
+
 ### side menu (main screen's navigation drawer)
+
+### no today's task
+
+### deleting task from side menu
 
 ### Settings (in side menu)
 
