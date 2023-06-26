@@ -38,7 +38,14 @@ This section contains the documentation for the Scheduler app.
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/281423d6-7b7e-4f07-9e94-f7246146f019" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/73870797-c8e5-493d-b63a-db287715fb3a" width=360>
 
+![SVID_20230626_200448_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985)
+![SVID_20230626_202035_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3)
+![SVID_20230626_202005_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a)
+![SVID_20230626_200459_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7ff2460-3b25-4ca4-a487-0f1da4914280)
+
 ### filters on the main screen
+
+![SVID_20230626_203100_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/26e9f1e8-8df6-45e7-8c14-4517c08f8209)
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/6fca261e-58f1-4248-ade7-b41e34ce3a58" width=360>
