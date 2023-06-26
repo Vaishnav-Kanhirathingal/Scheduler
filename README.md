@@ -42,30 +42,29 @@ To add a task, you have to fill out the necessary details.
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/281423d6-7b7e-4f07-9e94-f7246146f019" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/73870797-c8e5-493d-b63a-db287715fb3a" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/643c650c-2fe7-4dd7-8aac-7e0f068e7a12" width=360>
-
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985" width=360>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3" width=360>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7ff2460-3b25-4ca4-a487-0f1da4914280" width=360>
-
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/181be8c3-6a61-47fa-8fca-278db0f09ff3" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3" width=360>
 
 ### filters on the main screen
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/26e9f1e8-8df6-45e7-8c14-4517c08f8209" width=360>
-
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=360>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/6fca261e-58f1-4248-ade7-b41e34ce3a58" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/42861ea4-20cf-4bd7-b65e-b997a40b754c" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1bbdf3c8-52cb-4db8-80ce-ae3d45caa214" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/6fca261e-58f1-4248-ade7-b41e34ce3a58" width=360>
+
+
 
 ### deleting task from main screen
 
-<img src = "" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/26e9f1e8-8df6-45e7-8c14-4517c08f8209" width=360>
 
 ### side menu (main screen's navigation drawer)
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/23947ac5-c66e-4b42-807f-c5cf93b1a5f5" width=360>
+
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4d139e3c-c85a-489d-9189-2432fb9064b0" width=360>
 
 ### no today's task
