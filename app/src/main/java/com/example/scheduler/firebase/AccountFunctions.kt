@@ -16,32 +16,43 @@ object AccountFunctions {
     /** can be used to create a user and its own necessary directories
      * @param result this is the activity result of a one tap google sign up prompt
      * @param onSuccess a lambda to run after the function has executed successfully
-     * @param onFailure a lambda to run after the function has failed to execute. takes the
+     * @param notifyUser a lambda to run after the function has failed to execute. takes the
      * exception message as parameter
      */
     fun signInGoogle(
         result: ActivityResult,
         onSuccess: () -> Unit,
-        onFailure: (issue: String) -> Unit,
+        notifyUser: (issue: String) -> Unit,
     ) {
         GoogleSignIn.getSignedInAccountFromIntent(result.data)
             .addOnSuccessListener {
                 val credential = GoogleAuthProvider.getCredential(it.idToken, null)
-                auth
-                    .signInWithCredential(credential)
+                auth.signInWithCredential(credential)
                     .addOnSuccessListener {
                         val user = auth.currentUser
                         Log.d(TAG, "user = ${user?.email}")
                         DatabaseFunctions.createUserDirectories(
                             onSuccess = onSuccess,
-                            onFailure = onFailure
+                            notifyUser = notifyUser
                         )
                     }.addOnFailureListener { e ->
                         e.printStackTrace()
-                        onFailure(e.message ?: "Failed to get sign in with given credentials")
+                        notifyUser(
+                            if (e.message == null) {
+                                "Failed to get sign in with given credentials"
+                            } else {
+                                "Credential login failed due to error: ${e.message!!}"
+                            }
+                        )
                     }
             }.addOnFailureListener {
-                onFailure(it.message ?: "Failed to get signed in account from intent")
+                notifyUser(
+                    if (it.message == null) {
+                        "Failed to get signed in account from intent"
+                    } else {
+                        "Account login failed due to error: ${it.message!!}"
+                    }
+                )
                 it.printStackTrace()
             }
     }

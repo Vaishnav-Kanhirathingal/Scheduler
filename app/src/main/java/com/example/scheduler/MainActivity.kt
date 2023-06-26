@@ -65,11 +65,11 @@ class MainActivity : ComponentActivity() {
                     SchedulerNavHost(
                         navController = navHostController,
                         modifier = Modifier,
-                        googleSignInButton = { modifier: Modifier, onSuccess: () -> Unit, onFailure: (issue: String) -> Unit ->
+                        googleSignInButton = { modifier: Modifier, onSuccess: () -> Unit, notifyUser: (issue: String) -> Unit ->
                             GoogleSignInButton(
                                 modifier = modifier,
                                 onSuccess = onSuccess,
-                                onFailure = onFailure
+                                notifyUser = notifyUser
                             )
                         }
                     )
@@ -144,7 +144,7 @@ class MainActivity : ComponentActivity() {
     fun GoogleSignInButton(
         modifier: Modifier,
         onSuccess: () -> Unit,
-        onFailure: (issue: String) -> Unit
+        notifyUser: (issue: String) -> Unit
     ) {
 
         val googleSignInOptions = GoogleSignInOptions
@@ -160,7 +160,7 @@ class MainActivity : ComponentActivity() {
                     AccountFunctions.signInGoogle(
                         result = it,
                         onSuccess = onSuccess,
-                        onFailure = onFailure
+                        notifyUser = notifyUser
                     )
                 }
             )
@@ -186,7 +186,7 @@ fun SchedulerNavHost(
     googleSignInButton: @Composable (
         modifier: Modifier,
         onSuccess: () -> Unit,
-        onFailure: (issue: String) -> Unit,
+        notifyUser: (issue: String) -> Unit,
     ) -> Unit
 ) {
     NavHost(

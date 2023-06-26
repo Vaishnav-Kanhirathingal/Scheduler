@@ -41,12 +41,12 @@ object DatabaseFunctions {
     /** responsible for creating user directories based on the user email. It creates the directory
      * for where to store new tasks
      * @param onSuccess a lambda to run after the function has executed successfully
-     * @param onFailure a lambda to run after the function has failed to execute. takes the
+     * @param notifyUser a lambda to run after the function has failed to execute. takes the
      * exception message as parameter
      */
     fun createUserDirectories(
         onSuccess: () -> Unit,
-        onFailure: (issue: String) -> Unit
+        notifyUser: (issue: String) -> Unit
     ) {
         val db = FirebaseFirestore.getInstance()
         val email = FirebaseAuth.getInstance().currentUser!!.email!!
@@ -59,7 +59,13 @@ object DatabaseFunctions {
             }
             .addOnFailureListener { e ->
                 e.printStackTrace()
-                onFailure(e.message ?: "failed to create directories in the database")
+                notifyUser(
+                    if (e.message == null) {
+                        "Failed to create directories in the database"
+                    } else {
+                        "Error creating user directories: ${e.message!!}"
+                    }
+                )
             }
     }
 

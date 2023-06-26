@@ -62,7 +62,7 @@ fun SignUpScreen(
     googleSignInButton: @Composable (
         modifier: Modifier,
         onSuccess: () -> Unit,
-        onFailure: (issue: String) -> Unit,
+        notifyUser: (issue: String) -> Unit,
     ) -> Unit,
     navigateToMainScreen: () -> Unit
 ) {
@@ -106,10 +106,13 @@ fun SignUpScreen(
                                 text = "Use Google sign up to complete the sign up process"
                             )
                             val scope = CoroutineScope(Dispatchers.IO)
-                            googleSignInButton(Modifier, navigateToMainScreen) {
+                            googleSignInButton(
+                                Modifier,
+                                navigateToMainScreen
+                            ) {
                                 scope.launch {
                                     snackBarHostState.showSnackbar(
-                                        message = "Failed to Login: $it",
+                                        message = it,
                                         withDismissAction = true
                                     )
                                 }
