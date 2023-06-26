@@ -41,6 +41,7 @@ To add a task, you have to fill out the necessary details.
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/b5cd7d7b-d5db-4a5f-a5ef-ebef97fa438c" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/281423d6-7b7e-4f07-9e94-f7246146f019" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/73870797-c8e5-493d-b63a-db287715fb3a" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/643c650c-2fe7-4dd7-8aac-7e0f068e7a12" width=360>
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3" width=360>
