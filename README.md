@@ -98,7 +98,9 @@ todo
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/ff5e66f1-f514-4646-a6ca-34b64fea9384" width=360>
 
 ### Documentation (in side menu)
+![SVID_20230627_002502_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/d6804551-6c9f-4ac4-adb4-a05dfa3aee72)
 
 ### Git-Hub releases (in side menu)
+![SVID_20230627_002525_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/bedf1e0d-48e5-406d-83d7-fcd633a36a90)
 
 ### Reminder notifications and how it works (in notifications)
