@@ -27,7 +27,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -183,7 +182,7 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                         fontSize = FontSizeCustomValues.addTaskWarningSize
                     )
                 }
-                AnimatedVisibility(visible = daysDelayed.value == 0) {
+                AnimatedVisibility(visible = daysDelayed.value == 0 && !dateWise.value) {
                     Text(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -232,7 +231,10 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                             )
                             DatabaseFunctions.uploadTaskToFirebase(
                                 task = task,
-                                onSuccessListener = navigateUp,
+                                onSuccessListener = {
+                                    // TODO: add worker for notification if scheduled for today
+                                    navigateUp()
+                                },
                                 onFailureListener = { issue ->
                                     savingInProgress.value = false
                                     CoroutineScope(Dispatchers.IO).launch {
@@ -276,6 +278,7 @@ fun TitleAndDescription(
             val titleLimit = 35
             val descriptionLimit = 500
             OutlinedTextField(
+                isError = titleLowLimitError,
                 value = title.value,
                 onValueChange = {
                     try {
@@ -307,7 +310,6 @@ fun TitleAndDescription(
                         content = {
                             Text(
                                 modifier = Modifier.weight(1f),
-                                color = MaterialTheme.colorScheme.error,
                                 text = if (titleLowLimitError) "title length should be more"
                                 else ""
 
@@ -318,6 +320,7 @@ fun TitleAndDescription(
                 }
             )
             OutlinedTextField(
+                isError = descriptionLowLimitError,
                 value = description.value,
                 onValueChange = {
                     try {
@@ -348,7 +351,6 @@ fun TitleAndDescription(
                         content = {
                             Text(
                                 modifier = Modifier.weight(1f),
-                                color = MaterialTheme.colorScheme.error,
                                 text = if (descriptionLowLimitError) "description length should be more"
                                 else ""
 
