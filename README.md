@@ -82,6 +82,7 @@ every task card. Pressing the button brings up a prompt to delete the task from 
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/23947ac5-c66e-4b42-807f-c5cf93b1a5f5" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4d139e3c-c85a-489d-9189-2432fb9064b0" width=360>
+![SVID_20230627_000032_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/857b2b60-a2d1-4cf6-bb73-0bc896fbebe5)
 
 ### no today's task
 
