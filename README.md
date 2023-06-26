@@ -89,18 +89,30 @@ tasks scheduled for the day are displayed. The drawer menu contains more options
 
 ### Settings (in side menu)
 
-todo
+------------------------------------------------------------------------------------------------todo
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4232f063-f5c3-4ec0-a289-5224c02c9b8f" width=360>
 
 ### App info (in side menu)
 
+pressing the app info opens a page with two cards. First being the app's description along with it's
+Git-Hub link button. The second being the developer card. This contains my account links. Every icon
+button is a button to my account on the corresponding account.
+
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/ff5e66f1-f514-4646-a6ca-34b64fea9384" width=360>
 
 ### Documentation (in side menu)
-![SVID_20230627_002502_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/d6804551-6c9f-4ac4-adb4-a05dfa3aee72)
+
+Opens the Git-Hub README.md file which contains the app documentation.
+
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/d6804551-6c9f-4ac4-adb4-a05dfa3aee72" width=360>
 
 ### Git-Hub releases (in side menu)
-![SVID_20230627_002525_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/bedf1e0d-48e5-406d-83d7-fcd633a36a90)
+
+Opens the release section of the Git-Hub repository.
+
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/bedf1e0d-48e5-406d-83d7-fcd633a36a90" width=360>
 
 ### Reminder notifications and how it works (in notifications)
+
+------------------------------------------------------------------------------------------------todo
