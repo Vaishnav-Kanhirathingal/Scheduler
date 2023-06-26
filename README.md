@@ -9,8 +9,7 @@ dismiss button. The app also allows you to postpone the task by up to 5 days
 An issue with keeping reminders is you have to go into the apps or maybe a notepad to check what
 tasks are scheduled for today. This increases the chances of you forgetting the existence of such a
 list of task. With this app, you can schedule a task for a specific day and the app would create an
-un-dismissible which the user can dismiss if the tasks gets completed or can have it postponed if he
-wants to. This means that the notification would be present till either the user dismisses it or
+un-dismissible which the user can dismiss if the tasks gets completed or can have it postponed if he wants to. This means that the notification would be present till either the user dismisses it or
 postpones it for another day.
 
 ## Releases
@@ -24,28 +23,35 @@ This section contains the documentation for the Scheduler app.
 
 ### Signing up (Sign up screen)
 
+The app uses google sign in to create an account. Press the button to open sign up prompt. Select the account of choice and continue. All tasks are stored in the cloud.
+
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=360>
 
 ### Empty main screen (main screen)
 
+This is the main screen of the app. Currently there are no tasks. So, we can now move to create a task. To add a task, click on the `add task` button
+
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/20c1dd30-39c2-496e-aa01-df276dac6db7" width=360>
 
 ### Adding a task (add task screen)
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/181be8c3-6a61-47fa-8fca-278db0f09ff3" width=360>
+To add a task, you have to fill out the necessary details.
+
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/b5cd7d7b-d5db-4a5f-a5ef-ebef97fa438c" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/281423d6-7b7e-4f07-9e94-f7246146f019" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/73870797-c8e5-493d-b63a-db287715fb3a" width=360>
 
-![SVID_20230626_200448_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985)
-![SVID_20230626_202035_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3)
-![SVID_20230626_202005_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a)
-![SVID_20230626_200459_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7ff2460-3b25-4ca4-a487-0f1da4914280)
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7ff2460-3b25-4ca4-a487-0f1da4914280" width=360>
+
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/181be8c3-6a61-47fa-8fca-278db0f09ff3" width=360>
 
 ### filters on the main screen
 
-![SVID_20230626_203100_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/26e9f1e8-8df6-45e7-8c14-4517c08f8209)
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/26e9f1e8-8df6-45e7-8c14-4517c08f8209" width=360>
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/6fca261e-58f1-4248-ade7-b41e34ce3a58" width=360>
