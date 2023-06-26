@@ -80,19 +80,16 @@ every task card. Pressing the button brings up a prompt to delete the task from 
 
 ### side menu (main screen's navigation drawer)
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/23947ac5-c66e-4b42-807f-c5cf93b1a5f5" width=360>
+the side menu contains the user's profile image with their name and email. Below that, A list of all
+tasks scheduled for the day are displayed. The drawer menu contains more options to explore.
+
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4d139e3c-c85a-489d-9189-2432fb9064b0" width=360>
-![SVID_20230627_000032_1_AdobeExpress](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/857b2b60-a2d1-4cf6-bb73-0bc896fbebe5)
-
-### no today's task
-
-<img src = "" width=360>
-
-### deleting task from side menu
-
-<img src = "" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/23947ac5-c66e-4b42-807f-c5cf93b1a5f5" width=360>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/857b2b60-a2d1-4cf6-bb73-0bc896fbebe5" width=360>
 
 ### Settings (in side menu)
+
+todo
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4232f063-f5c3-4ec0-a289-5224c02c9b8f" width=360>
 
@@ -103,7 +100,5 @@ every task card. Pressing the button brings up a prompt to delete the task from 
 ### Documentation (in side menu)
 
 ### Git-Hub releases (in side menu)
-
-### Exit
 
 ### Reminder notifications and how it works (in notifications)
