@@ -59,6 +59,13 @@ Postpone duration in image 8 is how much the task can be postponed. And finally,
 
 ### filters on the main screen
 
+filters are of four types
+
+1. All - Displays all Tasks
+2. Day - Displays tasks scheduled for the day
+3. Week - Displays tasks scheduled within 7 days
+4. Month - Displays tasks scheduled within 30 days
+
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/42861ea4-20cf-4bd7-b65e-b997a40b754c" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1bbdf3c8-52cb-4db8-80ce-ae3d45caa214" width=360>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=360>
@@ -66,12 +73,14 @@ Postpone duration in image 8 is how much the task can be postponed. And finally,
 
 ### deleting task from main screen
 
+to delete a task from the main screen, you can press the delete icon button on the top right of
+every task card. Pressing the button brings up a prompt to delete the task from the database.
+
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/26e9f1e8-8df6-45e7-8c14-4517c08f8209" width=360>
 
 ### side menu (main screen's navigation drawer)
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/23947ac5-c66e-4b42-807f-c5cf93b1a5f5" width=360>
-
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4d139e3c-c85a-489d-9189-2432fb9064b0" width=360>
 
 ### no today's task
