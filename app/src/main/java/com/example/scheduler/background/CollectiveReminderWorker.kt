@@ -14,6 +14,7 @@ import com.example.scheduler.data.Task
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import kotlin.random.Random
 
 /** This worker class fetches all tasks from fire store and performs actions based on which task is
  * scheduled for the day.
@@ -35,7 +36,7 @@ class CollectiveReminderWorker(private val context: Context, workerParameters: W
                                     .setRequiredNetworkType(NetworkType.CONNECTED).build()
                                 val oneTimeWorkRequest = OneTimeWorkRequest
                                     .Builder(TaskReminderWorker::class.java)
-                                    .setInputData(getData(task, documentSnap.id))
+                                    .setInputData(getData(task = task))
                                     .setConstraints(constraints)
                                     .build()
                                 workManager.enqueueUniqueWork(
@@ -67,13 +68,14 @@ class CollectiveReminderWorker(private val context: Context, workerParameters: W
     companion object {
         /** creates data for intent using the parameter given.
          * @param task gets embedded into data with key [WorkerConstants.CollectiveWorker.taskKey]
-         * @param id gets embedded into data with key [WorkerConstants.CollectiveWorker.documentIDKey]
+         * along with a notificationTag with key [WorkerConstants.CollectiveWorker.notificationTagKey]
          */
-        fun getData(task: Task, id: String): Data {
+        fun getData(task: Task): Data {
+            val notificationTag = Random.nextLong().toString()
             return Data
                 .Builder()
                 .putString(WorkerConstants.CollectiveWorker.taskKey, Gson().toJson(task))
-                .putString(WorkerConstants.CollectiveWorker.documentIDKey, id)
+                .putString(WorkerConstants.CollectiveWorker.notificationTagKey, notificationTag)
                 .build()
         }
     }

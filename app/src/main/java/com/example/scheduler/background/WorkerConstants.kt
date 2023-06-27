@@ -11,7 +11,7 @@ object WorkerConstants {
      */
     object CollectiveWorker {
         const val taskKey = "task_key"
-        const val documentIDKey = "document_id"
+        const val notificationTagKey = "notification_id"
     }
 
     /** contains data keys, the constant notificationID and action keys

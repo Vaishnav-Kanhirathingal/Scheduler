@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.RingtoneManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -37,11 +36,13 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
                     inputData.getString(WorkerConstants.CollectiveWorker.taskKey),
                     Task::class.java
                 )
+            val notificationTag =
+                inputData.getString(WorkerConstants.CollectiveWorker.notificationTagKey)
+                    ?: "error_getting_id"
             showNotification(
                 task = task,
                 context = context,
-                taskID = inputData.getString(WorkerConstants.CollectiveWorker.documentIDKey)
-                    ?: "error_getting_id"
+                notificationTag = notificationTag
             )
             Result.success()
         } catch (e: Exception) {
@@ -51,7 +52,7 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
     }
 }
 
-fun showNotification(task: Task, context: Context, taskID: String) {
+fun showNotification(task: Task, context: Context, notificationTag: String) {
     val TAG = "showNotification"
     if (
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
@@ -61,7 +62,7 @@ fun showNotification(task: Task, context: Context, taskID: String) {
     } else {
         val basicBroadcastIntent = Intent(context, SchedulerBroadcastReceiver::class.java).apply {
             val taskStr: String = Gson().toJson(task)
-            putExtra(WorkerConstants.TaskWorker.notificationTagKey, taskID)//adding values
+            putExtra(WorkerConstants.TaskWorker.notificationTagKey, notificationTag)//adding values
             putExtra(WorkerConstants.TaskWorker.taskKey, taskStr)//adding values
         }
         val dismissPendingIntent =
@@ -100,7 +101,7 @@ fun showNotification(task: Task, context: Context, taskID: String) {
                 )
                 .build()
         NotificationManagerCompat.from(context)
-            .notify(taskID, WorkerConstants.TaskWorker.notificationId, notification)
+            .notify(notificationTag, WorkerConstants.TaskWorker.notificationId, notification)
     }
 }
 
@@ -133,7 +134,7 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
                     .setRequiredNetworkType(NetworkType.CONNECTED).build()
                 val oneTimeWorkRequest = OneTimeWorkRequest
                     .Builder(TaskReminderWorker::class.java)
-                    .setInputData(CollectiveReminderWorker.getData(task, docId))
+                    .setInputData(CollectiveReminderWorker.getData(task))
                     .setConstraints(constraints)
                     .setInitialDelay(task.timeAfterDelayMillis(), TimeUnit.MILLISECONDS)
                     .build()
