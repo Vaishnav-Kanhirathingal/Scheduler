@@ -47,15 +47,15 @@ either repeat after a certain interval or on a specific day of every month (the 
 date-wise reminders can't be more than 28 since that would cause an exception for february).
 Postpone duration in image 8 is how much the task can be postponed. And finally, we add the task.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/b5cd7d7b-d5db-4a5f-a5ef-ebef97fa438c" width=270 title="1">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/281423d6-7b7e-4f07-9e94-f7246146f019" width=270 title="2">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/73870797-c8e5-493d-b63a-db287715fb3a" width=270 title="3">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/643c650c-2fe7-4dd7-8aac-7e0f068e7a12" width=270 title="4">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985" width=270 title="5">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7ff2460-3b25-4ca4-a487-0f1da4914280" width=270 title="6">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a" width=270 title="7">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/181be8c3-6a61-47fa-8fca-278db0f09ff3" width=270 title="8">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3" width=270 title="9">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/b5cd7d7b-d5db-4a5f-a5ef-ebef97fa438c" width=273 title="1">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/281423d6-7b7e-4f07-9e94-f7246146f019" width=273 title="2">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/73870797-c8e5-493d-b63a-db287715fb3a" width=273 title="3">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/643c650c-2fe7-4dd7-8aac-7e0f068e7a12" width=273 title="4">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985" width=273 title="5">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7ff2460-3b25-4ca4-a487-0f1da4914280" width=273 title="6">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a" width=273 title="7">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/181be8c3-6a61-47fa-8fca-278db0f09ff3" width=273 title="8">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3" width=273 title="9">
 
 ### filters on the main screen
 
