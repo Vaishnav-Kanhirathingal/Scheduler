@@ -27,8 +27,8 @@ This section contains the documentation for the Scheduler app.
 The app uses google sign in to create an account. Press the button to open sign up prompt. Select
 the account of choice and continue. All tasks are stored in the cloud.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=400>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=400>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=410>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=410>
 
 ### Empty main screen (main screen)
 
@@ -50,12 +50,12 @@ Postpone duration in image 8 is how much the task can be postponed. And finally,
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/b5cd7d7b-d5db-4a5f-a5ef-ebef97fa438c" width=270 title="1">
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/281423d6-7b7e-4f07-9e94-f7246146f019" width=270 title="2">
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/73870797-c8e5-493d-b63a-db287715fb3a" width=270 title="3">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/643c650c-2fe7-4dd7-8aac-7e0f068e7a12" width=334 title="4">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985" width=334 title="5">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7ff2460-3b25-4ca4-a487-0f1da4914280" width=334 title="6">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a" width=334 title="7">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/181be8c3-6a61-47fa-8fca-278db0f09ff3" width=334 title="8">
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3" width=334 title="9">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/643c650c-2fe7-4dd7-8aac-7e0f068e7a12" width=270 title="4">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/27ac88bd-2b00-463e-9d14-8bcd98305985" width=270 title="5">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7ff2460-3b25-4ca4-a487-0f1da4914280" width=270 title="6">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/85598ebf-e5c7-497e-8b0d-12be63dfda7a" width=270 title="7">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/181be8c3-6a61-47fa-8fca-278db0f09ff3" width=270 title="8">
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/16d3e5fb-786a-4f95-a3b1-71e22f06d0a3" width=270 title="9">
 
 ### filters on the main screen
 
@@ -83,9 +83,9 @@ every task card. Pressing the button brings up a prompt to delete the task from 
 the side menu contains the user's profile image with their name and email. Below that, A list of all
 tasks scheduled for the day are displayed. The drawer menu contains more options to explore.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4d139e3c-c85a-489d-9189-2432fb9064b0" width=334>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/23947ac5-c66e-4b42-807f-c5cf93b1a5f5" width=334>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/857b2b60-a2d1-4cf6-bb73-0bc896fbebe5" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4d139e3c-c85a-489d-9189-2432fb9064b0" width=270>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/23947ac5-c66e-4b42-807f-c5cf93b1a5f5" width=270>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/857b2b60-a2d1-4cf6-bb73-0bc896fbebe5" width=270>
 
 ### Settings (in side menu)
 
