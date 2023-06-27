@@ -17,8 +17,8 @@ object DatabaseFunctions {
      */
     fun uploadTaskToFirebase(
         task: Task,
-        onSuccessListener: () -> Unit,
-        onFailureListener: (error: String) -> Unit
+        onSuccessListener: (id: String) -> Unit,
+        onFailureListener: (e: Exception) -> Unit
     ) {
         val data = task.toHashMap()
         val database = FirebaseFirestore.getInstance()
@@ -28,13 +28,12 @@ object DatabaseFunctions {
             .document(email)
             .collection(FirebaseKeys.listOfTaskName)
             .document()
-            .set(data)
-            .addOnSuccessListener {
-                onSuccessListener()
-                Log.d(TAG, "added task to database")
-            }.addOnFailureListener {
-                onFailureListener(it.message ?: "error while adding task to remote database")
-                it.printStackTrace()
+            .apply {
+                set(data)
+                    .addOnSuccessListener {
+                        onSuccessListener(this.id)
+                        Log.d(TAG, "added task to database")
+                    }.addOnFailureListener(onFailureListener)
             }
     }
 

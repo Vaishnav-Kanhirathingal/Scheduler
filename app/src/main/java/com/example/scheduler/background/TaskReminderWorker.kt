@@ -44,7 +44,9 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
                 val oneTimeWorkRequest = OneTimeWorkRequest
                     .Builder(TaskReminderWorker::class.java)
                     .apply {
-                        setInputData(CollectiveReminderWorker.getData(task = task))
+                        setInputData(
+                            CollectiveReminderWorker.getData(task = task, docId = documentId)
+                        )
                         setConstraints(constraints)
                         if (setPostponeDelay) {
                             // TODO: set initial delay correctly
@@ -76,12 +78,12 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
                     Task::class.java
                 )
             val notificationTag =
-                inputData.getString(WorkerConstants.CollectiveWorker.notificationTagKey)
+                inputData.getString(WorkerConstants.CollectiveWorker.taskIdKey)
                     ?: "error_getting_id"
             showNotification(
                 task = task,
                 context = context,
-                notificationTag = notificationTag
+                taskId = notificationTag
             )
             Result.success()
         } catch (e: Exception) {
@@ -91,7 +93,7 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
     }
 }
 
-fun showNotification(task: Task, context: Context, notificationTag: String) {
+fun showNotification(task: Task, context: Context, taskId: String) {
     val TAG = "showNotification"
     if (
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
@@ -101,7 +103,7 @@ fun showNotification(task: Task, context: Context, notificationTag: String) {
     } else {
         val basicBroadcastIntent = Intent(context, SchedulerBroadcastReceiver::class.java).apply {
             val taskStr: String = Gson().toJson(task)
-            putExtra(WorkerConstants.TaskWorker.notificationTagKey, notificationTag)//adding values
+            putExtra(WorkerConstants.TaskWorker.taskIdKey, taskId)//adding values
             putExtra(WorkerConstants.TaskWorker.taskKey, taskStr)//adding values
         }
         val dismissPendingIntent =
@@ -140,7 +142,7 @@ fun showNotification(task: Task, context: Context, notificationTag: String) {
                 )
                 .build()
         NotificationManagerCompat.from(context)
-            .notify(notificationTag, WorkerConstants.TaskWorker.notificationId, notification)
+            .notify(taskId, WorkerConstants.TaskWorker.notificationId, notification)
     }
 }
 
@@ -151,7 +153,7 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
     private val TAG = this::class.java.simpleName
     override fun onReceive(context: Context?, intent: Intent?) {
         // TODO: check if initial delay works properly
-        val docId = intent!!.getStringExtra(WorkerConstants.TaskWorker.notificationTagKey)!!
+        val docId = intent!!.getStringExtra(WorkerConstants.TaskWorker.taskIdKey)!!
         val task =
             Gson().fromJson(
                 intent.getStringExtra(WorkerConstants.TaskWorker.taskKey)!!,

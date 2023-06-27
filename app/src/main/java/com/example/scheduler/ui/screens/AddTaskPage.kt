@@ -48,7 +48,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.work.WorkManager
 import com.example.scheduler.R
+import com.example.scheduler.background.TaskReminderWorker
 import com.example.scheduler.data.Date
 import com.example.scheduler.data.RepetitionEnum
 import com.example.scheduler.data.Repetitions
@@ -242,11 +244,20 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                             )
                             DatabaseFunctions.uploadTaskToFirebase(
                                 task = task,
-                                onSuccessListener = {
-                                    // TODO: add worker for notification if scheduled for today
+                                onSuccessListener = { docId ->
+                                    if (task.isScheduledForToday()) {
+                                        TaskReminderWorker.scheduleWork(
+                                            task = task,
+                                            workManager = WorkManager.getInstance(context),
+                                            documentId = docId,
+                                            setPostponeDelay = false
+                                        )
+                                    }
                                     navigateUp()
                                 },
-                                onFailureListener = { issue ->
+                                onFailureListener = { e ->
+                                    e.printStackTrace()
+                                    val issue = e.message ?: "error while adding task to remote database"
                                     savingInProgress.value = false
                                     CoroutineScope(Dispatchers.IO).launch {
                                         snackBarHostState.showSnackbar(

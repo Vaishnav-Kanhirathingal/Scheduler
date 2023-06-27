@@ -9,7 +9,6 @@ import androidx.work.WorkerParameters
 import com.example.scheduler.data.Task
 import com.example.scheduler.firebase.DatabaseFunctions
 import com.google.gson.Gson
-import kotlin.random.Random
 
 /** This worker class fetches all tasks from fire store and performs actions based on which task is
  * scheduled for the day.
@@ -50,16 +49,13 @@ class CollectiveReminderWorker(private val context: Context, workerParameters: W
 
         /** creates data for intent using the parameter given.
          * @param task gets embedded into data with key [WorkerConstants.CollectiveWorker.taskKey]
-         * along with a notificationTag with key [WorkerConstants.CollectiveWorker.notificationTagKey]
+         * along with a notificationTag with key [WorkerConstants.CollectiveWorker.taskIdKey]
          */
-        fun getData(task: Task): Data {
+        fun getData(task: Task, docId: String): Data {
             return Data
                 .Builder()
                 .putString(WorkerConstants.CollectiveWorker.taskKey, Gson().toJson(task))
-                .putString(
-                    WorkerConstants.CollectiveWorker.notificationTagKey,
-                    Random.nextLong().toString()
-                )
+                .putString(WorkerConstants.CollectiveWorker.taskIdKey, docId)
                 .build()
         }
     }
