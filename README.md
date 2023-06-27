@@ -27,15 +27,15 @@ This section contains the documentation for the Scheduler app.
 The app uses google sign in to create an account. Press the button to open sign up prompt. Select
 the account of choice and continue. All tasks are stored in the cloud.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=415>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=415>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=410>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=410>
 
 ### Empty main screen (main screen)
 
 This is the main screen of the app. Currently there are no tasks. So, we can now move to create a
 task. To add a task, click on the `add task` button
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/20c1dd30-39c2-496e-aa01-df276dac6db7" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/20c1dd30-39c2-496e-aa01-df276dac6db7" width=360>
 
 ### Adding a task (add task screen)
 
@@ -66,17 +66,17 @@ filters are of four types
 3. Week - Displays tasks scheduled within 7 days
 4. Month - Displays tasks scheduled within 30 days
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/42861ea4-20cf-4bd7-b65e-b997a40b754c" width=415>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1bbdf3c8-52cb-4db8-80ce-ae3d45caa214" width=415>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=415>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/6fca261e-58f1-4248-ade7-b41e34ce3a58" width=415>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/42861ea4-20cf-4bd7-b65e-b997a40b754c" width=410>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1bbdf3c8-52cb-4db8-80ce-ae3d45caa214" width=410>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=410>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/6fca261e-58f1-4248-ade7-b41e34ce3a58" width=410>
 
 ### deleting task from main screen
 
 to delete a task from the main screen, you can press the delete icon button on the top right of
 every task card. Pressing the button brings up a prompt to delete the task from the database.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/26e9f1e8-8df6-45e7-8c14-4517c08f8209" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/26e9f1e8-8df6-45e7-8c14-4517c08f8209" width=360>
 
 ### side menu (main screen's navigation drawer)
 
@@ -91,7 +91,7 @@ tasks scheduled for the day are displayed. The drawer menu contains more options
 
 ------------------------------------------------------------------------------------------------todo
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4232f063-f5c3-4ec0-a289-5224c02c9b8f" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4232f063-f5c3-4ec0-a289-5224c02c9b8f" width=360>
 
 ### App info (in side menu)
 
@@ -99,19 +99,19 @@ pressing the app info opens a page with two cards. First being the app's descrip
 Git-Hub link button. The second being the developer card. This contains my account links. Every icon
 button is a button to my account on the corresponding account.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/ff5e66f1-f514-4646-a6ca-34b64fea9384" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/ff5e66f1-f514-4646-a6ca-34b64fea9384" width=360>
 
 ### Documentation (in side menu)
 
 Opens the Git-Hub README.md file which contains the app documentation.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/d6804551-6c9f-4ac4-adb4-a05dfa3aee72" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/d6804551-6c9f-4ac4-adb4-a05dfa3aee72" width=360>
 
 ### Git-Hub releases (in side menu)
 
 Opens the release section of the Git-Hub repository.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/bedf1e0d-48e5-406d-83d7-fcd633a36a90" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/bedf1e0d-48e5-406d-83d7-fcd633a36a90" width=360>
 
 ### Reminder notifications and how it works (in notifications)
 
