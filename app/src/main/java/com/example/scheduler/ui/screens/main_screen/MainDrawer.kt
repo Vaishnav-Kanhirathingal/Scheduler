@@ -1,5 +1,6 @@
 package com.example.scheduler.ui.screens.main_screen
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.ScrollState
@@ -207,7 +208,10 @@ fun OptionMenu(
             MenuItem(
                 icon = Icons.Default.ExitToApp,
                 text = "Exit",
-                onClick = { TODO("exit app") }
+                onClick = {
+                    val act = context as Activity
+                    act.finishAffinity()
+                }
             )
         }
     )
