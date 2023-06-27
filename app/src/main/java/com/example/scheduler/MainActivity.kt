@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -59,27 +58,25 @@ class MainActivity : ComponentActivity() {
             SchedulerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val navHostController: NavHostController = rememberNavController()
-                    SchedulerNavHost(
-                        navController = navHostController,
-                        modifier = Modifier,
-                        googleSignInButton = { modifier: Modifier, onSuccess: () -> Unit, notifyUser: (issue: String) -> Unit ->
-                            GoogleSignInButton(
-                                modifier = modifier,
-                                onSuccess = onSuccess,
-                                notifyUser = notifyUser
-                            )
-                        }
-                    )
-                }
+                    color = MaterialTheme.colorScheme.background,
+                    content = {
+                        SchedulerNavHost(
+                            modifier = Modifier,
+                            googleSignInButton = { modifier: Modifier, onSuccess: () -> Unit, notifyUser: (issue: String) -> Unit ->
+                                GoogleSignInButton(
+                                    modifier = modifier,
+                                    onSuccess = onSuccess,
+                                    notifyUser = notifyUser
+                                )
+                            }
+                        )
+                    }
+                )
             }
         }
     }
 
     private fun startWorker(replaceWork: Boolean = false) {
-        // TODO: test this out, use a refresh button with replaceWork as true
         createNotificationChannel()
 
         val cal: Calendar = Calendar.getInstance()
@@ -87,8 +84,6 @@ class MainActivity : ComponentActivity() {
         cal.set(Calendar.HOUR_OF_DAY, 0)
         cal.set(Calendar.MINUTE, 0)
         cal.set(Calendar.SECOND, 0)
-
-//        cal.add(Calendar.SECOND,3)
 
         val initialDelay: Long = cal.timeInMillis - System.currentTimeMillis()
 
@@ -181,7 +176,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SchedulerNavHost(
-    navController: NavHostController,
     modifier: Modifier,
     googleSignInButton: @Composable (
         modifier: Modifier,
@@ -189,6 +183,7 @@ fun SchedulerNavHost(
         notifyUser: (issue: String) -> Unit,
     ) -> Unit
 ) {
+    val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = if (FirebaseAuth.getInstance().currentUser == null) {
