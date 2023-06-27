@@ -27,8 +27,8 @@ This section contains the documentation for the Scheduler app.
 The app uses google sign in to create an account. Press the button to open sign up prompt. Select
 the account of choice and continue. All tasks are stored in the cloud.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=410>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=410>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=415>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=415>
 
 ### Empty main screen (main screen)
 
@@ -66,10 +66,10 @@ filters are of four types
 3. Week - Displays tasks scheduled within 7 days
 4. Month - Displays tasks scheduled within 30 days
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/42861ea4-20cf-4bd7-b65e-b997a40b754c" width=334>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1bbdf3c8-52cb-4db8-80ce-ae3d45caa214" width=334>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=334>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/6fca261e-58f1-4248-ade7-b41e34ce3a58" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/42861ea4-20cf-4bd7-b65e-b997a40b754c" width=415>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1bbdf3c8-52cb-4db8-80ce-ae3d45caa214" width=415>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f0dd45fc-2304-4892-a4cc-7196845bac06" width=415>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/6fca261e-58f1-4248-ade7-b41e34ce3a58" width=415>
 
 ### deleting task from main screen
 
