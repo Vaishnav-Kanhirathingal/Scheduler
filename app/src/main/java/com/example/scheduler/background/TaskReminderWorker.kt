@@ -95,52 +95,52 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
 
 fun showNotification(task: Task, context: Context, taskId: String) {
     val TAG = "showNotification"
+    val basicBroadcastIntent = Intent(context, SchedulerBroadcastReceiver::class.java).apply {
+        val taskStr: String = Gson().toJson(task)
+        putExtra(WorkerConstants.TaskWorker.taskIdKey, taskId)//adding values
+        putExtra(WorkerConstants.TaskWorker.taskKey, taskStr)//adding values
+    }
+    val dismissPendingIntent =
+        PendingIntent.getBroadcast(
+            context,
+            Random.nextInt(),
+            basicBroadcastIntent.apply { action = WorkerConstants.TaskWorker.Action.dismiss },
+            Intent.FILL_IN_DATA or PendingIntent.FLAG_IMMUTABLE
+        )
+    val postponePendingIntent =
+        PendingIntent.getBroadcast(
+            context,
+            Random.nextInt(),
+            basicBroadcastIntent.apply { action = WorkerConstants.TaskWorker.Action.postpone },
+            Intent.FILL_IN_DATA or PendingIntent.FLAG_IMMUTABLE
+        )
+
+    val notification =
+        NotificationCompat
+            .Builder(context, WorkerConstants.channelID)
+            .setContentTitle(
+                StringFunctions.getTimeAsText(
+                    task.timeForReminder.hour, task.timeForReminder.minute
+                ) + ": " + task.title
+            )
+            .setContentText(task.description)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
+            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setOngoing(true)
+            .addAction(R.drawable.task_24, "dismiss", dismissPendingIntent)
+            .addAction(
+                R.drawable.skip_next_24,
+                "postpone ${StringFunctions.getTextWithS("day", task.postponeDuration)}",
+                postponePendingIntent
+            )
+            .build()
     if (
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
         != PackageManager.PERMISSION_GRANTED
     ) {
         // TODO: get notification permission
     } else {
-        val basicBroadcastIntent = Intent(context, SchedulerBroadcastReceiver::class.java).apply {
-            val taskStr: String = Gson().toJson(task)
-            putExtra(WorkerConstants.TaskWorker.taskIdKey, taskId)//adding values
-            putExtra(WorkerConstants.TaskWorker.taskKey, taskStr)//adding values
-        }
-        val dismissPendingIntent =
-            PendingIntent.getBroadcast(
-                context,
-                Random.nextInt(),
-                basicBroadcastIntent.apply { action = WorkerConstants.TaskWorker.Action.dismiss },
-                Intent.FILL_IN_DATA or PendingIntent.FLAG_IMMUTABLE
-            )
-        val postponePendingIntent =
-            PendingIntent.getBroadcast(
-                context,
-                Random.nextInt(),
-                basicBroadcastIntent.apply { action = WorkerConstants.TaskWorker.Action.postpone },
-                Intent.FILL_IN_DATA or PendingIntent.FLAG_IMMUTABLE
-            )
-
-        val notification =
-            NotificationCompat
-                .Builder(context, WorkerConstants.channelID)
-                .setContentTitle(
-                    StringFunctions.getTimeAsText(
-                        task.timeForReminder.hour, task.timeForReminder.minute
-                    ) + ": " + task.title
-                )
-                .setContentText(task.description)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
-                .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setOngoing(true)
-                .addAction(R.drawable.task_24, "dismiss", dismissPendingIntent)
-                .addAction(
-                    R.drawable.skip_next_24,
-                    "postpone ${StringFunctions.getTextWithS("day", task.postponeDuration)}",
-                    postponePendingIntent
-                )
-                .build()
         NotificationManagerCompat.from(context)
             .notify(taskId, WorkerConstants.TaskWorker.notificationId, notification)
     }
@@ -152,7 +152,6 @@ fun showNotification(task: Task, context: Context, taskId: String) {
 class SchedulerBroadcastReceiver : BroadcastReceiver() {
     private val TAG = this::class.java.simpleName
     override fun onReceive(context: Context?, intent: Intent?) {
-        // TODO: check if initial delay works properly
         val docId = intent!!.getStringExtra(WorkerConstants.TaskWorker.taskIdKey)!!
         val task =
             Gson().fromJson(
