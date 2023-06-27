@@ -22,12 +22,51 @@ import com.example.scheduler.R
 import com.example.scheduler.data.StringFunctions
 import com.example.scheduler.data.Task
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 class TaskReminderWorker(private val context: Context, workerParameters: WorkerParameters) :
     Worker(context, workerParameters) {
-    val TAG = this::class.java.simpleName
+    private val TAG = this::class.java.simpleName
+
+    companion object {
+        private val TAG = this::class.java.simpleName
+        fun scheduleWork(
+            task: Task,
+            workManager: WorkManager,
+            documentId: String,
+            setPostponeDelay: Boolean
+        ) {
+            try {
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED).build()
+                val oneTimeWorkRequest = OneTimeWorkRequest
+                    .Builder(TaskReminderWorker::class.java)
+                    .apply {
+                        setInputData(CollectiveReminderWorker.getData(task = task))
+                        setConstraints(constraints)
+                        if (setPostponeDelay) {
+                            // TODO: set initial delay correctly
+//                            setInitialDelay(task.timeAfterDelayMillis(), TimeUnit.MILLISECONDS)
+                            setInitialDelay(3000, TimeUnit.MILLISECONDS)
+                        }
+                    }
+                    .build()
+                workManager.enqueueUniqueWork(
+                    documentId,
+                    ExistingWorkPolicy.REPLACE,
+                    oneTimeWorkRequest
+                )
+                Log.d(
+                    TAG, "added work for task: " +
+                            GsonBuilder().setPrettyPrinting().create().toJson(task)
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     override fun doWork(): Result {
         return try {
@@ -130,19 +169,11 @@ class SchedulerBroadcastReceiver : BroadcastReceiver() {
             }
 
             WorkerConstants.TaskWorker.Action.postpone -> {
-                val constraints = Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED).build()
-                val oneTimeWorkRequest = OneTimeWorkRequest
-                    .Builder(TaskReminderWorker::class.java)
-                    .setInputData(CollectiveReminderWorker.getData(task))
-                    .setConstraints(constraints)
-                    .setInitialDelay(task.timeAfterDelayMillis(), TimeUnit.MILLISECONDS)
-                    .build()
-                val workManager = WorkManager.getInstance(context)
-                workManager.enqueueUniqueWork(
-                    docId,
-                    ExistingWorkPolicy.REPLACE,
-                    oneTimeWorkRequest
+                TaskReminderWorker.scheduleWork(
+                    task = task,
+                    documentId = docId,
+                    workManager = WorkManager.getInstance(context),
+                    setPostponeDelay = true
                 )
                 Toast.makeText(context, "task : [${task.title}] : postponed", Toast.LENGTH_LONG)
                     .show()
