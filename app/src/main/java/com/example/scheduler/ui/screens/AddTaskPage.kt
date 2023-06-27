@@ -2,7 +2,9 @@ package com.example.scheduler.ui.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.icu.util.Calendar
+import android.net.Uri
 import android.util.Log
 import android.widget.DatePicker
 import androidx.compose.animation.AnimatedVisibility
@@ -100,8 +102,17 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
     val descriptionLow = 10
     val descriptionLowLimitError = description.value.length <= descriptionLow
 
-    // TODO: show error
     val snackBarHostState = SnackbarHostState()
+
+    val context = LocalContext.current
+    val openUrl = { url: String ->
+        context.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(url)
+            )
+        )
+    }
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
@@ -123,7 +134,7 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                 },
                 actions = {
                     IconButton(
-                        onClick = { TODO("go to add task doc") },
+                        onClick = { openUrl("https://github.com/Vaishnav-Kanhirathingal/Scheduler#adding-a-task-add-task-screen") },
                         content = {
                             Icon(imageVector = Icons.Filled.Info, contentDescription = null)
                         }
