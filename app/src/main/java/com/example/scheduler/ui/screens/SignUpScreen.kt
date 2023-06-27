@@ -32,16 +32,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
-// TODO:
-
 @Composable
 @Preview(showBackground = true)
 fun SignUpScreenPrev() {
     SignUpScreen(
         googleSignInButton = { m, os, of ->
             ElevatedButton(
-                onClick = { /*TODO*/ },
+                onClick = {},
                 content = {
                     Icon(
                         modifier = Modifier.padding(end = PaddingCustomValues.mediumSpacing),

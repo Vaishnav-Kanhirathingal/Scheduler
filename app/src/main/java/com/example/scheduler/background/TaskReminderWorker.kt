@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.RingtoneManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -31,7 +32,6 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
 
     override fun doWork(): Result {
         return try {
-            // TODO: get task
             val task =
                 Gson().fromJson(
                     inputData.getString(WorkerConstants.CollectiveWorker.taskKey),
@@ -90,7 +90,7 @@ fun showNotification(task: Task, context: Context, taskID: String) {
                 .setContentText(task.description)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(task.description))
                 .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setOngoing(true)
                 .addAction(R.drawable.task_24, "dismiss", dismissPendingIntent)
                 .addAction(

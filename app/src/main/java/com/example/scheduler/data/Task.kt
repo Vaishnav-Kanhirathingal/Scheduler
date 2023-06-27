@@ -205,7 +205,6 @@ fun main() {
             repeatGapDuration = random.nextInt(30),
             postponeDuration = 2
         ).let {
-            // TODO:
             println(
                 "timeAfterDelay = " +
                         it.timeAfterDelayMillis().toString() +
