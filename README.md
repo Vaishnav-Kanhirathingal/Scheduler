@@ -27,8 +27,8 @@ This section contains the documentation for the Scheduler app.
 The app uses google sign in to create an account. Press the button to open sign up prompt. Select
 the account of choice and continue. All tasks are stored in the cloud.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=334>
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=334>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/62bce314-7487-4fc1-967e-5be56a7f7f1e" width=400>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/1c554c5d-246c-4706-9a18-8b018bc20aac" width=400>
 
 ### Empty main screen (main screen)
 
