@@ -51,8 +51,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // TODO: remove replace work
-//        startWorker(replaceWork = true)
-        startTestWorker()
+        startWorker()
+//        startTestWorker()
         auth = FirebaseAuth.getInstance()
         setContent {
             SchedulerTheme {
@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startWorker(replaceWork: Boolean = false) {
+    private fun startWorker() {
         createNotificationChannel()
 
         val cal: Calendar = Calendar.getInstance()
@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
             .getInstance(this)
             .enqueueUniquePeriodicWork(
                 "reminder_initiator",
-                if (replaceWork) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE else ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.KEEP,
                 periodicWorkRequest
             )
 
