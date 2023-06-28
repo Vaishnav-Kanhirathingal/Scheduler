@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.scheduler.firebase.AccountFunctions
 import com.example.scheduler.firebase.DatabaseFunctions
@@ -86,6 +87,7 @@ fun SettingsScreen(navigateUp: () -> Unit, navigateToSignUpScreen: () -> Unit) {
                     if (showLoading.value) {
                         ShowLoadingPrompt(text = loadingText.value)
                     }
+                    val context = LocalContext.current
                     ConfirmationCard(
                         modifier = Modifier.fillMaxWidth(),
                         title = "Delete Account?",
@@ -95,10 +97,10 @@ fun SettingsScreen(navigateUp: () -> Unit, navigateToSignUpScreen: () -> Unit) {
                         onClick = {
                             loadingText.value = deleteAccStr
                             showLoading.value = true
-                            // TODO: verify by login
                             AccountFunctions.deleteUserAccount(
                                 notifyUser = showSnackBar,
                                 onSuccess = navigateToSignUpScreen,
+                                context = context,
                                 dismissLoadingPrompt = { showLoading.value = false }
                             )
                         }

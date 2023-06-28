@@ -1,5 +1,6 @@
 package com.example.scheduler.firebase
 
+import android.content.Context
 import android.util.Log
 import androidx.activity.result.ActivityResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -61,43 +62,49 @@ object AccountFunctions {
      * @param notifyUser a lambda which takes a string to be displayed to the user
      * @param onSuccess runs when the process is completed
      * @param dismissLoadingPrompt a lambda which dismisses the active loading animation prompt
+     * @param context a [Context] object
      */
     fun deleteUserAccount(
         notifyUser: (String) -> Unit,
         onSuccess: () -> Unit,
+        context: Context,
         dismissLoadingPrompt: () -> Unit
     ) {
         Log.d(TAG, "started delete user")
-        val failureMessage = "failed to delete account"
         val user = FirebaseAuth.getInstance().currentUser!!
         val userDocRef = FirebaseFirestore
             .getInstance()
             .collection(FirebaseKeys.parentCollectionName)
             .document(user.email!!)
-        val listCollection = userDocRef.collection(FirebaseKeys.listOfTaskName)
         val standardOnFailure = { e: Exception ->
             dismissLoadingPrompt()
             e.printStackTrace()
-            notifyUser(failureMessage)
+            notifyUser("failed to delete account")
         }
-
         val deleteUserDocAndAcc = {
             userDocRef.delete().addOnSuccessListener {
                 Log.d(TAG, "deleted user document")
-                // TODO: fix: requires recent login
-                user.delete().addOnSuccessListener {
-                    Log.d(TAG, "deleted account")
-                    dismissLoadingPrompt()
-                    try {
-                        onSuccess()
-                    } catch (e: Exception) {
-                        notifyUser("Failed to navigate to sign up screen")
-                        e.printStackTrace()
-                    }
+                val cred = GoogleAuthProvider
+                    .getCredential(
+                        GoogleSignIn.getLastSignedInAccount(context)?.idToken,
+                        null
+                    )
+                user.reauthenticate(cred).addOnSuccessListener {
+                    Log.d(TAG, "re-authenticated")
+                    user.delete().addOnSuccessListener {
+                        Log.d(TAG, "deleted account")
+                        dismissLoadingPrompt()
+                        try {
+                            onSuccess()
+                        } catch (e: Exception) {
+                            notifyUser("Failed to navigate to sign up screen")
+                            e.printStackTrace()
+                        }
+                    }.addOnFailureListener(standardOnFailure)
                 }.addOnFailureListener(standardOnFailure)
             }.addOnFailureListener(standardOnFailure)
         }
-
+        val listCollection = userDocRef.collection(FirebaseKeys.listOfTaskName)
         listCollection.get().addOnSuccessListener {
             var counter = 0
             val size = it.documents.size
