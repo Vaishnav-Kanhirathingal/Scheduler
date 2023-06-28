@@ -113,6 +113,14 @@ Opens the release section of the Git-Hub repository.
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/bedf1e0d-48e5-406d-83d7-fcd633a36a90" width=360>
 
+### Exit (in side menu)
+
+Exit button exits the app without closing background tasks
+
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/8d329b99-0415-4c31-81d1-46df9c337f82" width=360>
+
 ### Reminder notifications and how it works (in notifications)
 
-------------------------------------------------------------------------------------------------todo
+The app creates a notification at the start of every day or at the creation of a task which is scheduled for the day itself. Each task notification has  two buttons. One being the dismiss button and the other being a postpone button. The postpone button postpones the task by a few days. How many days a task gets postponed depends on the postpone value you enter at the creation of the task.
+
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/5c15cf3a-a3e1-4f8c-9d95-d9a811e47e77" width=360>
