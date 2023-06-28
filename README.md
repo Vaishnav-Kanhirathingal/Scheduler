@@ -124,3 +124,6 @@ Exit button exits the app without closing background tasks
 The app creates a notification at the start of every day or at the creation of a task which is scheduled for the day itself. Each task notification has  two buttons. One being the dismiss button and the other being a postpone button. The postpone button postpones the task by a few days. How many days a task gets postponed depends on the postpone value you enter at the creation of the task.
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/5c15cf3a-a3e1-4f8c-9d95-d9a811e47e77" width=360>
+
+![Screenshot_20230628_142438](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/2b81e4a0-d21c-4d84-8698-04b4e01f9a90)
+![Screenshot_20230628_142117](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/8a0b3ec7-24bd-4308-9064-a158bb98301f)
