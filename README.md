@@ -4,6 +4,22 @@ Scheduler is an application which helps in scheduling tasks for you so that you 
 remember them. Scheduler creates un-dismissible notification which you can remove by pressing a
 dismiss button. The app also allows you to postpone the task by up to 5 days
 
+## Reminder notifications and how it works (in notifications)
+
+The app creates a notification at the start of every day or at the creation of a task which is
+scheduled for the day itself. Each task notification has two buttons. One being the dismiss button
+and the other being a postpone button. The postpone button postpones the task by a few days. How
+many days a task gets postponed depends on the postpone value you enter at the creation of the task.
+
+1. The first GIF is a representation of how a task gets added on creation if it is scheduled for the
+   same day.
+2. The second image displays how two tasks can have different postpone durations.
+3. The third image shows a task with long description
+
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/5c15cf3a-a3e1-4f8c-9d95-d9a811e47e77" width=273>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/2b81e4a0-d21c-4d84-8698-04b4e01f9a90" width=273>
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/8a0b3ec7-24bd-4308-9064-a158bb98301f" width=273>
+
 ## Why
 
 An issue with keeping reminders is you have to go into the apps or maybe a notepad to check what
@@ -118,12 +134,3 @@ Opens the release section of the Git-Hub repository.
 Exit button exits the app without closing background tasks
 
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/8d329b99-0415-4c31-81d1-46df9c337f82" width=360>
-
-### Reminder notifications and how it works (in notifications)
-
-The app creates a notification at the start of every day or at the creation of a task which is scheduled for the day itself. Each task notification has  two buttons. One being the dismiss button and the other being a postpone button. The postpone button postpones the task by a few days. How many days a task gets postponed depends on the postpone value you enter at the creation of the task.
-
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/5c15cf3a-a3e1-4f8c-9d95-d9a811e47e77" width=360>
-
-![Screenshot_20230628_142438](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/2b81e4a0-d21c-4d84-8698-04b4e01f9a90)
-![Screenshot_20230628_142117](https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/8a0b3ec7-24bd-4308-9064-a158bb98301f)
