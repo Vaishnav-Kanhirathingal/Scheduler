@@ -111,10 +111,7 @@ Settings contain 3 options.
 2. Log out - logs out the user.
 3. Clear all tasks - Deletes all tasks from the database.
 
-<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/4232f063-f5c3-4ec0-a289-5224c02c9b8f" width=273>
-
----------------------------------------------------------------------------------todo delete account
-
+<img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/f6216040-1cc4-4424-aa33-181e23f41711" width=273>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/a7048116-0d90-4397-a74e-cb55dd3f7ee5" width=273>
 <img src = "https://github.com/Vaishnav-Kanhirathingal/Scheduler/assets/94210466/9e1fb16d-51c7-4202-b9d1-98bb2339a771" width=273>
 
