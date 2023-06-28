@@ -50,9 +50,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // TODO: remove replace work
         startWorker()
-//        startTestWorker()
         auth = FirebaseAuth.getInstance()
         setContent {
             SchedulerTheme {
@@ -78,26 +76,21 @@ class MainActivity : ComponentActivity() {
 
     private fun startWorker() {
         createNotificationChannel()
-
         val cal: Calendar = Calendar.getInstance()
         cal.add(Calendar.DAY_OF_YEAR, 1)
         cal.set(Calendar.HOUR_OF_DAY, 0)
         cal.set(Calendar.MINUTE, 0)
         cal.set(Calendar.SECOND, 0)
-
         val initialDelay: Long = cal.timeInMillis - System.currentTimeMillis()
-
         val constraints = Constraints
             .Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
-
         val periodicWorkRequest = PeriodicWorkRequest
             .Builder(CollectiveReminderWorker::class.java, 1L, TimeUnit.DAYS)
             .setConstraints(constraints)
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .build()
-
         WorkManager
             .getInstance(this)
             .enqueueUniquePeriodicWork(
@@ -105,10 +98,10 @@ class MainActivity : ComponentActivity() {
                 ExistingPeriodicWorkPolicy.KEEP,
                 periodicWorkRequest
             )
-
         Log.d(TAG, "Assigned work")
     }
 
+    @Deprecated(message = "was used for testing workers. No longer required")
     private fun startTestWorker() {
         createNotificationChannel()
         val constraints = Constraints
