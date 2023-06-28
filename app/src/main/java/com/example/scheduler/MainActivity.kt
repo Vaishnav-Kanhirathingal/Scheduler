@@ -205,7 +205,17 @@ fun SchedulerNavHost(
                 content = {
                     SettingsScreen(
                         navigateUp = { navController.navigateUp() },
-                        navigateToSignUpScreen = { navController.navigate(Destinations.SignUpScreen) }
+                        navigateToSignUpScreen = {
+                            navController.navigate(
+                                route = Destinations.SignUpScreen,
+                                builder = {
+                                    popUpTo(
+                                        route = Destinations.MainScreen,
+                                        popUpToBuilder = { inclusive = true }
+                                    )
+                                }
+                            )
+                        }
                     )
                 }
             )
@@ -215,8 +225,15 @@ fun SchedulerNavHost(
                     SignUpScreen(
                         googleSignInButton = googleSignInButton,
                         navigateToMainScreen = {
-                            // TODO: make this on top
-                            navController.navigate(Destinations.MainScreen)
+                            navController.navigate(
+                                route = Destinations.MainScreen,
+                                builder = {
+                                    popUpTo(
+                                        route = Destinations.SignUpScreen,
+                                        popUpToBuilder = { inclusive = true }
+                                    )
+                                }
+                            )
                         }
                     )
                 }
