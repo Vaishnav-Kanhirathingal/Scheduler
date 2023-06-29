@@ -30,6 +30,14 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
 
     companion object {
         private val TAG = this::class.java.simpleName
+
+        /** This function is used to create a worker of class [TaskReminderWorker] and enqueue it.
+         * @param task this is added to the data for the work request
+         * @param workManager takes a [WorkManager] instance to schedule work
+         * @param documentId this is added to the data for the work request
+         * @param setPostponeDelay if true, it would set an initial delay to the worker depending on
+         * the value of [Task.postponeDuration] for the parameter [task]
+         */
         fun scheduleWork(
             task: Task,
             workManager: WorkManager,
@@ -62,6 +70,11 @@ class TaskReminderWorker(private val context: Context, workerParameters: WorkerP
             }
         }
 
+        /** Creates a big text notification and displays as an ongoing notification
+         * @param task uses it to create the notification data.
+         * @param context used to create intents for broadcasting,etc.
+         * @param taskId used as a TAG to identify a notification uniquely
+         */
         fun showNotification(task: Task, context: Context, taskId: String) {
             val basicBroadcastIntent =
                 Intent(context, SchedulerBroadcastReceiver::class.java).apply {
