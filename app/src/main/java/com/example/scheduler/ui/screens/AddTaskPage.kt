@@ -257,7 +257,8 @@ fun AddTaskScaffold(navigateUp: () -> Unit) {
                                 },
                                 onFailureListener = { e ->
                                     e.printStackTrace()
-                                    val issue = e.message ?: "error while adding task to remote database"
+                                    val issue =
+                                        e.message ?: "error while adding task to remote database"
                                     savingInProgress.value = false
                                     CoroutineScope(Dispatchers.IO).launch {
                                         snackBarHostState.showSnackbar(

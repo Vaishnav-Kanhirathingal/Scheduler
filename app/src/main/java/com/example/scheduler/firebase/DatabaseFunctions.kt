@@ -6,6 +6,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
+/** contains all functions associated with data stored in firebase
+ */
 object DatabaseFunctions {
     private val TAG = this::class.java.simpleName
 
